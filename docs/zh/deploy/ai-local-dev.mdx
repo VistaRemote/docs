@@ -1,0 +1,59 @@
+# 本地 AI 开发环境（私有化栈�?
+
+用于调试 **行为分析 + 自托�?LLM + 向量�?+ Python ML** 全链路，**无需公网 API Key**�?
+
+## 前置
+
+- Docker Desktop
+- Node.js 24+、pnpm 9+
+- Python 3.11+（仅当在宿主机直接跑 `python-worker` 时）
+
+## 启动基础设施
+
+```bash
+cd deploy/compose
+docker compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml --profile ai up -d
+```
+
+| 服务 | 地址 |
+| :--- | :--- |
+| MySQL | `localhost:3306` |
+| Redis | `localhost:6379` |
+| Ollama（LLM�?| `http://localhost:11434` |
+| Qdrant（向量） | `http://localhost:6333` |
+| python-worker | `http://localhost:4100` |
+| MinIO（可选） | `http://localhost:9000` |
+
+拉取模型�?
+
+```bash
+docker exec vistaremote-ollama ollama pull llama3.2
+# 可选嵌入模型（RAG�?
+docker exec vistaremote-ollama ollama pull nomic-embed-text
+```
+
+## 启动应用
+
+```bash
+cd shared && pnpm install && pnpm build
+cd server && cp .env.example .env && pnpm install && pnpm start:dev
+cd ai && cp .env.example .env && pnpm install && pnpm start:dev
+```
+
+`ai/.env` 要点�?
+
+```ini
+REDIS_URL=redis://localhost:6379
+AI_BASE_URL=http://localhost:11434/v1
+AI_MODEL=llama3.2
+VECTOR_DB_URL=http://localhost:6333
+PYTHON_ML_URL=http://localhost:4100
+```
+
+## 架构说明
+
+- [AI 平台](/architecture/ai-platform) �?私有化卖点、Node vs Python
+- [AI 行为洞察](/architecture/ai-behavior) �?端侧监控与降�?
+
+Meta-Repo：`spec/ai-platform-spec.md`

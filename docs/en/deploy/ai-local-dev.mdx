@@ -1,0 +1,39 @@
+# Local AI dev (private stack)
+
+Debug **behavior analytics + self-hosted LLM + vector DB + Python ML** without public API keys.
+
+## Start stack
+
+```bash
+cd deploy/compose
+docker compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml --profile ai up -d
+```
+
+| Service | URL |
+| :--- | :--- |
+| Ollama (LLM) | `http://localhost:11434` |
+| Qdrant | `http://localhost:6333` |
+| python-worker | `http://localhost:4100` |
+
+```bash
+docker exec vistaremote-ollama ollama pull llama3.2
+```
+
+## Run apps
+
+```bash
+cd shared && pnpm install && pnpm build
+cd server && pnpm install && pnpm start:dev
+cd ai && cp .env.example .env && pnpm install && pnpm start:dev
+```
+
+`ai/.env`:
+
+```ini
+AI_BASE_URL=http://localhost:11434/v1
+VECTOR_DB_URL=http://localhost:6333
+PYTHON_ML_URL=http://localhost:4100
+```
+
+See [AI platform](/en/architecture/ai-platform) and [AI behavior](/en/architecture/ai-behavior).

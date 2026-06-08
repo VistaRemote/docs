@@ -1,0 +1,30 @@
+# 管理台入门
+
+**Web Admin**（`web/apps/admin`）面向平台管理员与企业 IT，用于管理 **全部注册用户** 与系统资源。
+
+## 访问
+
+- 独立域名部署，例如 `https://admin.example.com`
+- 使用管理员账号登录（`super_admin` / `admin` / `viewer`）
+
+## 核心菜单
+
+| 模块 | 能力 |
+| :--- | :--- |
+| **用户** | 列表、创建、禁用、修改套餐（free / pro / enterprise） |
+| **设备** | 被控机在线状态、吊销 Token |
+| **会话** | 活跃 Room、强制断开 |
+| **录制** | Pro+ 录制列表与回放（Enterprise 含策略触发） |
+| **安全** | Enterprise 外发/删文件/异常事件 |
+| **AI 报告** | 会话摘要、效率周报 |
+| **组织** | Enterprise 策略：关键词、域名黑名单等 |
+
+## 套餐说明
+
+| 套餐 | 录制 / AI |
+| :--- | :--- |
+| free | 仅远程 + 基础审计 |
+| pro | + 录制回放、AI 摘要 |
+| enterprise | + 策略录制、多屏、安全与效率洞察 |
+
+详见 [产品定位](/architecture/positioning) 与 [白皮书](/whitepaper/)。

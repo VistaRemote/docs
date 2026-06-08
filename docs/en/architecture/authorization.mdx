@@ -1,0 +1,57 @@
+# Authentication and authorization
+
+VistaRemote uses a **hybrid** model—not pure RBAC and not pure ABAC:
+
+```text
+Authenticate (JWT) → Plan entitlements → RBAC (job role) → ABAC (resource) → allow/deny + audit
+```
+
+Normative spec: `spec/authorization-spec.md` in the Meta-Repo.
+
+## RBAC or ABAC?
+
+| Model | Standalone? | Role here |
+| :--- | :--- | :--- |
+| **RBAC** | No (one layer) | Stable job roles: platform `super_admin` / `admin` / `viewer`; org `org_owner` / `it_support` / `member`, etc. |
+| **ABAC** | No (one layer) | Resource scope: `ownerId`, `orgId`, `allowOrgSupport`, room membership |
+| **Plan** | Third layer | `free` / `pro` / `enterprise` for commercial features (recording, AI, enterprise security) |
+
+## Two “admin” concepts
+
+| Account | App | Typical user |
+| :--- | :--- | :--- |
+| **Platform admin** | `web/apps/admin` | SaaS operators |
+| **Org user (client)** | `web/apps/client`, mobile | Employees, executives, IT support |
+
+IT support uses the **client** app with `orgRole=it_support`. Platform operators use **admin** JWT for global user/plan management.
+
+## Persona mapping
+
+| Business label | Technical setup |
+| :--- | :--- |
+| Employee | User `member` |
+| Executive / owner | User `org_owner` + Enterprise plan |
+| IT support | User `it_support` + device `allowOrgSupport` |
+| Platform admin | Admin `admin` / `super_admin` |
+| Compliance read-only | Admin `viewer` or User `security_auditor` |
+
+## JWT and realtime channels
+
+| Channel | Credential |
+| :--- | :--- |
+| Client REST | Controller JWT |
+| Admin REST | Admin JWT |
+| WSS `/signaling` | Short-lived **Signaling ticket** |
+| SSE `/api/v1/events/stream` | Controller or Admin JWT; `userId` must match `sub` |
+| Agent | Device token (not for controller signaling) |
+
+Policy helpers live in `shared/src/auth/`; WSS/SSE handshake enforcement is **P3** (FR-MSG-10/11).
+
+## Code layout
+
+```text
+shared/src/auth/     # roles, permissions, JWT schemas, evaluatePolicy
+server/src/auth/     # PolicyService (Nest)
+```
+
+After login, the client obtains a **signaling ticket** before opening `SignalingClient`.

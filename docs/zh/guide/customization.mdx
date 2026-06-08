@@ -1,0 +1,40 @@
+# 二开与定制指南
+
+VistaRemote 面向 **私有化、二开、低成本迭代** 设计，而非千万级并发直播。
+
+## 为什么好改、改得快？
+
+| 因素 | 说明 |
+| :--- | :--- |
+| **全栈 TypeScript** | `shared` 契约贯通 server / web / desktop / mobile / ai；国内 TS 人才储备大 |
+| **Python 仅重 ML** | `ai/python-worker` 做 OCR/VL 等重算，主业务仍是 TS |
+| **Spec 驱动** | 先改 `spec/*.md` 与 FR，再改代码，AI 协作者可跟 Spec 实现 |
+| **Meta-Repo** | 只拉需要的子仓；无 Monorepo 构建黑洞，Rsbuild 冷启动快 |
+| **MySQL + Docker** | 运维熟悉，单机可跑全栈 |
+
+语言层面：**TypeScript 与 Python 语法简单、生态成熟**，小团队可在数周内完成企业定制（SSO、审批流、定制 Admin、行业 OCR 规则等）。
+
+## 推荐二开路径
+
+```text
+1. 读 spec/product-positioning-spec.md + 相关模块 Spec
+2. 改 shared（若动协议）
+3. 改 server API / Admin
+4. 改 web client 或 desktop Agent
+5. 文档站 docs/ 同步用户可见说明
+```
+
+## 性能定制入口
+
+| 需求 | 文档 |
+| :--- | :--- |
+| Desktop 采集/编码/守护 | [Desktop 性能架构](/architecture/desktop-performance) |
+| Web 播放卡顿 | [WebRTC 开发调优](/architecture/webrtc-development) |
+| Mobile 触控延迟 | `spec/mobile-spec.md` FR-MOB-PERF |
+
+## 不适合的场景
+
+- 全球亿级观众同屏直播  
+- 必须用闭源黑盒且拒绝自建  
+
+适合：**企业内网、万级以下会话、要控数据与要改代码** 的客户。

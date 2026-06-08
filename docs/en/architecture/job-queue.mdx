@@ -1,0 +1,64 @@
+# Async jobs: why BullMQ
+
+VistaRemote uses **BullMQ on Redis** for AI audit, recording summaries, behavior reports, and other background work—not RabbitMQ or Kafka. This is an **engineering choice** for a TypeScript/NestJS team at **sub–10M-scale** throughput, not a log-aggregation platform.
+
+Normative spec: [job-queue-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/job-queue-spec.md) · ADR: [0006-bullmq-async-jobs](https://github.com/VistaRemote/vista-remote/blob/main/adr/0006-bullmq-async-jobs.md).
+
+## vs real-time messaging
+
+| Kind | Stack | Purpose |
+| :--- | :--- | :--- |
+| Signaling / notifications | WebSocket, SSE, DataChannel | Low latency |
+| **Background jobs** | **BullMQ + Redis** | Delay, retry, observable state |
+
+See [Messaging & transport](./messaging-transport).
+
+## 1. NestJS / TypeScript ecosystem
+
+BullMQ is the most capable and actively maintained **distributed job queue** in Node.js, with first-class **`@nestjs/bullmq`**:
+
+- **Producers (`server`)**: `@InjectQueue`, `queue.add(...)` with DI
+- **Consumers (`ai`)**: `@Processor` / `@Process`, idiomatic NestJS
+
+RabbitMQ (`amqplib`) and Kafka (`kafkajs`) require substantial custom connection, reconnect, and flow-control code.
+
+## 2. AI audit needs job semantics, not log streams
+
+AI audit differs from log shipping:
+
+- LLM calls often take **hundreds of ms to seconds**
+- **Rate limits** require delayed retry and **exponential backoff**
+- Admins need per-job states: **Waiting, Active, Completed, Failed, Delayed**
+
+BullMQ tracks **per-job lifecycle** in Redis. Kafka is a **log stream** without native single-job delay/backoff. RabbitMQ needs DLX/DLQ-heavy custom patterns.
+
+## 3. Operations: reuse Redis
+
+Redis is already required for sessions, signaling fan-out, and SSE. BullMQ adds **no new broker**. A small Redis instance is enough for high-throughput queues at our scale.
+
+Kafka is operationally heavy (KRaft/ZK, disk I/O) and impractical on **1 vCPU / 2 GB** VMs for this product class.
+
+## 4. Data path is simple and denoised
+
+Agents filter frames and desensitize locally; the cloud receives **structured behavior events**, not raw frame floods. Routing is linear:
+
+```text
+Agent → server enqueue → ai worker
+```
+
+No RabbitMQ-style exchange topology.
+
+## 5. Summary
+
+| Dimension | BullMQ + Redis | Kafka | RabbitMQ |
+| :--- | :--- | :--- | :--- |
+| NestJS DX | ✅ Official module | ⚠️ Custom | ⚠️ Custom |
+| Per-job delay/backoff | ✅ Built-in | ❌ DIY | ⚠️ Partial |
+| Job state | ✅ | ❌ | ⚠️ |
+| Extra infra | None | Cluster | Broker |
+| Fit for VistaRemote | ✅ AI jobs | Log pipes | Complex routing |
+
+## Related
+
+- [AI platform](./ai-platform)
+- [AI behavior](./ai-behavior)

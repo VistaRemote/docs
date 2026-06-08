@@ -1,0 +1,51 @@
+# 功能开发指南
+
+示例：为 Web Client 增加「会话内画质切换」（假设 Spec 已写 `FR-WRTC-20`）。
+
+## Step 0 — 门禁
+
+1. 打开 `spec/implementation-status.md`，确认 WebRTC / client 为 🟡 或 ✅。
+2. 阅读 `spec/webrtc-architecture-spec.md` 与 `spec/web-client-spec.md`。
+
+## Step 1 — 更新 Spec
+
+在 `webrtc-architecture-spec.md` 增加：
+
+- `FR-WRTC-20` 描述、默认值、与 `PlaybackQualityPreset` 的映射
+- 验收：切换后 3s 内 stats 反映新 jitter 目标
+
+## Step 2 — shared
+
+```text
+shared/src/webrtc/codec-preference.ts   # 若需新预设
+shared/src/...                          # 信令 payload（若需）
+pnpm build && pnpm test
+```
+
+## Step 3 — server（若需）
+
+信令广播、权限：改 `server/src/signaling/`；套餐限制则查 `EntitlementService`。
+
+## Step 4 — web client
+
+`web/apps/client`：UI + 调用已有 `RtcTuning` 工具。
+
+## Step 5 — 验收
+
+| 检查 | 方法 |
+| :--- | :--- |
+| 单元 | shared / server 相关测试 |
+| 手动 | 本地 `dev.sh` → 两浏览器或 client + desktop |
+| 权益 | 试用/付费边界符合 `commercial-tier-spec` |
+
+## Step 6 — 收尾
+
+1. `implementation-status.md` 更新该行
+2. 若用户可见：补充 [远程控制（用户）](/user/remote-control) 相关段落
+3. PR 使用模板，列出 FR 与 touched repos
+
+## 反模式
+
+- 在 `web` 内复制 DTO 而不改 `shared`
+- 未写 FR 直接上大功能
+- 跨库 PR 不同分支名

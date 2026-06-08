@@ -1,0 +1,287 @@
+# VistaRemote 项目白皮书
+
+| | |
+| :--- | :--- |
+| **项目名称** | VistaRemote |
+| **组织** | VibeCode |
+| **文档版本** | 0.3.0 |
+| **发布日期** | 2026-05-24 |
+| **状态** | 公开草案（Draft） |
+
+---
+
+## 摘要
+
+VistaRemote 是 VibeCode 开源生态中的 **跨平台远程桌面控制系统**。系统以 **WebRTC** 为核心传输技术：在 **一对一** 场景优先采用 **P2P 直连** 降低延迟与服务器带宽；在 **一对多观摩** 场景自动切换 **SFU** 拓扑，由被控端单路上行、观众多路下行。控制指令经 **SCTP DataChannel** 传输，与音视频分离，保证交互响应。
+
+工程上采用 **Flat Meta-Repo + Multi-Repo**：在保留 **TypeScript 全栈**一致性的同时，隔离 Electron 与 React Native 的构建冲突。关系型数据库统一为 **MySQL 8**（面向国内开发者与运维的主流选择）。开发流程遵循 **Spec-Driven Development（SDD）**，支撑 **Vibe Code** 高效迭代。
+
+**相对传统监控**：实时 **WebRTC** 远程而非仅事后录像；**开源可自建**，AI 分析可留在企业内网。详见 [产品定位与核心优势](/architecture/positioning)。
+
+---
+
+## 1. 行业背景与问题陈述
+
+### 1.1 远程桌面的持续需求
+
+远程桌面是企业 IT 运维、客服支持、远程办公与协作培训的基础能力。传统方案普遍存在：
+
+- **高延迟**：基于 TCP 或非实时优化的专有协议，跨网、跨防火墙体验差。
+- **厂商锁定**：商业产品依赖中心化云中继，带来成本与数据主权问题。
+- **技术栈陈旧**：部分开源方案以 C/C++ 单体为主，Web/移动端扩展成本高。
+- **隐私顾虑**：画面与控制数据经第三方云中转，难以满足内网合规。
+
+### 1.2 技术拐点
+
+WebRTC 已在浏览器与原生端成熟：标准 codecs、DTLS-SRTP、ICE/NAT 穿透与 DataChannel 使 **「浏览器即可控桌面」** 成为现实。VistaRemote 选择 **以 WebRTC 为一等公民**，用 TypeScript 统一信令、客户端与类型契约，降低全栈团队参与门槛。
+
+---
+
+## 2. 愿景与定位
+
+### 2.1 愿景
+
+> **让高性能、可自托管、可审计的远程桌面能力，成为现代 Web 技术栈的开源标配。**
+
+### 2.2 产品定位
+
+| 维度 | 定位 |
+| :--- | :--- |
+| **目标用户** | 开发者、中小企业 IT、技术支持团队、VibeCode 社区 |
+| **部署模式** | 私有化 / 自建为主，可选公有云托管（路线图） |
+| **差异化** | WebRTC 实时远程 + 可私有化 AI + 开源；TS 全栈降低二开与招聘成本；MySQL 友好部署 |
+| **非目标** | 替代重型 VDI、游戏级帧同步、无授权监控 |
+
+### 2.2 核心优势（对外口径）
+
+1. **WebRTC 架构**：相较传统基于专有协议或纯录屏的「监控」，提供低延迟 **实时远程控制** 与观摩（P2P / SFU）。  
+2. **AI 可自控**：独立 `ai` 服务；企业可自建 **Ollama**，录制与洞察数据不出域。  
+3. **开源 vs 商业监控**：代码可审计、可二开；相对闭源 DLP/桌面监控，**数据主权**在企业。  
+4. **TypeScript 全栈**：国内开发者生态成熟，**招人、定制、部署**（Docker + MySQL）成本低。
+
+展开论述见 [产品定位](/architecture/positioning)。
+
+### 2.3 数据存储：MySQL
+
+全项目采用 **MySQL 8.0+（InnoDB, utf8mb4）** 作为唯一关系型数据库，通过 TypeORM 访问。原因包括：国内团队熟悉度高、云 RDS 默认选项、与企业现有 DBA 体系兼容。不使用 PostgreSQL 作为目标架构。
+
+### 2.4 Vibe Code 与 Spec-Driven
+
+**Vibe Code** 强调人类意图与 AI 协作者在同一套结构化上下文下工作。VistaRemote 将 **Spec 文档**（`spec/system-overview.md` 与各模块 Spec）作为：
+
+- 产品与技术对齐的 **合同**；
+- AI 实现任务的 **输入附件**；
+- Code Review 的 **合规清单**。
+
+变更顺序强制 **shared 契约优先**，避免多端类型漂移（见 `spec/git-collaboration-spec.md`）。
+
+---
+
+## 3. 典型场景
+
+| 场景 | 参与方 | 拓扑 | 价值 |
+| :--- | :--- | :--- | :--- |
+| **远程技术支持** | 工程师（Web）+ 客户（Desktop Agent） | P2P | 低延迟看图操作 |
+| **移动巡检** | 管理员（App）+ 机房 PC（Agent） | P2P + TURN | 随身控桌面 |
+| **培训观摩** | 讲师（Agent）+ 多名学员（Web/App） | SFU | 单路上行、多路下行 |
+| **企业内网** | 全部组件自建 | P2P 优先 | 媒体不出公网（可仅 TURN 兜底） |
+
+---
+
+## 4. 系统架构概览
+
+### 4.1 逻辑组件
+
+```text
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│  Web 主控     │  │  Mobile 主控  │  │ Desktop 主控  │
+└──────┬───────┘  └──────┬───────┘  └──────┬───────┘
+       │                 │                 │
+       └────────────────┼─────────────────┘
+                        │ WSS 信令
+                 ┌──────▼──────┐
+                 │ NestJS      │
+                 │ Server      │
+                 └──────┬──────┘
+                        │
+       ┌────────────────┼────────────────┐
+       │                │                │
+┌──────▼──────┐  ┌──────▼──────┐  ┌─────▼─────┐
+│ TURN/STUN   │  │ SFU (1:N)   │  │ shared    │
+│ (coturn)    │  │ 可选        │  │ 类型契约   │
+└─────────────┘  └─────────────┘  └───────────┘
+                        │
+                 ┌──────▼──────┐
+                 │ Desktop     │
+                 │ Agent 被控   │
+                 └─────────────┘
+```
+
+### 4.2 媒体与控制路径
+
+| 路径 | 技术 | 说明 |
+| :--- | :--- | :--- |
+| **视频/音频** | RTP over DTLS-SRTP | 屏幕内容编码传输 |
+| **控制** | SCTP DataChannel | 键鼠/触控，归一化坐标 |
+| **信令** | WebSocket + JSON | SDP/ICE、房间与模式切换 |
+
+### 4.3 拓扑策略（核心设计决策）
+
+| 连接数 | 策略 | 原因 |
+| :--- | :--- | :--- |
+| 1 主控 : 1 被控 | **P2P** | 最低延迟、无 SFU 带宽成本 |
+| 1 被控 : N 主控 | **SFU** | 避免被控 N 路上行压垮 CPU/带宽 |
+
+Server **不转发媒体**，仅负责信令、鉴权、ICE 配置与 SFU 资源调度。
+
+### 4.4 WebRTC 核心卖点（对外）
+
+1. **真·实时远程** — 默认 **P2P + TURN** 穿透，操作延迟低于传统 TCP 录屏监控；键鼠走 **DataChannel**，与视频分离。  
+2. **智能拓扑** — 多人观摩或 TURN 压力过大时自动 **mediasoup SFU** 单路上行，不把带宽全堆在 coturn；**不引入 SRS**，运维与 TS 栈一致。  
+3. **流畅观看** — 主控端 **WebCodecs 硬解** + **Web Worker** 解码，抖动缓冲（流畅/清晰档位），减轻浏览器主线程卡顿。  
+4. **协议清晰** — **WebSocket 信令**、**SSE 业务通知**、**HTTPS 遥测**，各司其职，易审计、易扩展。  
+5. **可私有化** — 信令、TURN、SFU、录制、AI 均可部署在企业内网，媒体与元数据不出域。
+
+技术细节：[WebRTC 拓扑](/architecture/webrtc-topology) · [开发与调优](/architecture/webrtc-development) · [消息通道](/architecture/messaging-transport)。
+
+### 4.5 Meta-Repo 多仓架构
+
+子项目独立 Git 仓库，物理平铺于 Meta-Repo 根目录，由 `init.sh` 拉取。原因包括：Electron `node-gyp` 与 RN Metro 的依赖隔离、Rsbuild/Rspress 与 NestJS 构建解耦。详见 [架构总览](/architecture/overview)。
+
+**仓库一览：**
+
+| 仓库 | 角色 |
+| :--- | :--- |
+| `shared` | 类型与协议 SSOT |
+| `server` | NestJS 信令与服务端 API |
+| `desktop` | Electron 被控 Agent（+ 可选桌面主控） |
+| `web` | 浏览器主控 |
+| `mobile` | React Native 主控 |
+| `docs` | Rspress 文档站 |
+| `deploy` | Docker/K8s 部署模板 |
+
+---
+
+## 5. 安全与隐私
+
+| 原则 | 实现方向 |
+| :--- | :--- |
+| **最小权限** | 被控端显式授权；会话结束即停止采集与注入 |
+| **传输安全** | 信令 WSS；媒体 DTLS-SRTP |
+| **可自托管** | 信令、TURN、SFU 均可部署于客户域 |
+| **可审计** | 连接/断开/身份日志（Server） |
+| **密钥管理** | 环境变量与短期 TURN 凭证，禁止客户端硬编码 |
+
+企业版路线图可考虑端到端额外加密层；MVP 依赖 WebRTC 标准安全模型。
+
+---
+
+## 6. 技术栈总表
+
+| 层级 | 选型 |
+| :--- | :--- |
+| 契约 | TypeScript + Zod（`shared`） |
+| 服务端 | **NestJS + TypeORM + MySQL 8** |
+| AI 服务 | **独立 `ai` 仓库**（Node 主栈 + LangChain；自托管 Ollama + Qdrant；Python 微服务仅重 ML） |
+| 对象存储 | MinIO / S3（会话录制） |
+| 套餐 | **free** · **pro**（录制+AI摘要）· **enterprise**（安全+效率洞察） |
+| 前端构建 | **Rsbuild / Rspack**（大前端统一；RN 使用 Metro） |
+| 前端 UI | **Ant Design 5**（移动：antd-mobile） |
+| 前端样式 | **Sass**（CSS Modules） |
+| Web | **双应用**：用户端 Client + 管理端 Admin |
+| 桌面 | Electron + Rsbuild 渲染进程 |
+| 移动 | React Native + react-native-webrtc |
+| 文档 | Rspress + MDX |
+| 实时 | WebRTC（P2P / SFU） |
+| 穿透 | coturn 或兼容 TURN |
+
+---
+
+## 7. 套餐与 AI 能力（摘要）
+
+| 套餐 | 远程控制 | 录制/回放 | AI |
+| :--- | :---: | :---: | :--- |
+| Free | ✓ | — | — |
+| Pro | ✓ | ✓ | 会话摘要 |
+| Enterprise | ✓ | ✓ + 策略触发 | 异常检测、效率周报、安全规则 |
+
+AI 推理集中在 **`ai` 子项目**（Node/TS），避免拖累信令；**默认私有化**：自托管 **Ollama/vLLM + Qdrant**，重 ML 由 **`python-worker`** 承担，**不默认** 使用 OpenAI 等公网 API。路径：**端侧监控 → 行为入库 → LLM/RAG 报告 → 流程优化与 AI 替代（路线图）**。详见 `spec/ai-platform-spec.md`。
+
+---
+
+## 8. 路线图
+
+| 阶段 | 时间（示意） | 交付 | 成功标准 |
+| :--- | :--- | :--- | :--- |
+| **M0 契约** | T0 | `shared` 类型与 Spec 基线 | 各端可引用 `@vistaremote/shared` |
+| **M1 最小闭环** | T0+8w | Agent + Web + Server P2P | 局域网 1:1 可控 |
+| **M2 穿透与移动** | T0+12w | TURN + RN 主控 | 跨 NAT、手机控桌面 |
+| **M3 观摩** | T0+16w | SFU 一对多 | 3+ 观众稳定观看 |
+| **M4 Pro** | T0+18w | 录制/回放 + AI 摘要 | Pro 套餐 |
+| **M5 Enterprise** | T0+22w | 策略录制、多屏、安全与效率报告 | Enterprise |
+| **M6 部署** | T0+24w | MySQL + MinIO + ai + deploy | 私有化一键 |
+
+（具体排期由核心团队按资源调整。）
+
+---
+
+## 9. 开源与社区
+
+VistaRemote 隶属 **VibeCode**，面向全球开发者：
+
+- **许可证**：根目录 **VistaRemote Open Source License** — **个人非盈利免费**；**任何商业使用须付费商业许可**。微调工具链 **闭源** 独立交付（`spec/ai-finetune-spec.md`）。
+- **试用**：默认 14 天可体验 **SFU** 与 **AI 降云**；试用结束后须 **Pro / Enterprise**（见 `spec/commercial-tier-spec.md`）。
+- **贡献**：Meta-Repo `CONTRIBUTING.md` + `spec/git-collaboration-spec.md`。
+- **沟通**：GitHub Issues / Discussions（待建）。
+
+欢迎围绕 **WebRTC 最佳实践、Spec 完善、国际化文档** 提交 PR。
+
+---
+
+## 10. 风险与对策
+
+| 风险 | 对策 |
+| :--- | :--- |
+| NAT 穿透失败 | 强制可配置 TURN；文档化防火墙端口 |
+| 弱网画质差 | Simulcast/SVC 与动态降分辨率（路线图） |
+| 多端类型不一致 | shared SSOT + 跨库提交顺序 |
+| Electron/RN 构建冲突 | Meta-Repo 隔离，禁止 Monorepo hoist |
+| 安全误用 | 授权 UI、审计日志、明确「禁止静默监控」政策 |
+| AI 隐私与合规 | 套餐授权、PII 脱敏、企业可选私有化 LLM（Ollama） |
+| AI 服务拖垮信令 | 独立 `ai` 仓库 + 队列异步 |
+
+---
+
+## 11. 术语表
+
+| 术语 | 含义 |
+| :--- | :--- |
+| **Agent** | 安装于被控机器的 Electron 客户端 |
+| **Controller** | 发起控制的一方（Web/Mobile/Desktop） |
+| **Signaling** | SDP/ICE 交换，不含媒体 |
+| **SFU** | Selective Forwarding Unit，选择性转发 |
+| **Spec** | 实现前冻结的规格说明文档 |
+| **Meta-Repo** | 聚合多子仓库的脚手架仓库 |
+
+---
+
+## 12. 参考文档
+
+- [架构总览](/architecture/overview)
+- [产品定位](/architecture/positioning)
+- [WebRTC 拓扑](/architecture/webrtc-topology)
+- [快速开始](/guide/quick-start)
+- [Git 协作](/engineering/git-workflow)
+
+---
+
+## 13. 文档修订记录
+
+| 版本 | 日期 | 说明 |
+| :--- | :--- | :--- |
+| 0.1.0 | 2026-05-24 | 首版白皮书草案 |
+| 0.2.0 | 2026-05-24 | MySQL、套餐、ai 仓库、企业安全与录制 |
+
+---
+
+*© VibeCode · VistaRemote — 立足中国，面向全球开源社区。*

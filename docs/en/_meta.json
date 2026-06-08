@@ -1,0 +1,37 @@
+[
+  {
+    "type": "dir",
+    "name": "guide",
+    "label": "gettingStarted",
+    "collapsible": true
+  },
+  {
+    "type": "dir",
+    "name": "user",
+    "label": "userGuide",
+    "collapsible": true
+  },
+  {
+    "type": "dir",
+    "name": "architecture",
+    "label": "architecture",
+    "collapsible": true
+  },
+  {
+    "type": "dir",
+    "name": "engineering",
+    "label": "engineering",
+    "collapsible": true
+  },
+  {
+    "type": "dir",
+    "name": "deploy",
+    "label": "deploy",
+    "collapsible": true
+  },
+  {
+    "type": "dir",
+    "name": "whitepaper",
+    "label": "whitepaper"
+  }
+]

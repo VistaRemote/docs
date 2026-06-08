@@ -1,0 +1,31 @@
+# Agent 分发与接入
+
+规范全文：Meta-Repo `spec/agent-distribution-spec.md`。
+
+## 主控三种入口
+
+| 方式 | 说明 |
+| :--- | :--- |
+| **数字码** | 6–8 位，短期有效 |
+| **二维码** | 内含 `linkToken` / 完整 URL |
+| **链接** | `https://<站点>/join/{token}` 或 `vistaremote://join?token=` |
+
+Web 主控：`/pairing`（三 Tab）、`/join/:token`（直达）。
+
+## 三种安装包
+
+| 包 | 场景 | 默认行为 |
+| :--- | :--- | :--- |
+| **Consumer** | 个人安装 | 每次会话需确认 |
+| **Enterprise BYOD** | 员工自带电脑、主动安装 | 注册企业后可按策略自动监控（须同意） |
+| **Enterprise Managed** | 公司电脑 GPO/MDM 预装 | 受策略约束，可隐藏配对 UI |
+
+构建：`node tooling/scripts/build-agent-packages.mjs all`
+
+## API（开发）
+
+- `POST /api/v1/devices/pairing-session` — Agent 创建码/链/QR
+- `POST /api/v1/auth/pairing` — 主控加入
+- `POST /api/v1/devices/register` — 含 `installChannel`
+
+用户向说明：[远程控制](/user/remote-control) · [企业 Agent 安装](/user/agent-installation)。

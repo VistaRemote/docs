@@ -1,0 +1,73 @@
+# 异步任务队列：为何选择 BullMQ
+
+VistaRemote 的 AI 审计、录制摘要、行为报告等后台任务，使用 **BullMQ（基于 Redis）**，而不是 RabbitMQ 或 Kafka。这是面向 **TypeScript 全栈、敏捷交付、百万级规模** 的工程型选型，而非千万级日志管道选型。
+
+规范全文见 Meta-Repo [job-queue-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/job-queue-spec.md)；决策记录见 [ADR-0006](https://github.com/VistaRemote/vista-remote/blob/main/adr/0006-bullmq-async-jobs.md)。
+
+## 与实时消息的区别
+
+| 类型 | 技术 | 用途 |
+| :--- | :--- | :--- |
+| 信令 / 通知 | WebSocket、SSE、DataChannel | 低延迟、实时 |
+| **后台任务** | **BullMQ + Redis** | 可延迟、可重试、可查状态 |
+
+详见 [消息与传输](./messaging-transport)。
+
+## 1. NestJS / TypeScript 生态
+
+BullMQ 在 Node.js 生态中维护活跃，并对 NestJS 提供 **`@nestjs/bullmq`** 官方模块支持：
+
+- **生产者（server）**：`@InjectQueue`、`queue.add(...)`，与业务 Service 同层依赖注入
+- **消费者（ai）**：`@Processor`、`@Process`，写法与 NestJS 控制器一致
+
+RabbitMQ（`amqplib`）与 Kafka（`kafkajs`）虽可用，但需自行处理连接管理、断线重连、流控与 Channel 生命周期，**融合度与开发效率均弱于 BullMQ**。
+
+## 2. AI 审计：要「任务状态」，不是「日志流」
+
+AI 审计与普通日志采集不同：
+
+- 单次大模型推理常需 **数百毫秒～数秒**
+- 易受 **Rate Limit** 影响，需要 **延迟重试、指数退避**
+- 管理台需要看到任务处于 **Waiting / Active / Completed / Failed / Delayed**
+
+BullMQ 基于 Redis，**原生维护单任务生命周期**；Kafka 擅长日志流，**没有**开箱即用的「单任务延迟 + 失败退避」；RabbitMQ 需依赖死信队列与大量定制开发。
+
+典型配置意图：失败后 **延迟 3 秒起** 指数退避重试（具体见 Spec FR-JQ-11）。
+
+## 3. 运维：复用 Redis，不背 Kafka 集群
+
+系统已因以下用途引入 **Redis**：
+
+- 会话与配对
+- WebSocket 信令多实例 Pub/Sub
+- SSE 事件广播
+
+引入 BullMQ **无需新增中间件**；轻量 Redis 即可支撑高性能队列（本项目非千万级 TPS 日志场景）。
+
+Kafka 依赖 KRaft/ZooKeeper，对内存与磁盘 I/O 要求高，在 **1 核 2G** 小机上往往难以稳定运行；为当前规模维护 Kafka 集群容易陷入 **运维地狱**。
+
+## 4. 数据路径：已降噪，不是海量日志
+
+远程桌面虽有大量截帧，但 **Desktop Agent** 会做帧差过滤与本地 OCR 脱敏，实际上报的是 **结构化行为与少量关键内容**，不是原始日志洪流。路径也简单：
+
+```text
+Agent → server 入队 → ai Worker 消费
+```
+
+不需要 RabbitMQ 的 Exchange / Binding Key 级复杂路由。
+
+## 5. 对比小结
+
+| 维度 | BullMQ + Redis | Kafka | RabbitMQ |
+| :--- | :--- | :--- | :--- |
+| NestJS 体验 | ✅ 官方模块 | ⚠️ 自封装 | ⚠️ 自封装 |
+| 单任务延迟/退避 | ✅ 内置 | ❌ 自研 | ⚠️ 部分自研 |
+| 任务状态可查 | ✅ Job 状态 | ❌ | ⚠️ |
+| 额外运维组件 | 无（复用 Redis） | Broker 集群 | Broker |
+| 本项目场景 | ✅ AI Job | 日志管道 | 复杂路由 |
+
+## 相关文档
+
+- [AI 平台](./ai-platform)
+- [AI 行为洞察](./ai-behavior)
+- [部署与 Compose](/deploy/ai-local-dev)

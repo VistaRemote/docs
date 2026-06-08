@@ -1,0 +1,33 @@
+# Meta-Repo 架构
+
+## 为何不用 Monorepo？
+
+| 维度 | Monorepo | VistaRemote Meta-Repo |
+| :--- | :--- | :--- |
+| Electron / RN 原生依赖 | hoist 易冲突 | 各仓库独立 `node_modules` |
+| 构建链 | 单仓多工具链耦合 | Rsbuild / Metro / NestJS 解耦 |
+| 契约同步 | workspace 直引 | 物理 `shared` 仓库 + npm |
+
+## 目录结构
+
+```text
+vistaRemote/ (Meta-Repo)
+├── init.sh
+├── spec/
+├── shared/
+├── server/      # NestJS + MySQL
+├── ai/          # BullMQ + LLM
+├── web/         # apps/client + apps/admin
+├── desktop/
+├── mobile/
+├── docs/        # 本 Rspress 站点
+└── deploy/
+```
+
+## Git 协作要点
+
+- **禁止** submodule / subtree
+- 各子目录独立 `git commit`
+- 改协议：**先** `shared`，再 `server`，再各端
+
+详见 [Git 协作](/engineering/git-workflow) · [CI/CD 与版本发布](/engineering/cicd-release)。

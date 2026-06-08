@@ -1,0 +1,96 @@
+# CI/CD and versioning
+
+VistaRemote uses **per-repository builds and releases**: each sub-repo has its own SemVer tags and GitHub Actions workflows. When `@vistaremote/shared` is published, downstream repos are notified to bump their dependency.
+
+> Full normative spec: Meta-Repo [spec/cicd-release-spec.md](https://github.com/VistaRemote/vista-remote/blob/main/spec/cicd-release-spec.md)
+
+## Version and tag conventions
+
+| Repo | Tag format | Example | Artifact |
+| :--- | :--- | :--- | :--- |
+| **shared** | `vMAJOR.MINOR.PATCH` | `v0.2.0` | npm `@vistaremote/shared` (GitHub Packages) |
+| **server** | `server-v*` | `server-v0.2.0` | Docker `ghcr.io/vistaremote/server` |
+| **ai** | `ai-v*` | `ai-v0.2.0` | Docker `ghcr.io/vistaremote/ai` |
+| **web** | `web-v*` | `web-v0.2.0` | Static artifacts (client + admin) |
+| **desktop** | `desktop-v*` | `desktop-v0.2.0` | Build artifact (installers P1) |
+| **docs** | `docs-v*` | `docs-v0.2.0` | GitHub Pages |
+| **deploy** | `deploy-v*` | `deploy-v0.2.0` | Compose validation / release notes |
+| **mobile** | `mobile-v*` | `mobile-v0.2.0` | Build verification (stores P1) |
+
+**Tags are the source of truth** for releases; keep `package.json#version` aligned when possible.
+
+## Recommended release order
+
+```text
+1. Merge shared to main
+2. Tag v0.2.0 → release.yml publishes npm package
+3. repository_dispatch → consumer sync-shared.yml opens PRs
+4. Merge bump PRs, tag server-v0.2.0 / web-v0.2.0 / …
+5. Update deploy compose image tags → deploy-v0.2.0
+```
+
+### Publish shared
+
+```bash
+cd shared
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+Workflow `shared/.github/workflows/release.yml`: lint → test → build → publish → notify consumers.
+
+### Consumer auto-bump
+
+`sync-shared.yml` on each consumer:
+
+- Sets `@vistaremote/shared` to `^0.2.0`
+- Runs install, lint, test, build
+- Opens PR: `chore(deps): bump @vistaremote/shared to 0.2.0`
+
+### Release services
+
+```bash
+cd server
+git tag server-v0.2.0
+git push origin server-v0.2.0
+```
+
+## Local vs CI vs production
+
+| Environment | `@vistaremote/shared` |
+| :--- | :--- |
+| **Meta-Repo dev** | `file:../shared` in `package.json` |
+| **GitHub Actions** | `setup-shared` composite action (sibling checkout) |
+| **Docker / offline** | GitHub Packages pinned SemVer |
+
+Restore local `file:` deps after a registry bump:
+
+```bash
+node tooling/scripts/restore-shared-file-deps.mjs
+```
+
+## CI workflows
+
+| Workflow | Trigger | Purpose |
+| :--- | :--- | :--- |
+| `ci.yml` | push / PR | setup-shared → lint → test → build |
+| `sync-shared.yml` | `shared-published` | Auto bump + PR |
+| `release.yml` | tag | Images / static site / npm |
+| `dependency-review.yml` | PR | Dependency review |
+| CodeQL | push / PR | Security analysis |
+
+Meta-Repo `meta-ci.yml` only checks scaffolding, not sub-repo app code.
+
+## Maintainer setup
+
+Secret on **`VistaRemote/shared`**: `VISTAREMOTE_CI_PAT` (`repo` + `workflow`) for cross-repo dispatch.
+
+Sync workflow templates from Meta-Repo root:
+
+```bash
+node tooling/scripts/setup-github-workflows.mjs
+```
+
+## See also
+
+- [CONTRIBUTING](https://github.com/VistaRemote/vista-remote/blob/main/CONTRIBUTING.md)

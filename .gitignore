@@ -1,0 +1,15 @@
+# @see tooling/templates/gitignore.docs
+
+node_modules/
+doc_build/
+.rspress/
+dist/
+
+.env
+.env.local
+!.env.example
+
+*.log
+.DS_Store
+*.tsbuildinfo
+.cache/

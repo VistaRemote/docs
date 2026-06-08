@@ -1,0 +1,47 @@
+# Local development and environment switching
+
+## One-command bootstrap
+
+```bash
+git clone git@github.com:VistaRemote/vista-remote.git
+cd vista-remote
+nvm use            # Node 24.11+ (see .nvmrc)
+./init.sh          # Windows: .\init.ps1
+./dev.sh           # Windows: .\dev.ps1
+```
+
+This applies the **local** profile, starts Docker (MySQL, Redis, Ollama), runs `pnpm install` in cloned repos, and builds `shared`.
+
+Optional AI stack: `./dev.sh --with-ai` or `pnpm dev:up:ai`.
+
+## Run apps (separate terminals)
+
+```bash
+cd server && pnpm start:dev
+cd web && pnpm --filter @vistaremote/web-client dev
+cd desktop && pnpm dev
+cd mobile && pnpm start
+```
+
+## Switch environments
+
+Edit `config/environments/dev.env` (etc.) with your real hostnames, then:
+
+```bash
+pnpm env:local
+pnpm env:dev
+pnpm env:sit
+pnpm env:uat
+```
+
+Restart the dev process for each app you are running.
+
+## Single-repo developers (desktop / mobile only)
+
+```bash
+pnpm setup
+```
+
+Clones `../shared` if needed and installs dependencies.
+
+See `spec/developer-experience-spec.md`.

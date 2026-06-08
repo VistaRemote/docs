@@ -1,0 +1,31 @@
+# Trial period and paid features (SFU · cloud AI)
+
+Resource-heavy features are available during a **trial**; after it ends you need a **paid plan**.
+
+## Default trial
+
+- New users/orgs: **14 days** (`trialEndsAt`)
+- During trial: `free` plan users can still use trial-column features below
+- After trial without upgrade: **SFU** and **edge-to-cloud AI** are disabled; **1:1 P2P** remote remains
+
+## Feature matrix
+
+| Feature | During trial | Free after trial | Pro | Enterprise |
+| :--- | :---: | :---: | :---: | :---: |
+| **WebRTC SFU** (multi-viewer, TURN offload) | ✓ | ✗ | ✓ | ✓ |
+| **AI cloud fallback** (`behavior.cloud_infer`) | ✓ | ✗ | ✗ | ✓ |
+| P2P 1:1 remote | ✓ | ✓ | ✓ | ✓ |
+
+## Server enforcement
+
+- Before allocating **mediasoup SFU**: check `ProductFeature.WEBRTC_SFU`
+- Before enqueueing **cloud infer** jobs: check `ProductFeature.AI_CLOUD_INFER`
+- Error codes: `TRIAL_EXPIRED_REQUIRES_PRO`, `TRIAL_EXPIRED_REQUIRES_ENTERPRISE`
+
+SSOT: `shared/src/billing/entitlements.ts`
+
+## Specs
+
+- `spec/commercial-tier-spec.md`
+- `spec/webrtc-architecture-spec.md` (FR-WRTC-15)
+- `spec/ai-behavior-architecture-spec.md` (§3.4)

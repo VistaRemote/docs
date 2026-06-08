@@ -1,0 +1,28 @@
+# 开源协议与商业授权
+
+## 双轨授权
+
+| 使用方式 | 费用 | 说明 |
+| :--- | :--- | :--- |
+| **个人、非盈利** | **免费** | 学习、自用、不参与营利；遵守根目录 [LICENSE](https://github.com/VistaRemote/VistaRemote/blob/main/LICENSE) |
+| **任何商业使用** | **须付费签约** | 公司内部使用、对外 SaaS、集成商业产品、托管运营等 **一律** 需商业许可 |
+
+「商业使用」与是否注册公司无关，以是否构成 **营利性使用** 为准。
+
+## 与套餐（Pro / Enterprise）的区别
+
+- **LICENSE**：能否合法 **部署、修改、分发** 代码。
+- **套餐**：自建或官方 SaaS 上 **功能开关**（录制、SFU、AI 降云等）。
+
+自托管的商业客户通常需要 **商业 LICENSE + 相应功能订阅**。
+
+## 大模型微调（闭源）
+
+**微调训练工具链、客户语料、专有 LoRA 权重** 不在公开仓库中，建议独立私有项目 `ai-finetune`，仅向签约客户交付加密 **model bundle**。公开 `ai` 仓库只做推理与编排。
+
+详见 Meta-Repo：
+
+- `spec/licensing-spec.md`
+- `spec/ai-finetune-spec.md`
+
+商业授权咨询见 [COMMERCIAL-LICENSE.md](https://github.com/VistaRemote/VistaRemote/blob/main/COMMERCIAL-LICENSE.md)。

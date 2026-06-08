@@ -1,0 +1,16 @@
+# Architecture Overview
+
+VistaRemote uses a **Flat Meta-Repo**: independent Git repos for `shared`, `server`, `ai`, `web`, `desktop`, `mobile`, `docs`, and `deploy`.
+
+## Stack highlights
+
+- **WebRTC** for real-time remote desktop (P2P / SFU)
+- **NestJS + TypeORM + MySQL 8** on the server
+- **Rspack/Rsbuild** for web and Electron renderer
+- **Dedicated `ai` workers** for LLM and analytics (BullMQ)
+
+## Why not Monorepo?
+
+Electron native addons and React Native Metro conflict with shared `node_modules` hoisting. Separate repos keep builds reliable.
+
+More: [Positioning](/architecture/positioning) · [WebRTC](/architecture/webrtc-topology).

@@ -1,0 +1,35 @@
+# Docker 部署
+
+## 组件清单
+
+| 服务 | 说明 |
+| :--- | :--- |
+| **mysql** | MySQL 8，utf8mb4（**唯一**关系型库） |
+| **redis** | 会话、BullMQ |
+| **minio** | Pro+ 录制对象存储 |
+| **server** | NestJS API + 信令 |
+| **ai** | AI Worker（内网） |
+| **coturn** | TURN/STUN |
+| **web-client** / **web-admin** | 静态资源 |
+
+> 全栈不使用 PostgreSQL。
+
+## 快速开始（规划）
+
+```bash
+cd deploy
+cp compose/.env.example compose/.env
+# 编辑 MySQL、JWT、MinIO、AI 等变量
+docker compose -f compose/docker-compose.yml up -d
+```
+
+具体 Compose 文件随 `deploy` 仓库实现完善；规格见 Meta-Repo `spec/deploy-spec.md`。
+
+## 防火墙
+
+- TCP：443（HTTPS）、3000（API，可内网）
+- UDP：3478（TURN）、SFU 端口段（按配置文档）
+
+## 私有化 LLM
+
+Enterprise 可将 `AI_BASE_URL` 指向内网 **Ollama**，无需公网 LLM。参见 [产品定位](/architecture/positioning)。

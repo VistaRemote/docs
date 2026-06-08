@@ -1,0 +1,40 @@
+# WebRTC development and tuning
+
+## Code map
+
+| Repo | Path | Role |
+| :--- | :--- | :--- |
+| shared | `src/webrtc/`, `src/signaling/` | ICE, transport policy, tuning types |
+| server | `src/webrtc/`, `src/ice/`, `src/sfu/` | Policy, ICE API, mediasoup adapter |
+| web/client | `src/webrtc/` | `RemotePlayer`, jitter buffer, WebCodecs |
+| desktop | `electron/webrtc/` | Publisher, sender tuning |
+| mobile | `src/services/webrtc/` | RN session shell |
+
+## P2P + TURN (default)
+
+1. Fetch ICE from `GET /api/v1/ice/servers`.
+2. `TransportPolicyService` returns `p2p` for 1:1 when TURN is healthy.
+3. Exchange SDP/ICE over WebSocket.
+
+TURN is for **NAT traversal**, not a permanent media hub. When relay usage exceeds `TURN_LOAD_THRESHOLD`, new sessions should use SFU.
+
+## mediasoup SFU
+
+Triggered when:
+
+- Two or more controllers in a room
+- ICE failures pile up
+- coturn load ratio exceeds threshold
+- Enterprise `forceSfu`
+
+## Playback: jitter and main thread
+
+- **JitterBuffer** presets: fluent (50ms) vs clear (120ms)
+- Prefer **WebCodecs** hardware decode; fallback to `<video>` + canvas
+- Keep decoding off the React render path
+
+See `web/apps/client/src/webrtc/remote-player.ts` and `spec/webrtc-architecture-spec.md` §5.
+
+## Related specs
+
+- [webrtc-architecture-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/webrtc-architecture-spec.md)

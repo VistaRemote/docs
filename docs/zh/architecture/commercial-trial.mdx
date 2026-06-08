@@ -1,0 +1,34 @@
+# 试用期与付费能力（SFU · AI 降云）
+
+部分 **高成本能力** 在 **试用期内** 开放体验，**试用结束后** 必须订阅付费套餐。
+
+## 默认试用期
+
+- 新用户/组织：**14 天**（字段 `trialEndsAt`）
+- 试用期内：即使套餐为 `free`，也可使用下表「试用列」能力
+- 试用结束且未升级：**SFU** 与 **AI 端侧降云** 关闭；**1:1 P2P 远程** 仍可用
+
+## 能力对照
+
+| 能力 | 试用中 | 试用后 Free | Pro | Enterprise |
+| :--- | :---: | :---: | :---: | :---: |
+| **WebRTC SFU**（多观众、TURN 减压） | ✓ | ✗ | ✓ | ✓ |
+| **AI 端侧降云**（`behavior.cloud_infer`） | ✓ | ✗ | ✗ | ✓ |
+| P2P 1:1 远程 | ✓ | ✓ | ✓ | ✓ |
+
+## 服务端行为
+
+- 分配 **mediasoup SFU** 前检查 `ProductFeature.WEBRTC_SFU`
+- 入队 **降云** Job 前检查 `ProductFeature.AI_CLOUD_INFER`
+- 拒绝时返回：`TRIAL_EXPIRED_REQUIRES_PRO` 或 `TRIAL_EXPIRED_REQUIRES_ENTERPRISE`
+
+实现：`shared/src/billing/entitlements.ts`
+
+订阅与买断、支付渠道、订单 API 见 [订单与订阅](./billing-commerce)。
+
+## 相关 Spec
+
+- `spec/commercial-tier-spec.md`
+- `spec/billing-commerce-spec.md`
+- `spec/webrtc-architecture-spec.md`（FR-WRTC-15）
+- `spec/ai-behavior-architecture-spec.md`（§3.4）

@@ -1,0 +1,40 @@
+# 🔀 Git 协作与 IDE 配置指南
+
+在 VistaRemote 项目中，我们通过 `init.sh` 脚本将多个独立的子项目拉取到同一个目录下（含 `server`、`web`、`desktop`、`mobile`、`shared`、`docs`、`deploy`、`ai` 等）。这就意味着你的本地目录中存在多个并行的 `.git` 仓库。
+
+为了获得最佳的开发体验，请务必按照以下指南配置你的 IDE。
+
+## 为什么不用 Submodule 或 Subtree？
+在全端并发开发中，使用原生嵌套机制会导致极高的心智负担。具体原因详见 [Meta-Repo 架构](/architecture/meta-repo)。简而言之：保持物理目录的绝对隔离，是对多端敏捷开发最友好的方式。
+
+## 1. 推荐方案：Cursor / VS Code 工作区
+如果你使用 Cursor 或 VS Code，**请勿直接打开最外层文件夹**，这会导致 IDE 的 Git 视图只能识别最外层的脚手架代码。
+
+**操作步骤：**
+1. 在根目录创建 `vista-remote.code-workspace` 文件。
+2. 配置 `folders` 数组，将 `shared`, `server`, `web` 等相对路径引入。
+3. 在 IDE 中通过 `File -> Open Workspace from File` 打开该文件。
+4. **效果**：你的 Source Control 面板将被完美划分为 6 个独立的 Git 区域，你可以独立勾选、独立写 Commit，互不干扰。
+
+## 2. 备选方案：IntelliJ IDEA
+如果你是 JetBrains 系忠实用户，无需创建工作区文件，利用其原生的目录映射功能即可：
+
+**操作步骤：**
+1. 直接打开根目录的 `vistaRemote` 文件夹。
+2. 进入 `Settings -> Version Control -> Directory Mappings`。
+3. 点击 `+` 号，手动将 `server`, `desktop`, `mobile` 等子目录添加进去，将 VCS 类型设为 `Git`。
+4. **效果**：使用 `Cmd + K` 提交代码时，IDE 会自动按仓库名称对修改的文件进行分组 (Group by Repository)，且右下角可对所有仓库进行批量的分支切换与 Pull 操作。
+
+## 3. 代码规范与提交
+
+- **Biome**：见 [代码规范](/engineering/code-style)
+- **提交 / PR**：见 [贡献流程](/engineering/contributing-workflow)
+- **CI/CD / 版本**：见 [CI/CD 与版本发布](/engineering/cicd-release)
+- **Spec**：[工程规范](https://github.com/VistaRemote/vista-remote/blob/main/spec/engineering-standards-spec.md) · [Git 协作 Spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/git-collaboration-spec.md) · [CI/CD Spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/cicd-release-spec.md)
+
+## 4. 命令行一键同步脚本 (高级用法)
+如果你习惯使用纯命令行，我们在根目录提供了一个批量提交脚本 `sync.sh`，用于在紧急情况下快速提交全端修改：
+
+```bash
+# 提交所有子仓库的变更
+./sync.sh "feat: 更新 WebRTC 核心信令"

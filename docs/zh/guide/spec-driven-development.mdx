@@ -1,0 +1,48 @@
+# Spec 驱动开发（SDD）
+
+VistaRemote 以 **Spec 为边界** 迭代：先写需求 ID 与验收，再写代码。
+
+权威全文：Meta-Repo `spec/spec-driven-development-spec.md`。
+
+## 文档层级
+
+| 层级 | 位置 | 用途 |
+| :--- | :--- | :--- |
+| L0 | `system-overview.md` | 用户故事 US-xx |
+| L1 | `*-spec.md` | 模块 FR-xx |
+| L2 | `server/spec/SPEC.md` 等 | 单仓细则 |
+| 用户向 | 本站 `user/*` | 终端用户 |
+| 开发向 | 本站 `guide/*` | 开发者 |
+
+## 需求 ID
+
+| 前缀 | 含义 |
+| :--- | :--- |
+| `US-xx` | 用户故事 |
+| `FR-xxx` | 功能需求（如 `FR-SRV-08`） |
+| `SEC-xx` | 安全 |
+
+PR 描述应列出影响的 FR；纯重构注明「无 FR 变更」。
+
+## 实现顺序（强制）
+
+```text
+shared → server / ai → web | desktop | mobile → docs
+```
+
+违反顺序会导致类型漂移与 CI 失败。
+
+## 与实现状态的关系
+
+开发前查阅 [实现状态](/engineering/implementation-status)：
+
+- **✅ Ready**：可直接实现 Spec 中的 FR
+- **🟡 Partial**：在现有桩/内存 store 上扩展
+- **⬜ Planned**：先补基建或拆 P1 子任务
+
+## PR 检查清单
+
+- [ ] 已更新或确认相关 `spec/*.md`
+- [ ] 跨端变更已改 `shared`
+- [ ] 已更新 `implementation-status.md`（若改变就绪度）
+- [ ] 用户可见行为已更新 `user/*` 或 `guide/*`

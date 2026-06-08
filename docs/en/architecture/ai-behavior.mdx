@@ -1,0 +1,37 @@
+# AI behavior insights architecture
+
+VistaRemote Enterprise adds **monitoring, alerts, and efficiency insights** on remote desktop. Data stays in **customer-controlled infrastructure** (Ollama + Qdrant + MySQL)—no default dependency on public LLM APIs.
+
+## Multi-model split
+
+| Type | Examples | Where it runs |
+| :--- | :--- | :--- |
+| Real-time detection | Small models, CV, time-series | **Desktop Agent (edge-first)** |
+| Understanding & summaries | Self-hosted LLM + RAG | **ai worker (Node)** |
+| Baseline / anomaly ML | scikit-learn, etc. | **python-worker** (scheduled by ai) |
+| Privacy-sensitive | Rules + local CV | **Edge only** (no cloud by default) |
+
+## Edge-first and cloud fallback
+
+Analysis runs on the **employee device** when possible. On CPU pressure or timeout, the agent requests **cloud fallback** via `behavior.cloud_infer`; **ai (Node)** or **python-worker** completes the job without blocking daily work.
+
+**Cloud fallback is paid**: available during trial; after trial requires **Enterprise**. See [Trial and paid features](./commercial-trial).
+
+## Value loop
+
+```text
+Edge detection → structured events → Server → aggregates / vectors
+                              ↓
+                    ai (LangChain / LangGraph)
+                              ↓
+         efficiency reports · process optimization · automation candidates
+```
+
+Events live in **MySQL**; embeddings in **Qdrant**. Keystroke content and raw screen capture are **not** sent to the LLM by default.
+
+## Related docs
+
+- [AI platform (private deployment)](./ai-platform)
+- [Local AI dev](/deploy/ai-local-dev)
+
+Meta-Repo: `spec/ai-behavior-architecture-spec.md`

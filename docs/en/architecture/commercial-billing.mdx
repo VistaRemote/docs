@@ -1,0 +1,31 @@
+# Orders, subscriptions, and client-side gates
+
+## Purchase types
+
+| Type | Description |
+| :--- | :--- |
+| **Subscription** | Monthly or **yearly (~15% off)**; expires at `planExpiresAt` |
+| **Perpetual** | One-time purchase for the tier |
+
+SKU catalog: `shared/src/billing/catalog.ts`.
+
+## Trial and enforcement
+
+Same as [Trial and paid features](./commercial-trial): **SFU** and **cloud AI** require payment after trial.
+
+| Tier | Enforcement |
+| :--- | :--- |
+| Server | Signaling blocks extra viewers; cloud infer jobs skipped |
+| Web | `FeatureGate` + entitlements API |
+| Desktop | `assertCloudInferAllowed` before cloud placement |
+| Mobile | `fetchEntitlements` / `canUseSfu` |
+
+## Payment providers
+
+WeChat, Alipay, PayPal, Wise (integration P1). Bank cards later.
+
+Dev: `POST /api/v1/billing/orders/:id/simulate-paid`.
+
+## Admin modules
+
+Users, orders, and RBAC permissions pages — see `spec/billing-commerce-spec.md`.

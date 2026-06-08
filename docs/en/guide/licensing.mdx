@@ -1,0 +1,25 @@
+# Open source and commercial licensing
+
+## Two tracks
+
+| Use | Fee | Notes |
+| :--- | :--- | :--- |
+| **Personal, non-commercial** | **Free** | Learning and hobby use under the root [LICENSE](https://github.com/VistaRemote/VistaRemote/blob/main/LICENSE) |
+| **Any commercial use** | **Paid license required** | Internal business use, SaaS, embedding in products, paid hosting, etc. |
+
+Commercial use is defined by **for-profit activity**, not only by company registration.
+
+## Versus Pro / Enterprise plans
+
+- **LICENSE**: whether you may **deploy, modify, and redistribute** the code.
+- **Plans**: **feature gates** on your deployment or our SaaS (recording, SFU, cloud AI, etc.).
+
+Self-hosted commercial deployments typically need **both** a commercial license and the right subscription tier.
+
+## Model fine-tuning (closed source)
+
+Training pipelines, customer datasets, and proprietary LoRA adapters belong in a **separate private repo** (`ai-finetune`), delivered as encrypted **model bundles**. The public `ai` repo handles inference and orchestration only.
+
+See Meta-Repo `spec/licensing-spec.md` and `spec/ai-finetune-spec.md`.
+
+For commercial terms see [COMMERCIAL-LICENSE.md](https://github.com/VistaRemote/VistaRemote/blob/main/COMMERCIAL-LICENSE.md).

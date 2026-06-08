@@ -1,0 +1,147 @@
+# VistaRemote 产品定位与核心优势
+
+| Metadata | Value |
+| :--- | :--- |
+| **文档** | 产品定位（对内对外统一口径） |
+| **版本** | 1.0.0 |
+| **更新** | 2026-05-24 |
+
+---
+
+## 1. 一句话定位
+
+**VistaRemote** 是面向企业与开发者的 **开源、可私有化部署** 的远程桌面与智能监控平台：以 **WebRTC** 实现低延迟实时画面与控制，以 **可自托管的 AI 管线** 提供录制、审计、回放与行为洞察——数据留在企业自有基础设施内，安全可控。
+
+---
+
+## 2. 与传统监控方案对比
+
+| 维度 | 传统桌面监控 / 录屏软件 | VistaRemote |
+| :--- | :--- | :--- |
+| **传输技术** | 多为专有 TCP 协议或厂商中继，延迟与防火墙适配参差 | 标准 **WebRTC**：**P2P + TURN** 低延迟 1:1；多观众或 TURN 压力大时自动 **mediasoup SFU**（非 SRS 直播栈） |
+| **观看体验** | 录屏回放为主，实时卡顿常见 | **WebCodecs 硬解** + 抖动缓冲，减轻浏览器主线程卡顿 |
+| **实时性** | 偏「事后回放」，实时远程体验弱 | **实时远程控制** + 可选录制，同一套链路 |
+| **AI 能力** | 多绑定厂商云端，模型与数据不可控 | **独立 `ai` 服务**，支持公有 LLM API 或 **Ollama 私有化** |
+| **部署** | 闭源安装包 + 厂商云 | **开源** + Docker Compose **自建**（信令、MySQL、存储、AI 均可内网） |
+| **扩展** | C++/Delphi 老栈，二开困难 | **全栈 TypeScript**，契约在 `shared`，Spec 驱动 |
+
+---
+
+## 3. 与企业级商业监控软件对比
+
+| 维度 | 典型企业级桌面监控（商业） | VistaRemote |
+| :--- | :--- | :--- |
+| **授权** | 闭源、席位昂贵 | **个人非盈利免费**；**商业使用须签约**（见 [开源协议](/guide/licensing)） |
+| **数据主权** | 录像与分析数据常经厂商云 | **企业自建**：MySQL + MinIO + 内网 AI，满足合规与等保倾向 |
+| **AI 与隐私** | 黑盒分析，难以审计 Prompt 与出境 | 策略、录制、LLM 端点 **可配置**，审计日志可追踪 |
+| **远程协助** | 监控为主，远程控场为辅或另购 | **监控 + 远程控制** 统一 WebRTC 架构 |
+| **人才** | 厂商生态绑定 | **NestJS / React / RN / Electron**，国内开发者储备大 |
+
+企业版能力（关键词/窗口标题触发录制、多屏监控、外发与删文件告警、效率报告等）见 Meta-Repo `spec/enterprise-security-spec.md`。
+
+---
+
+## 4. 技术栈优势（开发与交付）
+
+### 4.0 选型一句话
+
+**不需要千万级并发时，VistaRemote 往往是性价比最高的选择** — 全栈 TS、Spec 驱动、Meta-Repo 快构建、私有化 AI，二开与交付速度显著优于传统 C++/闭源远控。
+
+### 4.1 全面拥抱 TypeScript（与 Python 分工）
+
+- **一端语言**：`shared` 契约贯通 server、web、desktop、mobile、ai。
+- **TS 与 Python 都简单易学**：主业务 TS；重 ML 仅在 `ai/python-worker`，降低团队认知负担。
+- **招人友好**：国内前端/Node 工程师规模大，上手周期短。
+- **二开成本低**：插件、定制 Admin、对接企业 SSO/IM 均以 TS 模块扩展为主 — 见 [二开指南](/guide/customization)。
+- **AI 协作**：Spec-Driven + Vibe Code，结构化 Spec 作为 AI 实现输入。
+
+### 4.2 不采用 Flutter；Rust 负责底层
+
+业界常宣传「Flutter + Skia/Impeller GPU 比 JS 跨端更流畅」。VistaRemote 的判断是：
+
+- **UI 层**：统一 **React 19 + Rsbuild**（Web/Desktop）与 **React Native 新架构 + JSI**（Mobile）。Rspack/Rsbuild 本身由 Rust 编写，已把**构建冷启动**打到极低；Electron 的 WebGL2/WebGPU、RN 的 JSI 已解决远控场景里过去的「桥接延迟」问题。
+- **底层**：**DXGI 截屏、NVENC 硬件编码、系统键鼠 Hook** 必须由 **Rust**（N-API / Native Module）实现，Dart/Flutter **无法替代**，引入 Flutter 只会多一套 Dart 维护面。
+
+详见 **[跨端技术栈（为何不用 Flutter）](./cross-platform-stack)**。
+
+### 4.3 构建与部署简单
+
+| 层级 | 选型 | 对团队的意义 |
+| :--- | :--- | :--- |
+| 前端 | Rsbuild（Rspack） | 编译快，与 Webpack 生态兼容 |
+| 后端 | NestJS + TypeORM | 国内 Node 企业级事实标准 |
+| 数据库 | **MySQL 8** | 运维熟悉度高，云厂商托管成熟（见下文） |
+| 部署 | `deploy` Compose 模板 | 单机/内网一键拉起全栈 |
+
+### 4.4 为何选用 MySQL（而非 PostgreSQL）
+
+这是 **刻意的工程选择**，服务于国内主流运维与招聘场景：
+
+| 考量 | 说明 |
+| :--- | :--- |
+| **开发者熟悉度** | 国内绝大多数后端/全栈简历与实战经验以 **MySQL** 为主 |
+| **托管与备份** | 阿里云 RDS、腾讯云、华为云等 **默认心智** 均为 MySQL |
+| **企业现有资产** | 许多组织已有 MySQL 集群、慢查询与主从规范，**复用 DBA 能力** |
+| **TypeORM 支持** | 与 NestJS 组合成熟，`utf8mb4` + InnoDB 满足本项目 JSON 列（审计 meta）需求 |
+
+> **规范说明**：全项目 Spec 与部署文档以 **MySQL 8.0+** 为唯一关系型数据库。若发现文档仍写 PostgreSQL，视为 **笔误**，应以本说明与 Meta-Repo `spec/server-spec.md` 为准。
+
+---
+
+## 5. 安全可控：企业为什么敢用我们的 AI
+
+1. **私有化部署**：Server、MySQL、MinIO（录制）、Redis、`ai` Worker 均可部署在企业 VPC。  
+2. **LLM 可选内网**：Enterprise 配置 `AI_BASE_URL` 指向 **Ollama / 私有推理网关**，会话摘要与报告 **不出域**。  
+3. **职责分离**：信令路径（`server`）与重计算（`ai`）分进程，便于防火墙分区。  
+4. **透明审计**：连接、录制播放、套餐变更、安全事件写入 MySQL，Admin 可查询导出。  
+5. **开源可审**：核心链路可代码审计，避免「黑盒监控」信任危机。
+
+---
+
+## 6. 三大核心卖点（对外传播）
+
+1. **WebRTC 实时远程** — P2P 优先的低延迟控制；多人观摩时 SFU 单路上行，不把压力全堆在 TURN；键鼠走 DataChannel，信令走 WebSocket。  
+2. **开源 + 可自建 AI** — 相比商业监控，数据与模型边界企业自控。  
+3. **TypeScript 全栈 + 现代架构分工** — React/RN 做产品、Rust 做底层、BullMQ 做 AI 任务；好招人、好二开、好部署。  
+   - 面向老板/运维/开发的完整叙事：**[技术选型优势](./tech-advantages)**。
+
+---
+
+## 7. 客户端性能（摘要）
+
+| 端 | 策略 |
+| :--- | :--- |
+| **Web 主控** | **WebCodecs** 硬解、Worker/OffscreenCanvas 解码、JitterBuffer — 避免 React 主线程卡顿 |
+| **Mobile** | **JSI** + 原生视频视图（`react-native-webrtc` 新架构） |
+| **Desktop Agent** | 端侧采集与录制；硬件编码；减轻服务端媒体压力 |
+
+详情：[Desktop 性能架构](/architecture/desktop-performance) · [WebRTC 开发调优](/architecture/webrtc-development)。
+
+### 7.1 端侧现代 AI（相对老竞品）
+
+传统远控多为 C++/闭源，难以嵌入 **PaddleOCR-slim + 边缘 Qwen2.5-VL + 规则引擎**。VistaRemote 在 `desktop/edge-ai` 与 `ai` 仓库将 AI 作为 **可演进管道**，与监控、录制同一套 TS 生态。
+
+---
+
+## 8. Meta-Repo 与构建 {#meta-repo-与构建}
+
+| 对比 | Monorepo | VistaRemote |
+| :--- | :--- | :--- |
+| 冷启动 | 全仓 install + 复杂图 | 单仓 Rsbuild **数百毫秒** |
+| 原生冲突 | Electron C++ 与 RN 常冲突 | **分仓独立** `node_modules` |
+| CI | 巨型流水线 | **分仓 tag**，全球分发轻量 |
+| 二开 | 改一层牵动全局 | 只拉 `web`+`server` 亦可 |
+
+---
+
+## 9. 相关文档
+
+- [技术选型优势（决策者 / 运维 / 开发）](./tech-advantages)
+- [跨端技术栈（为何不用 Flutter）](./cross-platform-stack)
+- [项目白皮书](/whitepaper/)
+- [架构总览](/architecture/overview)
+- [WebRTC 拓扑](/architecture/webrtc-topology)
+- [WebRTC 开发调优](/architecture/webrtc-development)
+- [Desktop 性能架构](/architecture/desktop-performance)
+- [二开与定制](/guide/customization)
+- [Docker 部署](/deploy/docker)

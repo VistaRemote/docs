@@ -1,0 +1,29 @@
+# Recording & Commercial Resource Gates
+
+## Default: agent-side recording (low server load)
+
+```text
+Desktop encode → local ring buffer → scheduled chunk upload → S3
+Server: metadata + presigned URLs only
+SFU: no recording by default
+```
+
+Implementation: `desktop/electron/recording/`. Spec: `spec/recording-playback-spec.md`.
+
+## Optional: SFU server recording (Enterprise)
+
+Requires **`recording.sfu_server`**:
+
+- mediasoup **PlainTransport** + **FFmpeg** stream copy
+- High CPU/bandwidth — not the default path
+
+## Plan features
+
+| Feature | Pro | Enterprise |
+| :--- | :---: | :---: |
+| `recording` (agent + cloud playback) | ✓ | ✓ |
+| `recording.sfu_server` | — | ✓ |
+| `webrtc.sfu` | ✓ | ✓ |
+| `ai.cloud_infer` | — | ✓ |
+
+See `spec/commercial-resources-spec.md`.

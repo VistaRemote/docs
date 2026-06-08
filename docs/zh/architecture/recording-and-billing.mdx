@@ -1,0 +1,34 @@
+# 录制与商业化资源点
+
+## 默认：端侧录制（减服务器压力）
+
+```text
+Desktop 编码 → 本地缓冲环区 → 定时分片上传 → S3
+Server：仅元数据 + 签名 URL
+SFU：默认不录制
+```
+
+- 环区默认上限 **512MB**，分片 **8MB**，上传间隔 **60s**
+- 支持断点续传（见 `spec/recording-playback-spec.md`）
+
+实现：`desktop/electron/recording/`。
+
+## 可选：SFU 服务端录制（Enterprise）
+
+仅当开通 **`recording.sfu_server`**：
+
+- mediasoup **PlainTransport** + **FFmpeg** 裸流拷贝
+- 高 CPU/带宽，**不作为默认**
+
+## 套餐与 Feature
+
+| Feature | Pro | Enterprise |
+| :--- | :---: | :---: |
+| `recording`（端侧+云回放） | ✓ | ✓ |
+| `recording.sfu_server` | — | ✓ |
+| `webrtc.sfu` | ✓ | ✓ |
+| `ai.cloud_infer` | — | ✓ |
+
+完整矩阵：[commercial-resources](https://github.com/VistaRemote/vista-remote/blob/main/spec/commercial-resources-spec.md) · [套餐 Spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/commercial-tier-spec.md)。
+
+用户向：[套餐与付费](/user/plans-and-billing)。

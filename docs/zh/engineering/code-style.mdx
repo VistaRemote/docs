@@ -1,0 +1,47 @@
+# 代码规范（Biome）
+
+VistaRemote 全栈 TypeScript 项目统一使用 **[Biome](https://biomejs.dev/)** 做格式化与 Lint，**不** 使用 Prettier + ESLint 双栈。
+
+## 配置位置
+
+| 文件 | 说明 |
+| :--- | :--- |
+| `tooling/biome.json` | 权威配置 |
+| Meta-Repo 根 `biome.json` | extends 上述配置 |
+| 各子仓库 `biome.json` | 从 `tooling/` 复制或 extends |
+
+## 常用命令
+
+```bash
+# Meta-Repo 根目录
+pnpm install
+pnpm check        # 检查
+pnpm check:fix    # 检查并修复
+pnpm format       # 仅格式化
+```
+
+子仓库示例：
+
+```bash
+cd server
+pnpm lint         # 需在子仓库 package.json 配置 "lint": "biome check ."
+```
+
+## 风格要点
+
+- 单引号、分号、2 空格、行宽 100
+- `import type` 分离类型导入
+- 避免 `any`（Biome 告警）
+- MD/MDX 行宽 120
+
+## 编辑器
+
+1. 安装扩展 **Biome**（VS Code / Cursor）
+2. 使用 `vista-remote.code-workspace` 打开项目（已配置 `formatOnSave`）
+3. 根目录 `.editorconfig` 与 Biome 对齐
+
+## Cursor AI
+
+项目包含 `.cursor/rules/*.mdc` 与 [AGENTS.md](https://github.com/VistaRemote/vista-remote/blob/main/AGENTS.md)，AI 生成代码须遵守相同规范。
+
+完整规范见 Meta-Repo `spec/engineering-standards-spec.md`。

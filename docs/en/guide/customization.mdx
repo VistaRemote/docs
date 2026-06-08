@@ -1,0 +1,39 @@
+# Customization & Secondary Development
+
+VistaRemote targets **self-hosted, fork-friendly, low-cost iteration** — not billion-viewer live streaming.
+
+## Why it's easy and fast
+
+| Factor | Notes |
+| :--- | :--- |
+| **TypeScript everywhere** | `shared` contracts across server / web / desktop / mobile / ai |
+| **Python for heavy ML only** | `ai/python-worker`; core product stays TS |
+| **Spec-driven** | Change Spec + FR first, then code |
+| **Meta-Repo** | Clone only what you need; no monorepo build black hole; fast Rsbuild |
+| **MySQL + Docker** | Familiar ops, single-machine full stack |
+
+**TypeScript and Python are approachable languages** — small teams can ship enterprise customizations (SSO, workflows, Admin, OCR rules) in weeks.
+
+## Suggested workflow
+
+```text
+1. Read spec/product-positioning-spec.md
+2. Update shared if protocols change
+3. server / web / desktop
+4. Sync docs for user-visible changes
+```
+
+## Performance customization
+
+| Topic | Doc |
+| :--- | :--- |
+| Desktop capture/encode/guard | [Desktop performance](/architecture/desktop-performance) |
+| Web playback | [WebRTC development](/architecture/webrtc-development) |
+| Mobile touch | `spec/mobile-spec.md` FR-MOB-PERF |
+
+## Not a fit for
+
+- Billion-scale live CDN audiences  
+- Closed-box-only vendors with no self-hosting  
+
+**Best for**: intranet assist, sub-10k sessions, data sovereignty, code-level control.

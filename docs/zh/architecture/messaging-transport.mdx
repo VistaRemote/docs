@@ -1,0 +1,58 @@
+# 消息推流：WebSocket 还是 EventSource？
+
+VistaRemote **按场景拆分协议**，不用一种技术包打天下。
+
+## 对照表
+
+| 你要传什么 | 用什么 | 为什么 |
+| :--- | :--- | :--- |
+| SDP / ICE / 加入房间 / 切换 SFU | **WebSocket** `wss://…/signaling` | 必须**双向**、低延迟 |
+| 键鼠、触控 | **WebRTC DataChannel** `control` | 比 WS 更低延迟，与视频同会话 |
+| 录制完成、AI 摘要、安全告警 | **SSE** `GET /api/v1/events/stream` | **单向**推送即可，自动重连简单 |
+| Agent 窗口标题、文件事件批量 | **HTTPS POST** `/api/v1/telemetry/events` | 可攒批、可落库，非实时推流 |
+| 屏幕画面 | **WebRTC 视频轨** | 不是「消息」，不走 WS/SSE |
+
+## 为什么不全用 EventSource？
+
+EventSource（SSE）只能 **服务器 → 浏览器**。信令需要客户端频繁上传 Offer、Answer、ICE candidate，若用 SSE 还要再开一堆 POST，延迟与实现复杂度都更差。
+
+因此：**信令 = WebSocket**；**通知 = SSE**。
+
+**异步后台任务**（AI 审计、录制摘要等）不走本页所述实时通道，统一用 **BullMQ + Redis**，见 **[异步任务队列](./job-queue)**。
+
+## 前端代码
+
+```text
+web/apps/client/src/messaging/
+├── signaling-client.ts    # WebSocket 信令
+└── event-stream-client.ts # SSE 业务事件
+```
+
+远程控制请使用 `shared` 的 `ControlEnvelope`，经 DataChannel 发送，**不要**走 `SignalingClient`。
+
+## 后端代码（P2）
+
+```text
+server/src/signaling/
+  signaling.gateway.ts          # WSS 主路径 /signaling
+  signaling-dispatcher.service.ts
+  redis-signaling.bus.ts        # Redis Pub/Sub
+server/src/events/
+  events.controller.ts          # SSE ?userId=
+  redis-events.bus.ts
+```
+
+`REDIS_URL` 未配置时自动回退进程内内存总线（单实例开发）。
+
+## 鉴权（P3）
+
+- WSS `/signaling`：握手携带 **Signaling Ticket**（短效 JWT）
+- SSE：须 **Controller/Admin JWT**，`userId` 与 token `sub` 一致
+
+详见 [认证与授权](./authorization)。
+
+## 相关 Spec
+
+- [messaging-transport-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/messaging-transport-spec.md)
+- [authorization-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/authorization-spec.md)
+- [webrtc-architecture-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/webrtc-architecture-spec.md)

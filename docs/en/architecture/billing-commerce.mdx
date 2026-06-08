@@ -1,0 +1,36 @@
+# Orders, subscriptions, and cross-client feature gates
+
+## Purchase models
+
+| Model | Description |
+| :--- | :--- |
+| **Subscription** | Monthly or yearly (yearly ~15% off); expires at `planExpiresAt` |
+| **Perpetual** | One-time purchase; plan stays active without renewal |
+
+SKU catalog: `shared/src/billing/catalog.ts`.
+
+## Trial and gating
+
+| Feature | 14-day trial | Free after trial | Pro (active) | Enterprise |
+| :--- | :---: | :---: | :---: | :---: |
+| SFU | ✓ | ✗ | ✓ | ✓ |
+| AI cloud fallback | ✓ | ✗ | ✗ | ✓ |
+
+**Server**: checks before SFU allocation and `behavior.cloud_infer` enqueue.  
+**Clients**: `GET /api/v1/billing/entitlements`; Web `FeatureGate`; Desktop `assertCloudInferAllowed`.
+
+## Payment providers
+
+WeChat, Alipay, PayPal, Wise (integration in progress); **bank card** reserved for later.
+
+Create order: `POST /api/v1/billing/orders` with `{ sku, provider }`.
+
+## Admin modules
+
+| Module | Route |
+| :--- | :--- |
+| Users | `/users` |
+| Orders | `/orders` |
+| Permissions (RBAC matrix) | `/permissions` |
+
+Specs: `spec/billing-commerce-spec.md`, `spec/commercial-tier-spec.md`

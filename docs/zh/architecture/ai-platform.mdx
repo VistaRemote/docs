@@ -1,0 +1,53 @@
+# AI 平台：私有化与双运行时
+
+VistaRemote AI 的两大卖点：
+
+1. **私有化部署、运维简单、数据安全** — 自托管 LLM 与向量库，默认不出网，不依赖 OpenAI 等第三方 SaaS。
+2. **行为洞察与长期价值** — 端侧监控 + 云端理解，支撑效率报告、**流程优化**与未来的 **AI 替代** 建议。
+
+## 异步队列：BullMQ
+
+后台 AI 任务使用 **BullMQ（Redis）**，不用 RabbitMQ/Kafka。理由（NestJS 融合、任务状态与重试、复用 Redis）见 **[异步任务队列](./job-queue)**。
+
+## 技术路线：TypeScript 为主，Python 补强
+
+| 层级 | 技术 | 说明 |
+| :--- | :--- | :--- |
+| **主 Worker** | Node.js / TypeScript | BullMQ、回调 server、与全栈契约一致 |
+| **LLM 编排** | LangChain.js、LangGraph.js | 摘要、周报、多步流程优化 Agent |
+| **推理** | Ollama / vLLM | `AI_BASE_URL` 指向内网 |
+| **向量库** | Qdrant（自托管） | RAG、行为模式检索 |
+| **重 ML** | `python-worker`（FastAPI） | 基线训练、Isolation Forest；**由 ai Node 调用**，server 不直连 |
+
+```text
+server → BullMQ → ai (Node) → Ollama / Qdrant
+                      └──HTTP──► python-worker (仅重 ML)
+```
+
+**不会** 把整个 AI 仓库改成 Python 单体——团队以 TS 开发为主，Python 只承担 Node 生态薄弱的部分。
+
+## 与客户端监控的关系
+
+| 位置 | 职责 |
+| :--- | :--- |
+| Desktop Agent | 实时规则、小模型、CV、时序；默认不上传录屏 |
+| Server | 入库、策略、入队 |
+| ai (Node) | LLM 总结、报告、流程优化编排 |
+| python-worker | 批量基线/异常 ML |
+
+详见 [AI 行为洞察架构](./ai-behavior)。
+
+## 本地开发
+
+```bash
+cd deploy/compose
+docker compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml --profile ai up -d
+docker exec vistaremote-ollama ollama pull llama3.2
+```
+
+[本地 AI 开发环境](/deploy/ai-local-dev)
+
+## 相关 Spec
+
+Meta-Repo：`spec/ai-platform-spec.md`、`spec/ai-behavior-architecture-spec.md`

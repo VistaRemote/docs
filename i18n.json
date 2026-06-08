@@ -1,0 +1,74 @@
+{
+  "guide": {
+    "en": "Guide",
+    "zh": "指南"
+  },
+  "architecture": {
+    "en": "Architecture",
+    "zh": "架构"
+  },
+  "engineering": {
+    "en": "Engineering",
+    "zh": "工程"
+  },
+  "api": {
+    "en": "API",
+    "zh": "API"
+  },
+  "deploy": {
+    "en": "Deploy",
+    "zh": "部署"
+  },
+  "whitepaper": {
+    "en": "Whitepaper",
+    "zh": "白皮书"
+  },
+  "gettingStarted": {
+    "en": "Getting Started",
+    "zh": "快速开始"
+  },
+  "userGuide": {
+    "en": "User Guide",
+    "zh": "用户指南"
+  },
+  "overview": {
+    "en": "Overview",
+    "zh": "总览"
+  },
+  "positioning": {
+    "en": "Positioning",
+    "zh": "产品定位"
+  },
+  "webrtc": {
+    "en": "WebRTC Topology",
+    "zh": "WebRTC 拓扑"
+  },
+  "metaRepo": {
+    "en": "Meta-Repo",
+    "zh": "Meta-Repo"
+  },
+  "gitWorkflow": {
+    "en": "Git Workflow",
+    "zh": "Git 协作"
+  },
+  "cicdRelease": {
+    "en": "CI/CD & Releases",
+    "zh": "CI/CD 与发布"
+  },
+  "docker": {
+    "en": "Docker",
+    "zh": "Docker 部署"
+  },
+  "serverApi": {
+    "en": "Server REST",
+    "zh": "服务端 REST"
+  },
+  "pairing": {
+    "en": "Pairing",
+    "zh": "配对连接"
+  },
+  "adminGuide": {
+    "en": "Admin Console",
+    "zh": "管理台"
+  }
+}

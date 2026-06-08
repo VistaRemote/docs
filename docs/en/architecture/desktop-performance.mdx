@@ -1,0 +1,36 @@
+# Desktop Performance Architecture
+
+Normative: `spec/desktop-performance-spec.md` · `desktop/ARCHITECTURE.md`.
+
+## Goals
+
+1. **No video over IPC** — `MediaStream` into WebRTC.  
+2. **GPU first** — NVENC / Intel QSV where available.  
+3. **Electron as console** — capture/encode/recording move to a **local Agent service** over time.  
+4. **Ship first, optimize later** — commercial MVP before deep native work. **This page does not publish internal schedules.**
+
+## What we optimize for (public)
+
+| Area | Approach |
+| :--- | :--- |
+| Capture | MediaStream pipeline |
+| Encode | Hardware acceleration |
+| Recording | Agent-side buffer + chunked cloud upload |
+| Web / Mobile | WebCodecs, native video surfaces |
+
+Contributors: see `spec/desktop-performance-spec.md` in the Meta-Repo.
+
+## Enterprise Managed
+
+Optional **watchdog** to recover from user `taskkill` (disclosure required). Stub: `electron/watchdog/process-guard.ts`.
+
+## Web & Mobile
+
+| Client | Optimization |
+| :--- | :--- |
+| Web | WebCodecs + Worker — [WebRTC development](/architecture/webrtc-development) |
+| Mobile | RN **JSI** + native video view — `spec/mobile-spec.md` |
+
+## Why not a monorepo?
+
+Flat Meta-Repo isolates native stacks; Rsbuild cold start in **milliseconds**; per-repo CI — see [Positioning](/architecture/positioning).

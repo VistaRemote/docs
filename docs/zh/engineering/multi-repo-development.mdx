@@ -1,0 +1,57 @@
+# Meta-Repo 下的独立开发与发布
+
+VistaRemote 是 **Meta-Repo + 多个独立 Git 仓库**。日常开发、CI、发布都在 **具体子仓库** 内完成，而不是在 Meta 根目录打一个总包。
+
+## 单独开发 web
+
+```bash
+cd web
+pnpm install
+pnpm dev          # 按 web 仓库 README
+pnpm lint         # 必须在 web 目录执行
+git commit && git push   # 推送到 VistaRemote/web 远端
+```
+
+`apps/client`（用户端）与 `apps/admin`（管理台）在同一 **web 仓库** 内，可分别构建发布。
+
+## 单独开发 mobile
+
+```bash
+cd mobile
+pnpm install
+pnpm start        # Metro
+pnpm lint
+git push          # VistaRemote/mobile
+```
+
+## 单独发布
+
+| 仓库 | 产物 |
+| :--- | :--- |
+| shared | npm 包 `@vistaremote/shared` |
+| server | Docker 镜像 / API 服务 |
+| web | 静态资源（client + admin） |
+| mobile | App 安装包 |
+| desktop | Electron 安装包 |
+| docs | 文档静态站 |
+| deploy | 组合各镜像版本的 Compose / K8s |
+
+**deploy** 负责把已发布的各服务版本写进部署清单，不是把所有代码打成一个包。
+
+## CI/CD 与版本
+
+- **shared 先发**：打 tag `v0.2.0` 发布 npm 包，自动通知各消费者开 bump PR
+- **各仓 tag**：如 `server-v0.2.0`、`web-v0.2.0` 触发镜像 / 静态资源发布
+- **本地联调**：仍用 `file:../shared`；CI 使用 `setup-shared` 兄弟目录布局
+
+详见 [CI/CD 与版本发布](/engineering/cicd-release) 与 [spec/cicd-release-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/cicd-release-spec.md)。
+
+## Biome：每个仓库都要配置
+
+- **共享规则**：Meta-Repo `tooling/biome.json`（基线）
+- **端差异**：`biome.server.json` / `biome.web.json` / `biome.mobile.json`
+- **各仓库根**：`biome.json` 一行 `extends` 到对应 preset
+
+Meta-Repo 根的 `pnpm check` **不会**检查 `web/`、`mobile/` 源码（子目录为独立 Git 且被 ignore）。请在子仓库内执行 `pnpm lint`。
+
+详见 Meta-Repo [meta-repo-development-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/meta-repo-development-spec.md)。

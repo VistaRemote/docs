@@ -1,0 +1,51 @@
+# Remote Control (User Guide)
+
+For **operators** using VistaRemote for remote assistance—not developers.
+
+## Roles
+
+| Role | Typical use |
+| :--- | :--- |
+| **Host (agent)** | Office PC runs Desktop Agent and shows a pairing code |
+| **Controller** | Admin enters the code on phone/browser to view and control the desktop |
+
+## How to connect (controller)
+
+| Method | Action |
+| :--- | :--- |
+| **Numeric code** | Enter 6–8 digits on `/pairing` |
+| **QR code** | Scan code shown on host screen |
+| **Link** | Open `https://…/join/…` or org short link |
+
+Web routes: `/pairing`, `/join/{token}`.
+
+## Quick steps
+
+### Host (Desktop)
+
+1. Install VistaRemote Agent (Windows / macOS / Linux).
+2. Sign in with your organization account (or register the device).
+3. Note the **pairing code** on screen (often 6–8 digits, time-limited).
+4. Share the code with the controller; **approve** when they connect before screen share starts.
+
+### Controller (Web or Mobile)
+
+1. Open your organization’s VistaRemote URL (browser or app).
+2. Enter the pairing code on the pairing page.
+3. When status is **connected**, you can see and control the remote desktop.
+
+Technical details: [Pairing](/guide/pairing) (developer-oriented).
+
+## Connection quality
+
+| Issue | Suggestion |
+| :--- | :--- |
+| Laggy video | Check network on both sides; IT may provide TURN |
+| LAN only | Ask IT to allow UDP or deploy TURN |
+| Multiple viewers | Requires **Pro/Enterprise** (SFU); may be limited after trial |
+
+## Security
+
+- Do not share pairing codes with untrusted parties; codes expire.
+- End the session and stop sharing when finished.
+- Enterprise editions may enable audit and behavior policies (admin-configured).

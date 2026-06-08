@@ -1,0 +1,24 @@
+# Messaging: WebSocket vs EventSource
+
+VistaRemote splits transports by use case.
+
+| Data | Protocol | Why |
+| :--- | :--- | :--- |
+| WebRTC signaling (SDP/ICE/rooms) | **WebSocket** | Bidirectional, low latency |
+| Remote control | **WebRTC DataChannel** | Lowest latency |
+| Recording ready, AI summary, alerts | **SSE** | One-way server push is enough |
+| Agent telemetry batches | **HTTPS POST** | Durable ingest |
+| Screen video | **WebRTC media** | Not messaging |
+
+**Do not use SSE for signaling** — clients must send offers, answers, and ICE candidates upstream in real time.
+
+**Async background jobs** (AI audit, recording summarize, etc.) use **BullMQ + Redis**, not the transports above — see **[Job queue](./job-queue)**.
+
+See Meta-Repo `spec/messaging-transport-spec.md`.
+
+## Authentication (P3)
+
+- WSS `/signaling`: **Signaling ticket** (short-lived JWT) on handshake
+- SSE: **Controller or Admin JWT**; `userId` must match token `sub`
+
+Details: [Authorization](./authorization).

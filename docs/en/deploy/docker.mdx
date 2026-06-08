@@ -1,0 +1,17 @@
+# Docker Deployment
+
+Planned stack (`deploy` repo):
+
+- **MySQL 8** (only relational DB)
+- Redis, MinIO, server, ai, coturn
+- web-client & web-admin static sites
+
+PostgreSQL is **not** used.
+
+```bash
+cd deploy
+cp compose/.env.example compose/.env
+docker compose -f compose/docker-compose.yml up -d
+```
+
+See Meta-Repo `spec/deploy-spec.md` for requirements.

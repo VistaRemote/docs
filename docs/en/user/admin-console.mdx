@@ -1,0 +1,40 @@
+# Admin Console (Users)
+
+For **enterprise IT / administrators** managing users, orders, and entitlements.
+
+## Access
+
+- URL is typically `https://<your-domain>/admin` (provided by your operator)
+- Sign in with a **platform admin** or **org admin** account
+
+Roles: [Authorization](/architecture/authorization).
+
+## Modules
+
+| Module | Purpose |
+| :--- | :--- |
+| **Users** | View/disable accounts, assign org roles |
+| **Orders** | Purchase history and status |
+| **Permissions** | Plan and feature flags (SFU, cloud inference) |
+
+Some lists may show **demo data** until MySQL and production JWT are wired — see [Implementation status](/engineering/implementation-status).
+
+## Common tasks
+
+### Grant Pro to a user
+
+1. Confirm payment (or internal contract workflow).
+2. Set plan to `pro` with valid expiry in Permissions or user detail.
+3. User refreshes client or signs in again.
+
+### Disable a user
+
+1. Users → select user → disable.
+2. User cannot start new sessions; active sessions may be dropped per policy.
+
+## Security
+
+- Prefer VPN or private network for admin URL; MFA planned (P1).
+- Audit sensitive actions (user delete, plan changes).
+
+Developers: [Admin getting started](/guide/admin-getting-started).

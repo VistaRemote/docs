@@ -1,0 +1,54 @@
+# Positioning & Advantages
+
+## One-liner
+
+**Open-source, self-hostable** remote desktop and monitoring: **WebRTC** for real-time control, **private AI** for recording insights — data stays on your infrastructure.
+
+**When you do not need tens of millions of concurrent viewers**, VistaRemote is often the **best trade-off**: fast delivery, low customization cost, full-stack **TypeScript** (+ **Python** only for heavy ML).
+
+## vs traditional monitoring
+
+| | Legacy DVR-style tools | VistaRemote |
+| :--- | :--- | :--- |
+| Transport | Proprietary TCP | **WebRTC** |
+| Real-time control | Weak | **Strong** |
+| Playback | Main-thread decode | **WebCodecs** + Worker |
+| AI | Vendor cloud | **Self-hosted `ai` + Ollama** |
+| Customization | C++/closed | **TS + Spec + `shared`** |
+
+## Why not Flutter
+
+Flutter’s Skia/Impeller pitch targets **self-drawn UI** frame rates. VistaRemote bottlenecks are **WebRTC and OS APIs** (DXGI capture, NVENC, global input hooks)—**Rust** via N-API/JSI, not Dart. UI stays **React + Rsbuild** (Web/Desktop) and **React Native + JSI** (mobile). Rspack’s Rust implementation speeds **bundling**, not a reason to adopt Flutter for runtime UI.
+
+**Full narrative for executives, ops, and developers:** [Technical advantages](./tech-advantages) · [Cross-platform stack](./cross-platform-stack) · [ADR-0007](https://github.com/VistaRemote/vibeCode/blob/main/adr/0007-no-flutter-cross-platform-ui.md).
+
+## Development velocity
+
+- **TypeScript** across server, web, desktop, mobile; **Python** in `ai/python-worker` only.
+- **Meta-Repo** (not monorepo): isolated native stacks, **sub-second** Rsbuild cold start, lightweight CI.
+- **MySQL + Docker** — familiar ops in CN/EU SMB.
+- See [Customization](/guide/customization).
+
+## Client performance (summary)
+
+| Client | Approach |
+| :--- | :--- |
+| Web | WebCodecs, Worker decode, JitterBuffer |
+| Mobile | RN **JSI** + native video surface |
+| Desktop | Agent-side capture/recording; hardware encode; low server media load |
+
+[Desktop performance](/architecture/desktop-performance) · [WebRTC tuning](/architecture/webrtc-development).
+
+## Edge AI vs legacy remote tools
+
+Legacy stacks struggle to embed **PaddleOCR-slim + edge Qwen2.5-VL + rules**. VistaRemote treats AI as a first-class pipeline in TS (`desktop/edge-ai`, `ai`).
+
+## Related
+
+- [Technical advantages](/architecture/tech-advantages)
+- [Cross-platform stack (no Flutter)](/architecture/cross-platform-stack)
+- [Desktop performance](/architecture/desktop-performance)
+- [Customization](/guide/customization)
+- [WebRTC topology](/architecture/webrtc-topology)
+
+For the full Chinese narrative (recommended for domestic teams), switch locale to 简体中文.

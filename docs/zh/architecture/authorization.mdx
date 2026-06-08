@@ -1,0 +1,57 @@
+# 认证与授权设计
+
+VistaRemote **不是**纯 RBAC，也**不是**纯 ABAC，而是三者叠加：
+
+```text
+认证（JWT）→ 套餐 Plan → 岗位 RBAC → 资源 ABAC → 允许/拒绝 + 审计
+```
+
+Normative Spec：Meta-Repo `spec/authorization-spec.md`。
+
+## RBAC 还是 ABAC？
+
+| 模型 | 本项目是否单独采用 | 作用 |
+| :--- | :--- | :--- |
+| **RBAC** | 作为**一层** | 稳定岗位：平台 `super_admin`/`admin`/`viewer`；企业 `org_owner`/`it_support`/`member` 等 |
+| **ABAC** | 作为**一层** | 资源边界：设备 `ownerId`、`orgId`、是否 `allowOrgSupport`、Room 成员 |
+| **Plan 权益** | 第三层 | `free`/`pro`/`enterprise` 决定录制、AI、企业安全等商业化能力 |
+
+## 两套「后台」别混淆
+
+| 账号类型 | 登录入口 | 典型人 |
+| :--- | :--- | :--- |
+| **平台 Admin** | `web/apps/admin` | 平台运营、SaaS 超管 |
+| **企业 User（Client）** | `web/apps/client`、移动端 | 员工、老板、IT Support |
+
+IT Support 在 Client 用 `orgRole=it_support` 协助本组织设备；平台管理员用 Admin JWT 管全站用户。
+
+## 业务角色对照
+
+| 说法 | 技术配置 |
+| :--- | :--- |
+| 普通员工 | User `member` |
+| 老板 | User `org_owner` + Enterprise |
+| IT Support | User `it_support` + 设备开启组织协助 |
+| 平台管理员 | Admin `admin` / `super_admin` |
+| 合规只读 | Admin `viewer` 或 User `security_auditor` |
+
+## JWT 与实时通道
+
+| 通道 | 凭证 |
+| :--- | :--- |
+| REST Client API | Controller JWT |
+| REST Admin API | Admin JWT |
+| WSS `/signaling` | **Signaling Ticket**（短效，含 `signaling.join`） |
+| SSE `/api/v1/events/stream` | Controller 或 Admin JWT；`userId` 须与 `sub` 一致 |
+| Agent | Device Token（不能用于信令主控） |
+
+实现状态：权限字与 `evaluatePolicy` 已在 `shared/src/auth/`；WSS/SSE 握手校验为 **P3**（见 messaging-transport Spec FR-MSG-10/11）。
+
+## 代码入口
+
+```text
+shared/src/auth/     # 角色、Permission、JWT Schema、evaluatePolicy
+server/src/auth/     # PolicyService（Nest）
+```
+
+客户端登录后保存 Token；连接信令前向 Server 换取 **Signaling Ticket** 再传给 `SignalingClient`。

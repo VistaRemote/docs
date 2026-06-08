@@ -1,0 +1,28 @@
+{
+  "name": "@vistaremote/docs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VistaRemote documentation site (Rspress)",
+  "scripts": {
+    "dev": "rspress dev",
+    "build": "rspress build",
+    "preview": "rspress preview",
+    "test": "rstest",
+    "test:watch": "rstest -w",
+    "lint": "biome check .",
+    "prepare": "node ../tooling/scripts/setup-husky.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "husky": "^9.1.7",
+    "@rspress/core": "^2.0.2",
+    "@rstest/core": "^0.10.2",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

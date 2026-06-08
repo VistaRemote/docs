@@ -1,0 +1,44 @@
+# 配对与连接
+
+## 流程概览
+
+```text
+被控 Agent 创建 PairingSession（数字码 + 二维码 + 链接）
+        │
+        ▼
+主控（Web / Mobile）任选：输入码 / 扫码 / 打开链接
+        │
+        ▼
+POST /api/v1/auth/pairing → roomId + signalingTicket
+        │
+        ▼
+   WebSocket 交换 SDP / ICE
+        │
+        ▼
+   WebRTC P2P（或 SFU）+ DataChannel 控制
+```
+
+规范：[Agent 分发与接入](/architecture/agent-distribution)。
+
+## 被控端（Desktop Agent）
+
+1. 安装并启动 Electron Agent。
+2. 登录/注册设备，获得 `deviceId`。
+3. 界面展示 **配对码**（或二维码，P1）。
+4. 用户确认授权后开始推流。
+
+## 主控端（Web Client）
+
+1. 打开用户端 `apps/client` 部署地址。
+2. 在配对页输入 6–8 位配对码。
+3. 进入会话页，等待 `connected` 状态后即可操作远程桌面。
+
+## 常见问题
+
+| 现象 | 排查 |
+| :--- | :--- |
+| 一直 `connecting` | 检查 TURN 配置、防火墙 UDP |
+| 配对码无效 | 是否过期（默认 TTL 300s） |
+| 有画面不能控 | DataChannel `control` 是否建立 |
+
+信令消息格式见 Meta-Repo `spec/shared-spec.md`（实现阶段）。

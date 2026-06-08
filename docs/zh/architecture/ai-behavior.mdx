@@ -1,0 +1,37 @@
+# AI 行为洞察架构
+
+VistaRemote 企业版在 **远程桌面** 之上提供 **员工行为监控、告警与效率洞察**。数据默认留在 **客户自托管环境**（Ollama + Qdrant + MySQL），不依赖公网 LLM。
+
+## 多模型分工
+
+| 类型 | 典型技术 | 执行位置 |
+| :--- | :--- | :--- |
+| 实时检测 | 小模型、CV、时序统计 | **客户端（Desktop Agent）优先** |
+| 理解与总结 | 自托管 LLM + RAG | **ai Worker（Node）** |
+| 基线 / 异常 ML | scikit-learn 等 | **python-worker**（由 ai 调度） |
+| 隐私敏感 | 规则 + 本地 CV | **仅端侧**（默认不上云） |
+
+## 端侧优先与自动降云
+
+监控类分析尽量在 **员工电脑本地** 完成。当 CPU 高压或推理超时时，Agent 标记 **降云**，由 Server 投递 `behavior.cloud_infer`，由 **ai (Node)** 或 **python-worker** 补算，且 **不阻塞办公**。
+
+**降云为付费能力**：试用期内可体验；试用结束后须 **Enterprise** 套餐。见 [试用期与付费能力](./commercial-trial)。
+
+## 数据与价值闭环
+
+```text
+端侧检测 → 结构化事件 → Server 入库 → 聚合/向量索引
+                              ↓
+                    ai (LangChain / LangGraph)
+                              ↓
+              效率报告 · 流程优化 · AI 替代建议（审批后展示）
+```
+
+行为数据存入企业 **MySQL**；向量片段进 **Qdrant**。**不默认** 将键盘内容与原始录屏送入 LLM。
+
+## 相关文档
+
+- [AI 平台（私有化与双运行时）](./ai-platform)
+- [本地 AI 开发环境](/deploy/ai-local-dev)
+
+Meta-Repo：`spec/ai-behavior-architecture-spec.md`

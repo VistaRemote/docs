@@ -1,0 +1,58 @@
+# Developer Handbook
+
+End-to-end path for **feature development**. Environment details: [Local development](/guide/local-development).
+
+## 1. Before you code (10 min)
+
+| Step | Doc |
+| :--- | :--- |
+| Clone & one-shot setup | [Quick start](/guide/quick-start) |
+| Spec index | Meta-Repo `spec/README.md` |
+| **What is ready** | [Implementation status](/engineering/implementation-status) |
+| **How to change requirements** | [Spec-driven development](/guide/spec-driven-development) |
+
+See root [DEVELOPMENT.md](https://github.com/VistaRemote/vista-remote/blob/main/DEVELOPMENT.md) for command cheatsheet.
+
+## 2. Architecture at a glance
+
+- **Meta-Repo**: `shared` → `server` / `ai` → `web` / `desktop` / `mobile`
+- **Contracts**: cross-platform types live only in `shared`
+- **Signaling**: WSS `/signaling` + optional SSE
+- **Media**: WebRTC P2P; multi-viewer uses SFU (entitlement-gated)
+
+See [Architecture overview](/architecture/overview).
+
+## 3. Adding a feature (standard flow)
+
+```text
+1. Check implementation-status → dependencies Ready
+2. Add FR-xxx + acceptance criteria in spec/*.md
+3. Update shared (if cross-platform)
+4. Implement server / clients
+5. Tests + manual verification
+6. Update implementation-status + user docs (if user-visible)
+```
+
+Details: [Feature development guide](/guide/feature-development).
+
+## 4. Common dev commands
+
+| Repo | Command |
+| :--- | :--- |
+| `server` | `pnpm start:dev` |
+| `web` client | `pnpm --filter @vistaremote/web-client dev` |
+| `web` admin | `pnpm --filter @vistaremote/web-admin dev` |
+| `desktop` | `pnpm dev` |
+| `shared` | `pnpm build` (after contract changes) |
+
+## 5. Cross-repo PR order
+
+1. Merge `shared`
+2. Consumers pull / bump
+3. Feature PRs (same branch name `feat/xxx`)
+
+See [Git workflow](/engineering/git-workflow).
+
+## 6. AI collaborators
+
+Read Meta-Repo `AGENTS.md` and `.cursor/rules/`.

@@ -1,0 +1,78 @@
+# 本地开发与多环境切�?
+
+新成员按此流程可�?**一条命�?* 内完成本地基础设施与依赖安装，并在 **Local / Dev / SIT / UAT** 之间切换 API 地址�?
+
+## 一键搭建（推荐�?
+
+```bash
+git clone git@github.com:VistaRemote/vista-remote.git
+cd vista-remote
+nvm use          # Node 24.11+
+./init.sh        # Windows: .\init.ps1
+./dev.sh         # Windows: .\dev.ps1
+```
+
+`dev.sh` / `dev.ps1` 会：
+
+1. 应用 **local** 环境变量到各子仓�?`.env`
+2. 启动 Docker：`mysql`、`redis`、`ollama`（见 `deploy/compose`�?
+3. 对已 clone 的子仓库执行 `pnpm install`
+4. 构建 `@vistaremote/shared`
+
+可�?AI 栈：
+
+```bash
+./dev.sh --with-ai
+# �?pnpm dev:up:ai
+```
+
+## 启动各端（多终端�?
+
+```bash
+cd server && pnpm start:dev
+cd web && pnpm --filter @vistaremote/web-client dev
+cd web && pnpm --filter @vistaremote/web-admin dev
+cd desktop && pnpm dev
+cd mobile && pnpm start
+cd ai && pnpm start:dev
+```
+
+## 切换环境（Local / Dev / SIT / UAT�?
+
+配置文件�?Meta-Repo：`config/environments/*.env`�?*Dev/SIT/UAT 域名请按你们团队实际地址修改�?*
+
+```bash
+pnpm env:local   # 本机 localhost
+pnpm env:dev
+pnpm env:sit
+pnpm env:uat
+```
+
+然后 **重启** 你正在运行的 Web / Desktop / Mobile / Server 进程即可，无需改代码�?
+
+| 环境 | 典型 API |
+| :--- | :--- |
+| local | `http://localhost:3000` |
+| dev | `https://api.dev.example.com` |
+| sit | `https://api.sit.example.com` |
+| uat | `https://api.uat.example.com` |
+
+## 只克�?desktop �?mobile 仓库
+
+无需拉整�?Meta-Repo 时，�?**该仓库根目录**�?
+
+```bash
+pnpm setup
+```
+
+脚本会：
+
+- 若检测到上层 Meta-Repo �?走完�?`setup-single-repo`
+- 否则自动 `git clone` 同级目录 `../shared` 并安装依�?
+
+之后同样可在 Meta 根目录用 `pnpm env:dev` 切换环境（若你同�?clone �?meta 仅用于脚本）�?
+
+## 相关 Spec
+
+- `spec/developer-experience-spec.md`
+- `spec/meta-repo-development-spec.md`

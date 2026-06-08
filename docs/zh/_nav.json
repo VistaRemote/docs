@@ -1,0 +1,26 @@
+[
+  {
+    "text": "guide",
+    "link": "/guide/quick-start",
+    "activeMatch": "/guide/"
+  },
+  {
+    "text": "architecture",
+    "link": "/architecture/overview",
+    "activeMatch": "/architecture/"
+  },
+  {
+    "text": "deploy",
+    "link": "/deploy/docker",
+    "activeMatch": "/deploy/"
+  },
+  {
+    "text": "api",
+    "link": "/api/server-rest",
+    "activeMatch": "/api/"
+  },
+  {
+    "text": "whitepaper",
+    "link": "/whitepaper/"
+  }
+]

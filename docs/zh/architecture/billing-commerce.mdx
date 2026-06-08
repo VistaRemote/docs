@@ -1,0 +1,36 @@
+# 订单、订阅与多端功能拦截
+
+## 付费形态
+
+| 形态 | 说明 |
+| :--- | :--- |
+| **订阅** | 月付 / 年付（年付约 84–85 折）；到期需续费 |
+| **买断** | 一次付费，对应套餐长期有效 |
+
+商品 SKU 与价格示意见 `shared/src/billing/catalog.ts`。
+
+## 试用与拦截
+
+| 功能 | 试用 14 天 | 试用后 Free | Pro（有效订阅/买断） | Enterprise |
+| :--- | :---: | :---: | :---: | :---: |
+| SFU | ✓ | ✗ | ✓ | ✓ |
+| AI 降云 | ✓ | ✗ | ✗ | ✓ |
+
+**服务端**：信令分配 SFU、队列 `behavior.cloud_infer` 前校验。  
+**客户端**：`GET /api/v1/billing/entitlements`，Web 使用 `FeatureGate`；Desktop 降云前 `assertCloudInferAllowed`。
+
+## 支付渠道
+
+微信、支付宝、PayPal、Wise（开发中对接）；**银行卡** 占位、后续上线。
+
+创建订单：`POST /api/v1/billing/orders`（body: `sku`, `provider`）。
+
+## 管理台模块
+
+| 模块 | 路由 |
+| :--- | :--- |
+| 用户管理 | `/users` |
+| 订单管理 | `/orders` |
+| 权限管理 | `/permissions`（RBAC 字表） |
+
+Spec：`spec/billing-commerce-spec.md`、`spec/commercial-tier-spec.md`

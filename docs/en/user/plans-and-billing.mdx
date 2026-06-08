@@ -1,0 +1,43 @@
+# Plans & Billing (Users)
+
+## Plan overview
+
+| Plan | For |
+| :--- | :--- |
+| **Free / trial** | Personal or non-commercial; time-limited premium trial |
+| **Pro** | Small teams; SFU multi-viewer, cloud AI inference, etc. |
+| **Enterprise** | Audit, policies, self-hosted, dedicated support |
+
+Canonical rules: [Commercial trial](/architecture/commercial-trial) and `spec/commercial-tier-spec.md`.
+
+## After trial ends
+
+These typically require a **paid plan**:
+
+- **SFU** multi-viewer
+- **Cloud behavior inference** (`ai.cloud_infer`)
+- **Cloud recording & playback** (`recording` — agent-side buffer upload)
+
+## Recording & plans
+
+| Capability | Plan | Notes |
+| :--- | :--- | :--- |
+| Agent-side recording + cloud storage | Pro+ | Local buffer, chunked upload; **not** default SFU recording |
+| SFU server recording | Enterprise | PlainTransport + FFmpeg; high resource use |
+
+See [Recording & billing](/architecture/recording-and-billing).
+
+## Purchase options
+
+- **Subscription**: monthly/yearly renewal
+- **Perpetual**: one-time license (per product catalog)
+
+Payment methods depend on deployment: WeChat Pay, Alipay, PayPal, Wise, etc.
+
+## Upgrade & renewal
+
+1. Sign in to the web client or contact sales for checkout.
+2. Entitlements apply after successful payment (production uses webhooks; dev may simulate).
+3. Renew before expiry to avoid SFU / cloud inference being blocked.
+
+Integrators: [Commercial billing](/architecture/commercial-billing).

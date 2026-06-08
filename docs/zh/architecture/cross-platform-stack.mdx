@@ -1,0 +1,57 @@
+# 跨端技术栈：为何不用 Flutter
+
+> **产品优势视角**（给老板、运维、开发的不同话术）见 **[技术选型优势](./tech-advantages)**。
+
+VistaRemote 的 **Web、Electron 桌面、React Native 移动** 统一采用 **React + TypeScript** 生态，**不** 采用 Flutter。底层截屏、硬件编码、键鼠 Hook 由 **Rust** 原生模块承担（非 Dart）。
+
+规范与决策记录：[ADR-0007](https://github.com/VistaRemote/vibeCode/blob/main/adr/0007-no-flutter-cross-platform-ui.md) · [ADR-0003](https://github.com/VistaRemote/vibeCode/blob/main/adr/0003-rust-not-cpp-for-native.md) · Meta-Repo `spec/frontend-toolchain-spec.md`。
+
+## 常见说法 vs 本项目判断
+
+| 说法 | 我们的判断 |
+| :--- | :--- |
+| 「Flutter 靠 Skia/Impeller GPU 渲染，比 JS 跨端流畅」 | 远控性能瓶颈在 **音视频与系统 API**，不在自绘 UI 帧率 |
+| 「一套 Dart 代码三端」 | 采集/编码/Hook 仍要 **Rust/C++**；与现有 `shared` TS 契约和 Nest 生态割裂 |
+| 「Rspack 也是 Rust 写的」 | Rust 用于 **构建工具** 与 **运行时原生模块**，职责不同，不意味着 UI 也要换 Flutter |
+
+## 大前端：React + Rspack 系
+
+| 端 | 运行时 | 构建 |
+| :--- | :--- | :--- |
+| Web Client / Admin | React 19 + antd | **Rsbuild**（Rspack） |
+| Desktop 渲染进程 | React + antd（与 Web 同构） | **Rsbuild** |
+| Mobile 主控 | React Native 新架构 | **Metro** |
+| 文档站 | MDX | **Rspress** |
+
+- **Electron**：Chromium 原生 **WebGL2 / WebGPU** 完善，远程画面走 WebRTC + 硬解。
+- **React Native**：**JSI** 直连 Native，`react-native-webrtc` 热路径不再受旧桥接延迟拖累。
+
+## 底层：Rust，不是 Dart
+
+远程桌面需要的能力示例：
+
+- Windows **DXGI Desktop Duplication** 截屏
+- **NVENC / QSV** 等硬件编码
+- 系统级 **键鼠 Hook** 与输入注入
+- 与 Agent Service 的 **零帧 IPC**
+
+这些 **Dart/Flutter 做不好**，也 **不应** 塞进 Flutter 插件里硬啃。Rust 模块通过 **N-API** 供 Electron 使用，通过 **Native Module + JSI** 供 RN 使用；Rust 工程师可专注音视频底层，TS/React 工程师专注产品与控制台。
+
+演进路线见 [Desktop 性能架构](./desktop-performance)（内部 R1–R6 不对用户承诺排期）。
+
+## 对比小结
+
+| 维度 | VistaRemote | Flutter 路线 |
+| :--- | :--- | :--- |
+| UI 跨端 | React / RN + antd 系 | Dart Widget |
+| 打包 | Rsbuild / Metro | Flutter toolchain |
+| 底层性能 | **Rust**（ADR-0003） | 仍需 C++/Rust 插件 |
+| 后端契约 | TypeScript `shared` | 需桥接或重写 |
+| 团队扩展 | 前端 + Rust 分工清晰 | Dart + 原生双轨 |
+
+## 相关文档
+
+- [技术选型优势](./tech-advantages)
+- [产品定位](./positioning)
+- [前端工具链 Spec](https://github.com/VistaRemote/vibeCode/blob/main/spec/frontend-toolchain-spec.md)
+- [Mobile Spec](https://github.com/VistaRemote/vibeCode/blob/main/spec/mobile-spec.md)

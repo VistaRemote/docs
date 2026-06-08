@@ -1,0 +1,22 @@
+# Admin Console Getting Started
+
+**Web Admin** (`web/apps/admin`) is for platform and org administrators: users, orders, and entitlements.
+
+## Access
+
+- Deployed separately, e.g. `https://admin.example.com`
+- Sign in with admin roles (`super_admin` / `admin` / `viewer`)
+
+## Core areas
+
+| Module | Capabilities |
+| :--- | :--- |
+| **Users** | List, create, disable, assign plan |
+| **Orders** | Purchase history and status |
+| **Permissions** | Feature flags (SFU, cloud inference) |
+
+Some screens use **demo data** until MySQL and production JWT are wired — see [Implementation status](/engineering/implementation-status).
+
+End-user oriented guide: [Admin console (users)](/user/admin-console).
+
+Plans: [Commercial trial](/architecture/commercial-trial).

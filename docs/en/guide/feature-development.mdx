@@ -1,0 +1,50 @@
+# Feature Development Guide
+
+Example: add in-session **quality preset switching** on Web Client (assume Spec defines `FR-WRTC-20`).
+
+## Step 0 — Gates
+
+1. Open `spec/implementation-status.md`; confirm WebRTC / client is 🟡 or ✅.
+2. Read `spec/webrtc-architecture-spec.md` and `spec/web-client-spec.md`.
+
+## Step 1 — Update Spec
+
+In `webrtc-architecture-spec.md` add:
+
+- `FR-WRTC-20` behavior, defaults, mapping to `PlaybackQualityPreset`
+- Acceptance: stats reflect new jitter target within 3s after switch
+
+## Step 2 — shared
+
+```text
+shared/src/webrtc/codec-preference.ts
+pnpm build && pnpm test
+```
+
+## Step 3 — server (if needed)
+
+Signaling broadcast / auth: `server/src/signaling/`; plan limits via `EntitlementService`.
+
+## Step 4 — web client
+
+`web/apps/client`: UI + existing RTC tuning helpers.
+
+## Step 5 — Verification
+
+| Check | How |
+| :--- | :--- |
+| Unit | shared / server tests |
+| Manual | `dev.sh` → two browsers or client + desktop |
+| Entitlements | trial/paid per `commercial-tier-spec` |
+
+## Step 6 — Wrap-up
+
+1. Update `implementation-status.md`
+2. If user-visible: update [Remote control (users)](/user/remote-control)
+3. PR template with FR list and repos touched
+
+## Anti-patterns
+
+- Duplicating DTOs in `web` without `shared`
+- Large features without FR IDs
+- Cross-repo PRs with mismatched branch names

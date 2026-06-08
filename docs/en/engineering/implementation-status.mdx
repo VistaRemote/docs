@@ -1,0 +1,42 @@
+# Implementation Status (developers)
+
+Summary synced with Meta-Repo `spec/implementation-status.md`. **Update the source file when merging PRs that change readiness.**
+
+## Summary
+
+| Area | Status |
+| :--- | :--- |
+| Spec + SDD workflow | ✅ |
+| shared contracts | ✅ |
+| Local dev-up / env profiles | ✅ |
+| Server persistence / real payments | 🟡 P1 |
+| E2E pairing + JWT | 🟡 MVP-A/B |
+
+**Takeaway**: parallel feature work inside existing boundaries is supported; full production loop follows MVP phases below.
+
+## Repositories
+
+| Repo | Status | Notes |
+| :--- | :--- | :--- |
+| shared | ✅ | Signaling, auth, billing, telemetry, ai jobs |
+| server | 🟡 | WSS/SSE, SFU routing, entitlements; in-memory stores |
+| web/client | 🟡 | Signaling client, playback, FeatureGate |
+| web/admin | 🟡 | Users/orders/permissions skeleton |
+| desktop | 🟡 | Electron, edge-ai, env |
+| mobile | 🟡 | RN skeleton, peer-session |
+| ai | 🟡 | Worker, LLM stub, python-worker |
+| deploy | ✅ | compose, mediasoup profile |
+| docs | ✅ | zh/en Rspress |
+
+## Suggested MVP sequence
+
+1. **MVP-A** — MySQL User/Session + JWT
+2. **MVP-B** — Client pairing + 1:1 video
+3. **MVP-C** — BullMQ + AI summarize
+4. **MVP-D** — Recording to MinIO
+
+Full matrix: [spec/implementation-status.md](https://github.com/VistaRemote/vista-remote/blob/main/spec/implementation-status.md).
+
+## Foundation checklist
+
+F-01–F-10 (init, shared, env, docker, signaling, entitlements, docs site) are ready — see `spec/architecture-foundation-spec.md`.

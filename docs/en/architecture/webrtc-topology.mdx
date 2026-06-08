@@ -1,0 +1,40 @@
+# WebRTC topology
+
+VistaRemote defaults to **P2P + STUN/TURN (coturn)** for 1:1 remote desktop. Use **mediasoup SFU** when multiple controllers watch one agent, P2P keeps failing, or **TURN relay load** is too high.
+
+> **Commercial**: SFU is included during the **14-day trial**; after trial you need **Pro** or higher. See [Trial and paid features](./commercial-trial).
+
+> Normative spec: Meta-Repo `spec/webrtc-architecture-spec.md`
+
+## Why not SRS?
+
+| Factor | Rationale |
+| :--- | :--- |
+| Use case | Remote desktop & enterprise monitoring, not mass live streaming |
+| Scale | Tens of concurrent sessions — mediasoup sidecar is enough |
+| Stack | TypeScript end-to-end, same ops model as server/ai |
+| Cost | SRS adds a separate C++ media plane we do not need |
+
+## Mode matrix
+
+| Scenario | Mode | Media path |
+| :--- | :--- | :--- |
+| 1 controller : 1 agent | **P2P** | End-to-end; coturn relay if needed |
+| 1 agent : N controllers | **SFU** | Single uplink to mediasoup; N downlinks |
+| Repeated ICE failure | **SFU** | Server policy fallback |
+| coturn overload | **SFU** | New sessions prefer SFU to spare TURN |
+
+## Channels
+
+| Channel | Purpose |
+| :--- | :--- |
+| RTP | Screen video |
+| DataChannel `control` | Input events |
+| WebSocket | Signaling only |
+
+NestJS **does not terminate RTP** except via the separate mediasoup worker.
+
+## See also
+
+- [WebRTC development guide](/en/architecture/webrtc-development)
+- [Positioning](/en/architecture/positioning)

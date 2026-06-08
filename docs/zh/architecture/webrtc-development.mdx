@@ -1,0 +1,119 @@
+# WebRTC 开发与调优
+
+面向在 `shared` / `server` / `web` / `desktop` / `mobile` 上实现媒体的开发者。
+
+## 仓库与代码入口
+
+| 仓库 | 路径 | 职责 |
+| :--- | :--- | :--- |
+| shared | `src/signaling/`、`src/webrtc/` | 信令类型、ICE、传输策略、播放档位 |
+| server | `src/webrtc/`、`src/ice/`、`src/sfu/` | 模式决策、ICE API、mediasoup 适配 |
+| web/client | `src/webrtc/` | `RemotePlayer`、`JitterBuffer`、`PeerSession` |
+| desktop | `electron/webrtc/` | `WebRtcPublisher`、发送端调优 |
+| mobile | `src/services/webrtc/` | RN 会话壳（与 web 对齐） |
+
+## 默认路径：P2P + TURN
+
+1. 主控/被控从 `GET /api/v1/ice/servers` 拉取 STUN/TURN。
+2. `TransportPolicyService` 在 **1:1 且 TURN 未过载** 时返回 `mode: p2p`。
+3. 交换 SDP/ICE（WebSocket，载荷见 `shared` 信令类型）。
+
+**注意**：TURN 用于 **穿透**，不应成为所有会话的默认数据中心中继。监控 coturn relay 带宽，超阈后新会话走 SFU（环境变量 `TURN_LOAD_THRESHOLD`，默认 0.85）。
+
+## 何时走 mediasoup SFU
+
+- Room 内主控数 ≥ 2（培训、巡检、多屏监控）。
+- 同一 Session P2P ICE 连续失败。
+- `turnLoad.bandwidthRatio` 或 `allocationRatio` 超过阈值。
+- 企业策略 `forceSfu: true`。
+
+Server 通过信令 `session-mode` 下发 `MediasoupSfuParams`（`roomId`、`signalingUrl` 等）。
+
+## 消息通道（别混用）
+
+| 类型 | 协议 |
+| :--- | :--- |
+| 信令 | **WebSocket** — `SignalingClient` |
+| 控制 | **DataChannel** — 不用 WS |
+| 通知 | **SSE** — `EventStreamClient` |
+
+详见 [消息推流说明](/architecture/messaging-transport)。
+
+## 播放端：抖动与 Web Worker
+
+除 `JitterBuffer` 外，P1 提供 **`decode.worker.ts`**：
+
+- 解码与缓冲在 Worker 内完成
+- 主线程 `DecodeWorkerBridge` 仅 `drawImage` 上屏
+- 避免 React 重渲染与 Long Task 叠加卡顿
+
+```text
+web/apps/client/src/webrtc/
+├── workers/decode.worker.ts
+├── worker-bridge.ts
+└── remote-player.ts   # 自动优先 Worker 路径
+```
+
+## 播放端：抖动与主线程（补充）
+
+远程桌面对 **操作延迟** 敏感，画面卡顿常来自：
+
+1. **网络抖动** — 使用 `JitterBuffer`（流畅 50ms / 清晰 120ms）。
+2. **主线程阻塞** — React 重渲染、大列表、同步 JSON 解析；解码应在 **Worker / 独立 canvas 绘制循环**。
+3. **软解 CPU** — 优先 **WebCodecs** `VideoDecoder`（GPU 硬解），不支持时回退 `video` + `drawImage`。
+
+实现见 `web/apps/client/src/webrtc/remote-player.ts`。
+
+### 手动调优清单
+
+```typescript
+// shared 导出 defaultRtcTuning / rtcTuningConfigSchema
+iceTransportPolicy: 'all' | 'relay'
+degradationPreference: 'maintain-framerate'  // 远程操作优先
+maxVideoBitrate: number                      // 发送端
+playbackPreset: 'fluent' | 'clear'         // 接收缓冲
+```
+
+- 采集 `RTCStatsReport`：`inbound-rtp.jitter`、`framesDropped`（Enterprise 可上报）。
+- 弱网：先降帧率，再降分辨率（与 `FR-WRTC-22` 一致）。
+
+## 被控端（Electron）
+
+- `WebRtcPublisher` 在 **主进程** 创建 `RTCPeerConnection`。
+- SFU 模式：**单路 Publish**，禁止 N 个观众 N 路上行。
+- `applyDegradationPreference` 保持操作流畅。
+
+## 本地联调
+
+```bash
+# Meta-Repo
+./init.sh
+cd server && pnpm dev          # ICE API :3000/api/v1/ice/servers
+cd web && pnpm dev:client      # 主控
+cd desktop && pnpm dev         # 被控
+```
+
+Chrome：`chrome://webrtc-internals` 查看候选类型（host / srflx / relay）与当前是否 P2P。
+
+## P2 能力（已实现）
+
+| 能力 | 说明 |
+| :--- | :--- |
+| **WSS 信令** | `server` `SignalingGateway` → `ws://host/signaling` |
+| **Redis 多实例** | `REDIS_URL` 启用 `RedisSignalingBus` / `RedisEventsBus` |
+| **SSE 按用户** | `GET /api/v1/events/stream?userId=&orgId=` |
+| **mediasoup** | `docker compose --profile webrtc` + `MEDIASOUP_CONTROLLER_URL` |
+| **stats.worker** | `RtcStatsBridge` 主线程仅 getStats，聚合在 Worker |
+
+```bash
+# 本地全栈 WebRTC 依赖
+docker compose -f deploy/compose/docker-compose.dev.yml up -d
+docker compose -f deploy/compose/docker-compose.dev.yml --profile webrtc up -d
+cd server && cp .env.example .env && pnpm dev
+```
+
+## 相关 Spec
+
+- [webrtc-architecture-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/webrtc-architecture-spec.md)
+- [system-overview](https://github.com/VistaRemote/vista-remote/blob/main/spec/system-overview.md) §4
+- [deploy-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/deploy-spec.md) — coturn / mediasoup 端口

@@ -1,0 +1,33 @@
+# Meta-Repo Architecture
+
+## Why not a monorepo?
+
+| Dimension | Monorepo | VistaRemote Meta-Repo |
+| :--- | :--- | :--- |
+| Electron / RN native deps | hoist conflicts | isolated `node_modules` per repo |
+| Build pipelines | coupled toolchains | Rsbuild / Metro / NestJS decoupled |
+| Contract sync | workspace imports | physical `shared` repo + npm |
+
+## Layout
+
+```text
+vista-remote/ (Meta-Repo)
+├── init.sh / dev.sh
+├── spec/
+├── shared/
+├── server/
+├── ai/
+├── web/         # apps/client + apps/admin
+├── desktop/
+├── mobile/
+├── docs/
+└── deploy/
+```
+
+## Git essentials
+
+- **No** submodule / subtree
+- Commit inside each sub-repo directory
+- Contract changes: **`shared` first**, then `server`, then clients
+
+See [Git workflow](/engineering/git-workflow) and [CI/CD & releases](/engineering/cicd-release).

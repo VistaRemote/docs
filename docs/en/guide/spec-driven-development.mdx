@@ -1,0 +1,48 @@
+# Spec-Driven Development (SDD)
+
+VistaRemote iterates with **Specs as the boundary**: requirement IDs and acceptance criteria first, then code.
+
+Canonical spec: Meta-Repo `spec/spec-driven-development-spec.md`.
+
+## Document layers
+
+| Layer | Location | Audience |
+| :--- | :--- | :--- |
+| L0 | `system-overview.md` | User stories US-xx |
+| L1 | `*-spec.md` | Module FR-xx |
+| L2 | `server/spec/SPEC.md` etc. | Single-repo detail |
+| End users | This site `user/*` | Operators & end users |
+| Developers | This site `guide/*` | Contributors |
+
+## Requirement IDs
+
+| Prefix | Meaning |
+| :--- | :--- |
+| `US-xx` | User story |
+| `FR-xxx` | Functional requirement |
+| `SEC-xx` | Security |
+
+List affected FRs in PR descriptions; refactors with no behavior change should say so explicitly.
+
+## Implementation order (required)
+
+```text
+shared → server / ai → web | desktop | mobile → docs
+```
+
+Skipping this order causes contract drift and CI failures.
+
+## Implementation status
+
+Before coding, read [Implementation status](/engineering/implementation-status):
+
+- **✅ Ready**: implement FRs as written
+- **🟡 Partial**: extend existing stubs / in-memory stores
+- **⬜ Planned**: land infrastructure first or split a P1 task
+
+## PR checklist
+
+- [ ] Updated or confirmed relevant `spec/*.md`
+- [ ] Cross-platform changes in `shared`
+- [ ] Updated `implementation-status.md` when readiness changes
+- [ ] User-visible changes documented under `user/*` or `guide/*`

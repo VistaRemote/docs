@@ -1,0 +1,31 @@
+# 服务端 REST API（摘要）
+
+> 完整字段以 `@vistaremote/shared` 与 `spec/server-spec.md` 为准。以下为导航用摘要。
+
+## 公开 / 主控
+
+| Method | Path | 说明 |
+| :--- | :--- | :--- |
+| `POST` | `/api/v1/auth/pairing` | 配对码加入 |
+| `POST` | `/api/v1/devices/register` | Agent 注册 |
+| `POST` | `/api/v1/devices/heartbeat` | 心跳 |
+| `GET` | `/api/v1/ice` | ICE servers |
+
+## 管理端 `/api/v1/admin`
+
+| Method | Path | 说明 |
+| :--- | :--- | :--- |
+| `POST` | `/admin/auth/login` | 管理员登录 |
+| `GET` | `/admin/users` | **全部用户**列表 |
+| `PATCH` | `/admin/users/:id/plan` | 修改套餐 |
+| `GET` | `/admin/recordings` | 录制列表 |
+| `GET` | `/admin/security/incidents` | 安全事件 |
+
+## WebSocket
+
+- 路径：`/signaling`
+- 载荷：`SignalingEnvelope`（`shared` 定义）
+
+## 套餐守卫
+
+`free` 用户调用 Pro/Enterprise 接口返回 `PLAN_FORBIDDEN`。

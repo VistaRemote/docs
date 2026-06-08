@@ -1,0 +1,38 @@
+# Desktop 性能架构
+
+Normative：`spec/desktop-performance-spec.md` · 仓库内 `desktop/ARCHITECTURE.md`。
+
+## 设计目标
+
+1. **视频帧不走 IPC** — `MediaStream` 直进 WebRTC。  
+2. **GPU 优先** — 构建启用 NVENC、Intel QSV。  
+3. **Electron 只做控制台** — 采集/编码/录制逐步下沉 **本地 Agent 服务**。  
+4. **先交付再深化** — 优先可商用能力；深度性能路线在 Meta-Repo `spec/` 维护，**本文不写未发布排期**。
+
+## 当前工程方向（可对外表述）
+
+| 方向 | 说明 |
+| :--- | :--- |
+| MediaStream 采集 | 减轻服务端与 SFU 压力 |
+| 硬件编码 | NVENC / QSV |
+| 端侧录制 | 本地缓冲 + 分片上传 |
+| Web / Mobile | WebCodecs、RN 原生视图 |
+
+贡献者详见 Meta-Repo `spec/desktop-performance-spec.md`。
+
+## 企业 Managed 专项
+
+- **进程守护**：可选 Watchdog，防止普通用户 `taskkill`（须法律告知）。  
+- 实现桩：`electron/watchdog/process-guard.ts`。
+
+## 与 Web / Mobile 分工
+
+| 端 | 播放/交互优化 |
+| :--- | :--- |
+| Web | WebCodecs + Worker + JitterBuffer → [WebRTC 开发调优](/architecture/webrtc-development) |
+| Mobile | RN **JSI** + 原生 `RTCView` → `spec/mobile-spec.md` |
+| Desktop | 本文 + 采集/编码侧 |
+
+## 为何不用 Monorepo？
+
+Meta-Repo **平铺多仓**：Electron 原生 C++ 与 RN Metro **物理隔离**，Rsbuild 冷启动 **数百毫秒**，CI 按仓并行 — 见 [产品定位](/architecture/positioning#meta-repo-与构建)。

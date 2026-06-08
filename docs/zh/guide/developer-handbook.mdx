@@ -1,0 +1,58 @@
+# 开发者手册
+
+面向 **功能开发** 的完整路径；环境细节见 [本地开发与多环境](/guide/local-development)。
+
+## 1. 开始前（10 分钟）
+
+| 步骤 | 文档 |
+| :--- | :--- |
+| 克隆与一键环境 | [快速开始](/guide/quick-start) |
+| Spec 索引 | Meta-Repo `spec/README.md` |
+| **能写什么** | [实现状态](/engineering/implementation-status) |
+| **怎么改需求** | [Spec 驱动开发](/guide/spec-driven-development) |
+
+根目录 [DEVELOPMENT.md](https://github.com/VistaRemote/vista-remote/blob/main/DEVELOPMENT.md) 为命令速查入口。
+
+## 2. 架构速览
+
+- **Meta-Repo**：`shared` → `server` / `ai` → `web` / `desktop` / `mobile`
+- **契约**：跨端类型只在 `shared` 定义
+- **信令**：WSS `/signaling` + 可选 SSE 通知
+- **媒体**：WebRTC P2P；多观众走 SFU（需套餐权益）
+
+详见 [架构总览](/architecture/overview)。
+
+## 3. 新增功能（标准流程）
+
+```text
+1. 查 implementation-status → 确认依赖已 Ready
+2. 在对应 spec/*.md 写 FR-xxx + 验收标准
+3. 改 shared（若跨端）
+4. 实现 server / 客户端
+5. 单测 + 手测
+6. 更新 implementation-status + 用户文档（若可见）
+```
+
+分步说明：[功能开发指南](/guide/feature-development)。
+
+## 4. 常用仓库命令
+
+| 仓库 | 开发 |
+| :--- | :--- |
+| `server` | `pnpm start:dev` |
+| `web` client | `pnpm --filter @vistaremote/web-client dev` |
+| `web` admin | `pnpm --filter @vistaremote/web-admin dev` |
+| `desktop` | `pnpm dev` |
+| `shared` | `pnpm build`（改契约后先 build） |
+
+## 5. 跨库 PR 顺序
+
+1. `shared` 合并
+2. 各消费者拉取 / bump
+3. 业务仓 PR（**同名分支** `feat/xxx`）
+
+见 [Git 工作流](/engineering/git-workflow) 与 `spec/git-collaboration-spec.md`。
+
+## 6. AI 协作者
+
+阅读 Meta-Repo `AGENTS.md`；Cursor 规则见 `.cursor/rules/`。

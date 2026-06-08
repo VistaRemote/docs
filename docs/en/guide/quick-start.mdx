@@ -1,0 +1,44 @@
+# Quick Start
+
+## Prerequisites
+
+- Git
+- Node.js â‰?22.0.0ï¼ˆrecommended **24.11 LTS** â€?run `nvm use` at Meta-Repo rootï¼?
+- pnpm â‰?9
+
+## Meta-Repo
+
+```bash
+git clone git@github.com:VistaRemote/vista-remote.git
+cd vista-remote
+chmod +x init.sh
+./init.sh
+```
+
+## Documentation site
+
+```bash
+cd docs
+pnpm install
+pnpm dev
+```
+
+Open the URL printed in the terminal (default `http://localhost:5173`).
+
+## Local dev (recommended)
+
+```bash
+./dev.sh    # Windows: .\dev.ps1
+```
+
+See [Developer handbook](/guide/developer-handbook).
+
+## Next
+
+- [Developer handbook](/guide/developer-handbook)
+- [Spec-driven development](/guide/spec-driven-development)
+- [Implementation status](/engineering/implementation-status)
+- [Pairing](/guide/pairing)
+- [User: remote control](/user/remote-control)
+- [Positioning](/architecture/positioning)
+- [Docker](/deploy/docker)

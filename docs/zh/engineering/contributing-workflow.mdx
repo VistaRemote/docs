@@ -1,0 +1,55 @@
+# 贡献流程与 PR
+
+## 开始之前
+
+1. 阅读 [CONTRIBUTING](https://github.com/VistaRemote/vista-remote/blob/main/CONTRIBUTING.md)（Meta-Repo）
+2. 实现功能前阅读对应 [Spec](https://github.com/VistaRemote/vista-remote/tree/main/spec)
+3. `./init.sh` 拉取子仓库，用 **工作区** 打开 `vista-remote.code-workspace`
+
+## 日常流程
+
+```text
+拉取 main → 创建分支 → 开发 → Biome 检查 → 提交 → 推送 → 开 PR → Review → 合并
+```
+
+### 分支命名
+
+- `feat/模块-描述` — 新功能
+- `fix/问题描述` — 修复
+
+**跨库开发**：在 `shared`、`server`、`web` 等仓库使用 **相同分支名**。
+
+### 提交信息（Conventional Commits）
+
+```text
+feat(server): add admin user pagination API
+fix(web): correct pairing form validation message
+docs(docs): add contributing workflow page
+```
+
+本地通过 **commitlint** + Husky 校验（Meta-Repo 根目录 `pnpm install` 后生效）。
+
+### 改 shared 的顺序
+
+1. 先 PR 合并 `shared`
+2. 打 tag `v0.x.x` 发布 `@vistaremote/shared`（或等维护者发版）
+3. 各消费者合并自动 bump PR 后，再 PR / 发版 `server`、客户端
+
+发版与 tag 约定见 [CI/CD 与版本发布](/engineering/cicd-release)。
+
+## Pull Request
+
+- 使用仓库 PR 模板填写：改动仓库、Spec、自测、关联 Issue
+- CI 须通过：子仓 `pnpm lint`、test、build（含 `setup-shared` 布局）
+- 至少 1 人 Review；默认 **Squash merge** 到 `main`
+
+## 行为与安全
+
+- [行为准则](https://github.com/VistaRemote/vista-remote/blob/main/CODE_OF_CONDUCT.md)
+- 安全漏洞请走 [SECURITY.md](https://github.com/VistaRemote/vista-remote/blob/main/SECURITY.md)，勿公开 Issue
+
+## 相关
+
+- [CI/CD 与版本发布](/engineering/cicd-release)
+- [Git 协作与 IDE](/engineering/git-workflow)
+- [代码规范 Biome](/engineering/code-style)

@@ -1,0 +1,53 @@
+# AI platform: private deployment and dual runtime
+
+VistaRemote AI is built around two product pillars:
+
+1. **Private deployment, simple ops, data sovereignty** — self-hosted LLM and vector DB; no default traffic to OpenAI or other public SaaS APIs.
+2. **Behavior insights and long-term value** — edge monitoring plus cloud understanding for efficiency reports, **process optimization**, and future **automation / AI replacement** recommendations.
+
+## Async jobs: BullMQ
+
+Background AI work uses **BullMQ on Redis**, not RabbitMQ or Kafka. Rationale (NestJS integration, job lifecycle, Redis reuse) is in **[Job queue](./job-queue)**.
+
+## TypeScript first, Python where it wins
+
+| Layer | Stack | Notes |
+| :--- | :--- | :--- |
+| **Primary worker** | Node.js / TypeScript | BullMQ, callbacks to `server`, same contracts as the rest of the monorepo |
+| **LLM orchestration** | LangChain.js, LangGraph.js | Summaries, weekly reports, multi-step optimization agents |
+| **Inference** | Ollama / vLLM | `AI_BASE_URL` points to your network |
+| **Vector store** | Self-hosted **Qdrant** | RAG and behavior pattern retrieval |
+| **Heavy ML** | `python-worker` (FastAPI) | Baselines, Isolation Forest; called **only** from the Node `ai` worker |
+
+```text
+server → BullMQ → ai (Node) → Ollama / Qdrant
+                      └──HTTP──► python-worker (heavy ML only)
+```
+
+We do **not** rewrite the entire AI stack in Python—the team ships mainly in TS; Python is a focused microservice.
+
+## Relation to client monitoring
+
+| Tier | Role |
+| :--- | :--- |
+| Desktop Agent | Real-time rules, small models, CV, time-series; no screen upload by default |
+| Server | Ingest, policy, enqueue |
+| ai (Node) | LLM summaries, reports, LangGraph workflows |
+| python-worker | Batch baseline / anomaly ML |
+
+See [AI behavior architecture](./ai-behavior).
+
+## Local development
+
+```bash
+cd deploy/compose
+docker compose -f docker-compose.dev.yml up -d
+docker compose -f docker-compose.dev.yml --profile ai up -d
+docker exec vistaremote-ollama ollama pull llama3.2
+```
+
+[Local AI dev environment](/deploy/ai-local-dev)
+
+## Specs
+
+Meta-Repo: `spec/ai-platform-spec.md`, `spec/ai-behavior-architecture-spec.md`

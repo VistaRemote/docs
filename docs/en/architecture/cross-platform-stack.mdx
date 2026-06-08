@@ -1,0 +1,56 @@
+# Cross-platform stack: why not Flutter
+
+> **Product narrative** for executives, operations, and developers: **[Technical advantages](./tech-advantages)**.
+
+VistaRemote uses **React + TypeScript** for **Web, Electron desktop, and React Native mobile** UI. We do **not** use Flutter. Screen capture, hardware encoding, and system-level input hooks are implemented in **Rust** native modules—not Dart.
+
+Normative sources: [ADR-0007](https://github.com/VistaRemote/vibeCode/blob/main/adr/0007-no-flutter-cross-platform-ui.md) · [ADR-0003](https://github.com/VistaRemote/vibeCode/blob/main/adr/0003-rust-not-cpp-for-native.md) · `spec/frontend-toolchain-spec.md`.
+
+## Common claims vs our view
+
+| Claim | Our view |
+| :--- | :--- |
+| “Flutter’s Skia/Impeller GPU rendering beats JS cross-platform” | Remote desktop bottlenecks are **media pipelines and OS APIs**, not self-drawn widget frame rates |
+| “One Dart codebase for all platforms” | Capture/encode/hooks still need **Rust/C++**; splits from our TypeScript `shared` contracts and NestJS ecosystem |
+| “Rspack is written in Rust too” | Rust powers **build tools** and **runtime native modules**—different roles; UI stays on React |
+
+## Big frontend: React + Rspack toolchain
+
+| Surface | Runtime | Bundler |
+| :--- | :--- | :--- |
+| Web Client / Admin | React 19 + antd | **Rsbuild** (Rspack) |
+| Desktop renderer | React + antd (aligned with Web) | **Rsbuild** |
+| Mobile controller | React Native (New Architecture) | **Metro** |
+| Docs site | MDX | **Rspress** |
+
+- **Electron**: Chromium **WebGL2 / WebGPU** are production-ready; video uses WebRTC + hardware decode.
+- **React Native**: **JSI** gives near zero-copy paths to native code; legacy bridge latency is no longer the main issue for `react-native-webrtc`.
+
+## Native layer: Rust, not Dart
+
+Examples of what remote desktop requires:
+
+- Windows **DXGI Desktop Duplication** capture
+- **NVENC / QSV** hardware encoding
+- System-level **keyboard/mouse hooks**
+- **Zero-frame IPC** with the Agent Service
+
+**Flutter/Dart cannot own these well.** Rust ships as **N-API** modules for Electron and **Native Module + JSI** for RN—Rust engineers focus on AV/native performance; TS/React engineers own product UI.
+
+See [Desktop performance](./desktop-performance) for the internal roadmap (no user-facing Rust schedule in docs).
+
+## Summary
+
+| Dimension | VistaRemote | Flutter path |
+| :--- | :--- | :--- |
+| UI cross-platform | React / RN + antd family | Dart widgets |
+| Bundling | Rsbuild / Metro | Flutter toolchain |
+| Native performance | **Rust** (ADR-0003) | Still needs C++/Rust plugins |
+| Backend contracts | TypeScript `shared` | Extra bridging |
+| Team split | Frontend + Rust | Dart + native dual track |
+
+## Related
+
+- [Technical advantages](./tech-advantages)
+- [Positioning](./positioning)
+- [Frontend toolchain spec](https://github.com/VistaRemote/vibeCode/blob/main/spec/frontend-toolchain-spec.md)

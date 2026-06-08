@@ -1,0 +1,22 @@
+# Git Workflow & IDE Setup
+
+VistaRemote uses multiple independent `.git` repositories under one Meta-Repo folder. Configure your IDE for the best experience.
+
+## Why not submodules?
+
+See [Meta-Repo architecture](/architecture/meta-repo). Physical isolation keeps Electron, RN, and NestJS builds independent.
+
+## Cursor / VS Code
+
+Open **`vista-remote.code-workspace`** (multi-root) instead of only the outer folder so Source Control shows each repo separately.
+
+## Commits & PRs
+
+- **Style**: Biome — `pnpm check:fix` (see `spec/engineering-standards-spec.md`)
+- **Contributing**: [Contributing workflow](/engineering/contributing-workflow)
+- **Releases**: [CI/CD & releases](/engineering/cicd-release)
+- **Specs**: `spec/git-collaboration-spec.md` in the Meta-Repo
+
+## Cross-repo changes
+
+When touching `shared`, merge **shared first**, then bump consumers on the **same branch name** (e.g. `feat/webrtc-sfu`).

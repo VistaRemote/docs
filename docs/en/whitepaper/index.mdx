@@ -1,0 +1,30 @@
+# VistaRemote Whitepaper
+
+| | |
+| :--- | :--- |
+| **Version** | 0.3.0 (Draft) |
+| **Organization** | VibeCode |
+
+## Summary
+
+VistaRemote is a **cross-platform remote desktop** system built on **WebRTC** (P2P first, SFU for broadcast). It targets teams who need **self-hosted** deployments with optional **private AI** (recordings, summaries, enterprise security insights).
+
+## Plans
+
+| Plan | Remote | Recording | AI |
+| :--- | :---: | :---: | :---: |
+| Free | ✓ | — | — |
+| Pro | ✓ | ✓ | Session summary |
+| Enterprise | ✓ | ✓ + policy triggers | Anomaly & efficiency reports |
+
+## Stack
+
+- NestJS + TypeORM + **MySQL 8**
+- Rsbuild / Rspress / Electron / React Native
+- BullMQ + **`ai`** (Node/TS, LangChain) + self-hosted **Ollama** + **Qdrant**; Python microservice for heavy ML only
+
+---
+
+For the full whitepaper (Chinese), switch to **简体中文** or read the complete sections in the zh locale site tree.
+
+Related: [Architecture](/architecture/overview) · [Positioning](/architecture/positioning)
