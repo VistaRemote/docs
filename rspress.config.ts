@@ -5,9 +5,10 @@ export default defineConfig({
   lang: 'zh',
   title: 'VistaRemote',
   description: 'WebRTC 远程桌面 · 可私有化 AI · TypeScript 全栈',
+  icon: '/brand-logo.png',
   logo: {
-    light: '/logo-light.svg',
-    dark: '/logo-dark.svg',
+    light: '/brand-logo.png',
+    dark: '/brand-logo.png',
   },
   locales: [
     {

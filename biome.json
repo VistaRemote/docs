@@ -1,7 +1,4 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
-  "extends": ["../tooling/biome.web.json"],
-  "files": {
-    "includes": ["**", "!**/doc_build", "!**/.rspress", "!**/node_modules"]
-  }
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "extends": ["../tooling/biome.web.json"]
 }
