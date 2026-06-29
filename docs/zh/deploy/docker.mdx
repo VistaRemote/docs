@@ -4,7 +4,7 @@
 
 | 服务 | 说明 |
 | :--- | :--- |
-| **mysql** | MySQL 8，utf8mb4（**唯一**关系型库） |
+| **postgres** | PostgreSQL 16（**唯一**关系型 OLTP；宿主机 **:5436**） |
 | **redis** | 会话、BullMQ |
 | **minio** | Pro+ 录制对象存储 |
 | **server** | NestJS API + 信令 |
@@ -12,18 +12,18 @@
 | **coturn** | TURN/STUN |
 | **web-client** / **web-admin** | 静态资源 |
 
-> 全栈不使用 PostgreSQL。
+> 与 **LuminaryWorks** 生态一致，全栈使用 **PostgreSQL** 作为唯一 OLTP。
 
 ## 快速开始（规划）
 
 ```bash
 cd deploy
 cp compose/.env.example compose/.env
-# 编辑 MySQL、JWT、MinIO、AI 等变量
-docker compose -f compose/docker-compose.yml up -d
+# 编辑 PostgreSQL、JWT、MinIO、AI 等变量
+docker compose -f compose/docker-compose.dev.yml up -d
 ```
 
-具体 Compose 文件随 `deploy` 仓库实现完善；规格见 Meta-Repo `spec/deploy-spec.md`。
+具体 Compose 文件见 `deploy/compose/`；规格见 Meta-Repo `spec/deploy-spec.md` 与 [ADR-0008](https://github.com/VistaRemote/vibeCode/blob/main/adr/0008-postgresql-oltp.md)。
 
 ## 防火墙
 

@@ -14,7 +14,7 @@
 
 VistaRemote 是 VibeCode 开源生态中的 **跨平台远程桌面控制系统**。系统以 **WebRTC** 为核心传输技术：在 **一对一** 场景优先采用 **P2P 直连** 降低延迟与服务器带宽；在 **一对多观摩** 场景自动切换 **SFU** 拓扑，由被控端单路上行、观众多路下行。控制指令经 **SCTP DataChannel** 传输，与音视频分离，保证交互响应。
 
-工程上采用 **Flat Meta-Repo + Multi-Repo**：在保留 **TypeScript 全栈**一致性的同时，隔离 Electron 与 React Native 的构建冲突。关系型数据库统一为 **MySQL 8**（面向国内开发者与运维的主流选择）。开发流程遵循 **Spec-Driven Development（SDD）**，支撑 **Vibe Code** 高效迭代。
+工程上采用 **Flat Meta-Repo + Multi-Repo**：在保留 **TypeScript 全栈**一致性的同时，隔离 Electron 与 React Native 的构建冲突。关系型数据库统一为 **PostgreSQL 16**（面向国内开发者与运维的主流选择）。开发流程遵循 **Spec-Driven Development（SDD）**，支撑 **Vibe Code** 高效迭代。
 
 **相对传统监控**：实时 **WebRTC** 远程而非仅事后录像；**开源可自建**，AI 分析可留在企业内网。详见 [产品定位与核心优势](/architecture/positioning)。
 
@@ -49,7 +49,7 @@ WebRTC 已在浏览器与原生端成熟：标准 codecs、DTLS-SRTP、ICE/NAT �
 | :--- | :--- |
 | **目标用户** | 开发者、中小企业 IT、技术支持团队、VibeCode 社区 |
 | **部署模式** | 私有化 / 自建为主，可选公有云托管（路线图） |
-| **差异化** | WebRTC 实时远程 + 可私有化 AI + 开源；TS 全栈降低二开与招聘成本；MySQL 友好部署 |
+| **差异化** | WebRTC 实时远程 + 可私有化 AI + 开源；TS 全栈降低二开与招聘成本；PostgreSQL（LuminaryWorks 生态） |
 | **非目标** | 替代重型 VDI、游戏级帧同步、无授权监控 |
 
 ### 2.2 核心优势（对外口径）
@@ -57,13 +57,13 @@ WebRTC 已在浏览器与原生端成熟：标准 codecs、DTLS-SRTP、ICE/NAT �
 1. **WebRTC 架构**：相较传统基于专有协议或纯录屏的「监控」，提供低延迟 **实时远程控制** 与观摩（P2P / SFU）。  
 2. **AI 可自控**：独立 `ai` 服务；企业可自建 **Ollama**，录制与洞察数据不出域。  
 3. **开源 vs 商业监控**：代码可审计、可二开；相对闭源 DLP/桌面监控，**数据主权**在企业。  
-4. **TypeScript 全栈**：国内开发者生态成熟，**招人、定制、部署**（Docker + MySQL）成本低。
+4. **TypeScript 全栈**：国内开发者生态成熟，**招人、定制、部署**（Docker + PostgreSQL）成本低。
 
 展开论述见 [产品定位](/architecture/positioning)。
 
-### 2.3 数据存储：MySQL
+### 2.3 数据存储：PostgreSQL
 
-全项目采用 **MySQL 8.0+（InnoDB, utf8mb4）** 作为唯一关系型数据库，通过 TypeORM 访问。原因包括：国内团队熟悉度高、云 RDS 默认选项、与企业现有 DBA 体系兼容。不使用 PostgreSQL 作为目标架构。
+全项目采用 **PostgreSQL 16+** 作为唯一关系型 OLTP，通过 TypeORM + `pg` 访问。与 **LuminaryWorks** 生态（identity、auth-core）一致，便于跨项目联调与共享 DBA 规范。本地开发见 `deploy/compose/docker-compose.dev.yml`（宿主机 **:5436**）。
 
 ### 2.4 Vibe Code 与 Spec-Driven
 
@@ -181,7 +181,7 @@ Server **不转发媒体**，仅负责信令、鉴权、ICE 配置与 SFU 资源
 | 层级 | 选型 |
 | :--- | :--- |
 | 契约 | TypeScript + Zod（`shared`） |
-| 服务端 | **NestJS + TypeORM + MySQL 8** |
+| 服务端 | **NestJS + TypeORM + PostgreSQL 16** |
 | AI 服务 | **独立 `ai` 仓库**（Node 主栈 + LangChain；自托管 Ollama + Qdrant；Python 微服务仅重 ML） |
 | 对象存储 | MinIO / S3（会话录制） |
 | 套餐 | **free** · **pro**（录制+AI摘要）· **enterprise**（安全+效率洞察） |
@@ -219,7 +219,7 @@ AI 推理集中在 **`ai` 子项目**（Node/TS），避免拖累信令；**默�
 | **M3 观摩** | T0+16w | SFU 一对多 | 3+ 观众稳定观看 |
 | **M4 Pro** | T0+18w | 录制/回放 + AI 摘要 | Pro 套餐 |
 | **M5 Enterprise** | T0+22w | 策略录制、多屏、安全与效率报告 | Enterprise |
-| **M6 部署** | T0+24w | MySQL + MinIO + ai + deploy | 私有化一键 |
+| **M6 部署** | T0+24w | PostgreSQL + MinIO + ai + deploy | 私有化一键 |
 
 （具体排期由核心团队按资源调整。）
 
@@ -280,7 +280,8 @@ VistaRemote 隶属 **VibeCode**，面向全球开发者：
 | 版本 | 日期 | 说明 |
 | :--- | :--- | :--- |
 | 0.1.0 | 2026-05-24 | 首版白皮书草案 |
-| 0.2.0 | 2026-05-24 | MySQL、套餐、ai 仓库、企业安全与录制 |
+| 0.2.0 | 2026-05-24 | 套餐、ai 仓库、企业安全与录制 |
+| 0.3.0 | 2026-06-28 | OLTP 改为 PostgreSQL（LuminaryWorks 生态对齐） |
 
 ---
 

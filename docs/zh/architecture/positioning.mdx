@@ -22,7 +22,7 @@
 | **观看体验** | 录屏回放为主，实时卡顿常见 | **WebCodecs 硬解** + 抖动缓冲，减轻浏览器主线程卡顿 |
 | **实时性** | 偏「事后回放」，实时远程体验弱 | **实时远程控制** + 可选录制，同一套链路 |
 | **AI 能力** | 多绑定厂商云端，模型与数据不可控 | **独立 `ai` 服务**，支持公有 LLM API 或 **Ollama 私有化** |
-| **部署** | 闭源安装包 + 厂商云 | **开源** + Docker Compose **自建**（信令、MySQL、存储、AI 均可内网） |
+| **部署** | 闭源安装包 + 厂商云 | **开源** + Docker Compose **自建**（信令、PostgreSQL、存储、AI 均可内网） |
 | **扩展** | C++/Delphi 老栈，二开困难 | **全栈 TypeScript**，契约在 `shared`，Spec 驱动 |
 
 ---
@@ -32,7 +32,7 @@
 | 维度 | 典型企业级桌面监控（商业） | VistaRemote |
 | :--- | :--- | :--- |
 | **授权** | 闭源、席位昂贵 | **个人非盈利免费**；**商业使用须签约**（见 [开源协议](/guide/licensing)） |
-| **数据主权** | 录像与分析数据常经厂商云 | **企业自建**：MySQL + MinIO + 内网 AI，满足合规与等保倾向 |
+| **数据主权** | 录像与分析数据常经厂商云 | **企业自建**：PostgreSQL + MinIO + 内网 AI，满足合规与等保倾向 |
 | **AI 与隐私** | 黑盒分析，难以审计 Prompt 与出境 | 策略、录制、LLM 端点 **可配置**，审计日志可追踪 |
 | **远程协助** | 监控为主，远程控场为辅或另购 | **监控 + 远程控制** 统一 WebRTC 架构 |
 | **人才** | 厂商生态绑定 | **NestJS / React / RN / Electron**，国内开发者储备大 |
@@ -70,30 +70,30 @@
 | :--- | :--- | :--- |
 | 前端 | Rsbuild（Rspack） | 编译快，与 Webpack 生态兼容 |
 | 后端 | NestJS + TypeORM | 国内 Node 企业级事实标准 |
-| 数据库 | **MySQL 8** | 运维熟悉度高，云厂商托管成熟（见下文） |
+| 数据库 | **PostgreSQL 16** | 运维熟悉度高，云厂商托管成熟（见下文） |
 | 部署 | `deploy` Compose 模板 | 单机/内网一键拉起全栈 |
 
-### 4.4 为何选用 MySQL（而非 PostgreSQL）
+### 4.4 为何选用 PostgreSQL（LuminaryWorks 生态）
 
-这是 **刻意的工程选择**，服务于国内主流运维与招聘场景：
+这是 **与 LuminaryWorks 生态对齐** 的工程选择：
 
 | 考量 | 说明 |
 | :--- | :--- |
-| **开发者熟悉度** | 国内绝大多数后端/全栈简历与实战经验以 **MySQL** 为主 |
-| **托管与备份** | 阿里云 RDS、腾讯云、华为云等 **默认心智** 均为 MySQL |
-| **企业现有资产** | 许多组织已有 MySQL 集群、慢查询与主从规范，**复用 DBA 能力** |
-| **TypeORM 支持** | 与 NestJS 组合成熟，`utf8mb4` + InnoDB 满足本项目 JSON 列（审计 meta）需求 |
+| **生态一致** | identity、auth-core 与共享基础设施已统一 **PostgreSQL** |
+| **跨项目复用** | TypeORM 实体、迁移与运维 playbook 可在生态内共享 |
+| **能力扩展** | JSONB、窗口函数；可选 **pgvector** 与 Qdrant 并存 |
+| **TypeORM 支持** | 与 NestJS + `pg` 驱动组合成熟，`server` 已接入 |
 
-> **规范说明**：全项目 Spec 与部署文档以 **MySQL 8.0+** 为唯一关系型数据库。若发现文档仍写 PostgreSQL，视为 **笔误**，应以本说明与 Meta-Repo `spec/server-spec.md` 为准。
+> **规范说明**：全项目 Spec 与部署文档以 **PostgreSQL 16+** 为唯一关系型 OLTP。见 Meta-Repo [ADR-0008](https://github.com/VistaRemote/vibeCode/blob/main/adr/0008-postgresql-oltp.md) 与 `spec/server-spec.md`。
 
 ---
 
 ## 5. 安全可控：企业为什么敢用我们的 AI
 
-1. **私有化部署**：Server、MySQL、MinIO（录制）、Redis、`ai` Worker 均可部署在企业 VPC。  
+1. **私有化部署**：Server、PostgreSQL、MinIO（录制）、Redis、`ai` Worker 均可部署在企业 VPC。  
 2. **LLM 可选内网**：Enterprise 配置 `AI_BASE_URL` 指向 **Ollama / 私有推理网关**，会话摘要与报告 **不出域**。  
 3. **职责分离**：信令路径（`server`）与重计算（`ai`）分进程，便于防火墙分区。  
-4. **透明审计**：连接、录制播放、套餐变更、安全事件写入 MySQL，Admin 可查询导出。  
+4. **透明审计**：连接、录制播放、套餐变更、安全事件写入 PostgreSQL，Admin 可查询导出。  
 5. **开源可审**：核心链路可代码审计，避免「黑盒监控」信任危机。
 
 ---

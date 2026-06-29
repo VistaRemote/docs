@@ -11,7 +11,7 @@ Normative: [ADR-0007](https://github.com/VistaRemote/vibeCode/blob/main/adr/0007
 | You care about | VistaRemote answer |
 | :--- | :--- |
 | **Time to market** | TypeScript everywhere, **sub-second Rsbuild** cold start, Docker Compose stack |
-| **Vendor lock-in** | **Open source**, **self-hosted** MySQL / MinIO / on-prem AI |
+| **Vendor lock-in** | **Open source**, **self-hosted** PostgreSQL / MinIO / on-prem AI |
 | **Smooth remote control** | **WebRTC** + client-side GPU encode + optional **Rust** for DXGI/NVENC |
 | **AI governance** | Separate `ai` service, **Ollama in VPC**, **BullMQ** retries & visibility |
 | **Hiring** | **React / NestJS / RN** — no forced **Flutter + native** dual track |
@@ -46,7 +46,7 @@ See [Positioning](./positioning) and [Docker deploy](/deploy/docker).
 
 | Component | Role | Why it helps |
 | :--- | :--- | :--- |
-| **MySQL 8** | App data | Standard ops in CN/EU SMB |
+| **PostgreSQL 16** | App data | Standard ops in CN/EU SMB |
 | **Redis** | Sessions + **BullMQ** | No extra Kafka/RabbitMQ cluster |
 | **Docker Compose** | Full stack | Templates in `deploy` repo |
 | **mediasoup** | SFU sidecar | When 1:N viewers need it |
@@ -65,7 +65,7 @@ Ship first on Electron/TS; add **Rust** in `desktop/native` by ROI — without r
 
 - Web / Admin / Desktop UI: **React 19 + antd + Rsbuild**
 - Mobile: **React Native + JSI** + `react-native-webrtc`
-- Server: **NestJS + MySQL**
+- Server: **NestJS + PostgreSQL**
 - Contracts: `@vistaremote/shared`
 
 Flutter’s GPU story targets **widget rendering**, not **WebRTC + OS APIs**. Details: [Cross-platform stack](./cross-platform-stack).
@@ -97,7 +97,7 @@ flowchart LR
     Srv[NestJS]
     Redis[(Redis BullMQ)]
     AI[ai worker]
-    DB[(MySQL)]
+    DB[(PostgreSQL)]
   end
   Web --> Srv
   Mob --> Srv

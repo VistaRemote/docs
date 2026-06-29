@@ -1,6 +1,6 @@
 # AI behavior insights architecture
 
-VistaRemote Enterprise adds **monitoring, alerts, and efficiency insights** on remote desktop. Data stays in **customer-controlled infrastructure** (Ollama + Qdrant + MySQL)—no default dependency on public LLM APIs.
+VistaRemote Enterprise adds **monitoring, alerts, and efficiency insights** on remote desktop. Data stays in **customer-controlled infrastructure** (Ollama + Qdrant + PostgreSQL)—no default dependency on public LLM APIs.
 
 ## Multi-model split
 
@@ -27,7 +27,7 @@ Edge detection → structured events → Server → aggregates / vectors
          efficiency reports · process optimization · automation candidates
 ```
 
-Events live in **MySQL**; embeddings in **Qdrant**. Keystroke content and raw screen capture are **not** sent to the LLM by default.
+Events live in **PostgreSQL**; embeddings in **Qdrant**. Keystroke content and raw screen capture are **not** sent to the LLM by default.
 
 ## Related docs
 

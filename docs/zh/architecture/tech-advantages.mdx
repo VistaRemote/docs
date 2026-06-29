@@ -11,7 +11,7 @@
 | 您关心什么 | VistaRemote 的答案 |
 | :--- | :--- |
 | **能不能尽快上线？** | 全栈 **TypeScript** + **Rsbuild 秒级构建** + Docker 一键栈，二开以天计而非月计 |
-| **会不会被厂商绑架？** | **开源可审计** + **私有化部署**（MySQL、MinIO、内网 AI） |
+| **会不会被厂商绑架？** | **开源可审计** + **私有化部署**（PostgreSQL、MinIO、内网 AI） |
 | **画面卡不卡、稳不稳？** | **WebRTC** 实时链路 + 端侧 **GPU 编码** + 可选 **Rust** 压榨 DXGI/NVENC |
 | **AI 数据敢不敢用？** | 独立 `ai` 服务 + **Ollama 内网** + BullMQ 可重试、可观测 |
 | **团队招不招得到人？** | **React / NestJS / RN** 国内主流栈，**不** 强推 Flutter 双轨 |
@@ -39,7 +39,7 @@ VistaRemote 选择 **React 做 UI、Rust 只做该做的事**：控制台与 Adm
 
 ### 3. 合规与信任：数据在自家机房
 
-- 录像、审计、AI 摘要均可落在 **企业 VPC**（MySQL + MinIO + Redis + 可选 Ollama）。
+- 录像、审计、AI 摘要均可落在 **企业 VPC**（PostgreSQL + MinIO + Redis + 可选 Ollama）。
 - 相对闭源监控厂商：**无黑盒云分析、无强制出境**，利于等保与内审叙事。
 
 详见 [产品定位](./positioning) · [Docker 部署](/deploy/docker)。
@@ -52,7 +52,7 @@ VistaRemote 选择 **React 做 UI、Rust 只做该做的事**：控制台与 Adm
 
 | 组件 | 角色 | 为何省心 |
 | :--- | :--- | :--- |
-| **MySQL 8** | 业务库 | 国内 DBA 最熟，云 RDS 现成 |
+| **PostgreSQL 16** | 业务库 | 国内 DBA 最熟，云 RDS 现成 |
 | **Redis** | 会话、信令 Pub/Sub、**BullMQ 队列** | **不另起** RabbitMQ/Kafka 集群 |
 | **Docker Compose** | 单机/内网全栈 | `deploy` 仓模板化，见 [deploy-spec](https://github.com/VistaRemote/vibeCode/blob/main/spec/deploy-spec.md) |
 | **mediasoup** | SFU 侧车 | 按需启用，非千万级直播栈 |
@@ -78,7 +78,7 @@ VistaRemote 选择 **React 做 UI、Rust 只做该做的事**：控制台与 Adm
 
 - **Web / Admin / Desktop UI**：React 19 + antd + Rsbuild
 - **Mobile**：React Native 新架构 + **JSI**（`react-native-webrtc` 热路径）
-- **Server**：NestJS + TypeORM + MySQL
+- **Server**：NestJS + TypeORM + PostgreSQL
 - **契约**：`@vistaremote/shared` 单点真相
 
 「Flutter GPU 比 JS 快」在远控场景 **不成立**：瓶颈在 **WebRTC 与 OS API**；RN 的 JSI 已解决旧桥接延迟。详见 [跨端技术栈](./cross-platform-stack)。
@@ -113,7 +113,7 @@ flowchart LR
     Srv[NestJS server]
     Redis[(Redis BullMQ)]
     AI[ai Worker]
-    DB[(MySQL)]
+    DB[(PostgreSQL)]
   end
   Web --> Srv
   Mob --> Srv
@@ -135,7 +135,7 @@ flowchart LR
 | 底层截屏编码 | 黑盒 | 仍需原生插件 | **Rust 明确路线** |
 | 后台 AI 任务 | 厂商云 | 自研成本高 | **BullMQ + 私有化 ai** |
 | 二开 | 难 | 中（双栈） | **TS 全栈 + Spec** |
-| 运维组件 | 不透明 | 常膨胀 | **MySQL + Redis + Compose** |
+| 运维组件 | 不透明 | 常膨胀 | **PostgreSQL + Redis + Compose** |
 
 ---
 

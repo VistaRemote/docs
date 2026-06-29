@@ -26,11 +26,11 @@ Compared with **traditional screen-recording monitoring** and **closed-source en
 | Pillar | VistaRemote |
 | :--- | :--- |
 | **WebRTC-native** | Real-time remote control and streaming—not legacy TCP DVR-style monitoring only |
-| **Open source & self-hosted** | Full stack on-prem: **MySQL**, MinIO, optional **private LLM (Ollama)**—AI data stays inside the enterprise |
+| **Open source & self-hosted** | Full stack on-prem: **PostgreSQL**, MinIO, optional **private LLM (Ollama)**—AI data stays inside the enterprise |
 | **TypeScript end-to-end** | Lower hiring friction in China, lower customization cost, Spec-Driven + Vibe Code |
 | **AI by design** | Dedicated `ai` workers; not bolted onto a proprietary cloud |
 
-Detailed positioning (including **why MySQL over PostgreSQL** for domestic teams): [产品定位](/architecture/positioning).
+Detailed positioning (including **PostgreSQL alignment with LuminaryWorks**): [产品定位](/architecture/positioning).
 
 ---
 
@@ -64,7 +64,7 @@ vistaRemote/ (Meta-Repo Root)
 ├── init.sh                  # Distributed repository orchestrator
 ├── spec/                    # System design blueprints and compliance bounds
 ├── shared/                  # THE SINGLE SOURCE OF TRUTH (TypeScript Types & Contracts)
-├── server/                  # NestJS + TypeORM + MySQL
+├── server/                  # NestJS + TypeORM + PostgreSQL
 ├── ai/                      # AI/分析 Worker（BullMQ + LLM，独立仓库）
 ├── web/                     # Rsbuild: apps/client + apps/admin (全用户管理台)
 ├── desktop/                 # Controlled Agent & Dashboard (Electron + React)
@@ -84,7 +84,7 @@ VistaRemote follows **Spec-Driven Development (SDD)** under the VibeCode workflo
 | **System Overview (L0)** | Meta-Repo `spec/system-overview.md` | Architects, leads |
 | **Git Collaboration** | [Git 协作](/engineering/git-workflow) | All contributors |
 | **Whitepaper** | [/whitepaper/](/whitepaper/) | Product, community, stakeholders |
-| **Positioning** | [/architecture/positioning](/architecture/positioning) | WebRTC vs 传统监控、开源 vs 商业、MySQL 选型 |
+| **Positioning** | [/architecture/positioning](/architecture/positioning) | WebRTC vs 传统监控、开源 vs 商业、PostgreSQL 选型 |
 
 ### WebRTC topology (normative summary)
 
