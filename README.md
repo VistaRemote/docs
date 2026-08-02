@@ -1,11 +1,11 @@
-# VistaRemote 文档站
+﻿# VistaRemote 文档站
 
 基于 [Rspress 2](https://rspress.rs/)（**Rspack 生态**）的技术文档：架构、部署、API、产品优势与二开指南。
 
 | Metadata | Value |
 | :--- | :--- |
 | **仓库** | `VistaRemote/docs` |
-| **许可证** | [LICENSE](./LICENSE) |
+| **许可证** | [Polyform Noncommercial 1.0.0](LICENSE) (Polyform-NC) |
 
 ## 环境要求
 
