@@ -48,6 +48,14 @@ docker exec vistaremote-ollama ollama pull llama3.2
 
 [Local AI dev environment](/deploy/ai-local-dev)
 
+## LuminaryWorks AI Platform boundary
+
+- **Keep in VistaRemote:** edge detection, recording, BullMQ worker, product RAG, Python ML, Casbin.
+- **Use the shared gateway:** LLM completion / embedding / BYOK vault / managed credits. Treat the `ai` worker as an adapter—do not invent a parallel Provider/Vault semantics.
+- **Default: no exfiltration** still beats managed SaaS.
+
+Authority: [LuminaryWorks AI Platform](https://docs.luminaryworks.dev/develop/ai-platform) · MetaRepo `spec/ai-platform-spec.md`
+
 ## Specs
 
 Meta-Repo: `spec/ai-platform-spec.md`, `spec/ai-behavior-architecture-spec.md`

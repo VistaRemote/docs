@@ -48,6 +48,14 @@ docker exec vistaremote-ollama ollama pull llama3.2
 
 [本地 AI 开发环境](/deploy/ai-local-dev)
 
+## LuminaryWorks AI Platform 边界
+
+- **保留在 VistaRemote**：端侧检测、录制、BullMQ worker、产品 RAG、Python ML、Casbin。
+- **交给中央网关**：LLM 补全 / embedding / BYOK vault / 托管额度。`ai` 子仓降为适配器，不另造平行 Provider 语义。
+- **默认不出网** 仍优先于托管 SaaS。
+
+权威：[LuminaryWorks AI 平台](https://docs.luminaryworks.dev/develop/ai-platform) · MetaRepo `spec/ai-platform-spec.md`
+
 ## 相关 Spec
 
 Meta-Repo：`spec/ai-platform-spec.md`、`spec/ai-behavior-architecture-spec.md`
