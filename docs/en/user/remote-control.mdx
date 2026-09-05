@@ -59,9 +59,20 @@ When the host has two or more monitors:
 
 - Closing the window keeps the Agent in the **system tray**; restore, disconnect, or quit from the tray.
 - Tray menu includes **Open at login**.
+- **Linux**: X11 / XWayland inject directly; pure Wayland needs Screen sharing + Remote Desktop portal consent. See [Linux remote control](/guide/linux-remote-control).
+
+## Clipboard, files, and terminal (Web / Viewer)
+
+After the session is connected and the host has armed control, the side panel can:
+
+- Sync **plain-text** clipboard both ways
+- List the host user home directory and upload/download a single file (chunked)
+- Open a user-session terminal (for example `echo` / `dir`)
+
+Inject and ops channels stop as soon as the session disconnects.
 
 ## Security
 
-- Do not share pairing codes with untrusted parties; codes expire.
+- Do not share pairing codes with untrusted parties; codes expire and are **one-shot** (`PAIRING_CONSUMED`) — a class cannot reuse one code.
 - End the session and stop sharing when finished.
 - Enterprise editions may enable audit and behavior policies (admin-configured).

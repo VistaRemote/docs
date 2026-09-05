@@ -1,0 +1,31 @@
+# Linux 已登录远控（门户与 X11）
+
+VistaRemote **不要求**关闭 Wayland 或强制 Xorg。已登录图形会话即可。
+
+## 会话类型
+
+| 环境 | 注入 | 采集（本轮） |
+| :--- | :--- | :--- |
+| X11（仅 `DISPLAY`） | XTest | Chromium `getDisplayMedia` |
+| XWayland（同时有 `WAYLAND_DISPLAY` 与 `DISPLAY`） | 优先 XTest | 屏幕共享门户 / Chromium |
+| 纯 Wayland（仅 `WAYLAND_DISPLAY`） | 需 **xdg-desktop-portal RemoteDesktop**；未授权时错误码 `CONTROL_NEEDS_PORTAL` | 屏幕共享门户 |
+
+失败时 Agent **不会静默丢弃**键鼠；主控诊断会看到 `CONTROL_NEEDS_PORTAL`。
+
+## Ubuntu GNOME（Wayland）授权步骤
+
+1. 启动 Desktop Agent，主控连接后开始共享屏幕。
+2. 系统弹出 **屏幕共享 / Screen sharing** 门户：选择显示器并允许。
+3. 若要注入键鼠，GNOME 还会弹出 **远程桌面 / Remote Desktop**（或「输入设备」）门户：勾选指针与键盘后允许。
+4. 设置 → 隐私 → 屏幕共享：确认会话期间保持允许。
+5. 若从未弹出门户：安装 `xdg-desktop-portal` 与 `xdg-desktop-portal-gnome`，注销后重试。
+
+KDE Plasma 对应 **KDE Desktop Portal**；授权对话框文案为「远程控制 / Remote control」。
+
+精简环境若没有门户，请在已登录 X11 会话中运行 Agent，或保留 XWayland 的 `DISPLAY`。
+
+## 明确不做
+
+- 不修改发行版 `WaylandEnable=false`
+- 不在登录窗 / GDM / 锁屏注入
+- 不默认使用 root `uinput`

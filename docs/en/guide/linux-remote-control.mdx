@@ -1,0 +1,31 @@
+# Linux logged-in remote control (portal and X11)
+
+VistaRemote does **not** require turning Wayland off or forcing Xorg. A logged-in graphical session is enough.
+
+## Session types
+
+| Environment | Input inject | Capture (this iteration) |
+| :--- | :--- | :--- |
+| X11 (`DISPLAY` only) | XTest | Chromium `getDisplayMedia` |
+| XWayland (`WAYLAND_DISPLAY` and `DISPLAY`) | XTest first | Screen-share portal / Chromium |
+| Pure Wayland (`WAYLAND_DISPLAY` only) | **xdg-desktop-portal RemoteDesktop**; otherwise `CONTROL_NEEDS_PORTAL` | Screen-share portal |
+
+The Agent never silently drops pointer/keyboard events. Controllers see `CONTROL_NEEDS_PORTAL` in diagnostics when the portal is required.
+
+## Ubuntu GNOME (Wayland) consent
+
+1. Start the Desktop Agent and connect from a controller.
+2. Approve the **Screen sharing** portal and pick a display.
+3. For inject, approve the **Remote Desktop** (or input devices) portal — pointer and keyboard.
+4. Keep the permission for the session under Settings → Privacy → Screen Sharing.
+5. If no dialog appears, install `xdg-desktop-portal` and `xdg-desktop-portal-gnome`, then log out and retry.
+
+KDE Plasma uses the KDE desktop portal (“Remote control”).
+
+Headless/minimal images without a portal should run the Agent in an X11 session, or keep XWayland `DISPLAY`.
+
+## Out of scope
+
+- Distro defaults such as `WaylandEnable=false`
+- Display manager / GDM / lock-screen inject
+- Root `uinput` as the default path

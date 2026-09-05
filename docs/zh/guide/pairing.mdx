@@ -30,7 +30,7 @@ POST /api/v1/auth/pairing → roomId + signalingTicket
 ## 主控端（Web Client）
 
 1. 打开用户端 `apps/client` 部署地址。
-2. 在配对页输入 6–8 位配对码。
+2. 在配对页输入 6–8 位配对码（须已登录；码一次性消费，二次 join 为 `PAIRING_CONSUMED`，班级不能共用）。
 3. 进入会话页，等待 `connected` 状态后即可操作远程桌面。
 
 ## 常见问题
@@ -38,7 +38,7 @@ POST /api/v1/auth/pairing → roomId + signalingTicket
 | 现象 | 排查 |
 | :--- | :--- |
 | 一直 `connecting` | 检查 TURN 配置、防火墙 UDP |
-| 配对码无效 | 是否过期（默认 TTL 300s） |
-| 有画面不能控 | DataChannel `control` 是否建立 |
+| 配对码无效 | 是否过期（默认 TTL 300s）或已被消费（`PAIRING_CONSUMED`） |
+| 有画面不能控 | DataChannel `control` 是否建立；Win/mac 注入已有，Linux 见独立指南 |
 
 信令消息格式见 Meta-Repo `spec/shared-spec.md`（实现阶段）。

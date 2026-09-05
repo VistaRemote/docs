@@ -25,7 +25,7 @@ Web 主控：`/pairing`（三 Tab）、`/join/:token`（直达）。
 ## API（开发）
 
 - `POST /api/v1/devices/pairing-session` — Agent 创建码/链/QR
-- `POST /api/v1/auth/pairing` — 主控加入
+- `POST /api/v1/auth/pairing` — 主控加入（须 Controller JWT；默认一次性，二次 join → `PAIRING_CONSUMED`）
 - `POST /api/v1/devices/register` — 含 `installChannel`
 
 用户向说明：[远程控制](/user/remote-control) · [企业 Agent 安装](/user/agent-installation)。
