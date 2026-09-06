@@ -61,15 +61,21 @@ When the host has two or more monitors:
 - Tray menu includes **Open at login**.
 - **Linux**: X11 / XWayland inject directly; pure Wayland needs Screen sharing + Remote Desktop portal consent. See [Linux remote control](/guide/linux-remote-control).
 
-## Clipboard, files, and terminal (Web / Viewer)
+## Clipboard, files, terminal, chat, processes, services, and power (Web / Viewer)
 
 After the session is connected and the host has armed control, the side panel can:
 
-- Sync **plain-text** clipboard both ways
-- List the host user home directory and upload/download a single file (chunked)
-- Open a user-session terminal (for example `echo` / `dir`)
+- Sync **plain-text** clipboard both ways (host copies update the viewer)
+- List the host user home directory, upload/download, create folders, delete (inside the jail)
+- Open an **xterm** user-session terminal (Windows ConPTY / POSIX PTY; for example `echo` / `dir` / `tput cols`)
+- Chat with the person at the host
+- List processes and end a task (not pid 1 or the Agent itself)
+- **Read-only** list of system services (no remote start/stop)
+- **Reboot / shut down** after a typed confirmation; the action is delayed several seconds
 
-Inject and ops channels stop as soon as the session disconnects.
+Accounts without the matching permission do not see the terminal, services, or power tabs. VistaRemote does not include Intel AMT, remote printing, registry editing, or Wake-on-LAN magic packets.
+
+The host must **Allow** in the Agent window before keyboard, mouse, and ops channels work; **View only** keeps the video. The host desktop shows an always-on-top **connection bar** to disconnect. Inject and ops channels stop as soon as the session disconnects.
 
 ## Security
 
