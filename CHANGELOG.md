@@ -7,7 +7,7 @@
 
 ### Added
 
-- （本仓库变更）
+- 用户指南：Mesh 会话工具与 VistaRemote 的对应表；FAQ 说明不是完整 MeshCentral RMM
 
 ## [0.1.0] - 2026-05-24
 

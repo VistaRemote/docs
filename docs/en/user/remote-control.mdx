@@ -2,6 +2,10 @@
 
 For **operators** using VistaRemote for remote assistance—not developers.
 
+VistaRemote takes the **logged-in desktop session** tools operators use in MeshCentral / MeshAgent—screen, keyboard and mouse, clipboard, files, terminal, chat, processes, read-only services, power, host info, notify, lock, open URL, screenshot—and ships them here. Video uses **WebRTC**, not Mesh JPEG desktop or server byte relay.
+
+VistaRemote is **not** full MeshCentral RMM. It does not include Intel AMT / IP-KVM, remote printing, registry, service start/stop, Wake-on-LAN magic packets, UAC/logon desktop, file clipboard, USB, audio mix, wallpaper toggle, remote script run, locking the host user’s input, or an Agent JS console.
+
 ## Roles
 
 | Role | Typical use |
@@ -18,6 +22,31 @@ For **operators** using VistaRemote for remote assistance—not developers.
 | **Link** | Open `https://…/join/…` or org short link |
 
 Web routes: `/pairing`, `/join/{token}`.
+
+The **Electron Viewer** is the same Web controller in a desktop shell (same session ops sidebar). The **mobile app** can view the screen and send mouse/keyboard; this release has no files/terminal ops panel on mobile.
+
+## Mapping from Mesh session tools
+
+This is Mesh **already-logged-in desktop** (KVM session / toolbar / same-device terminal and files), not inventory RMM. These tools are available **inside a VistaRemote session** after the host clicks Allow and the account has the matching permission.
+
+| Typical Mesh capability | VistaRemote |
+| :--- | :--- |
+| Mouse / keyboard / wheel | Operate on the remote video |
+| View only (no input) | Pairing page **View only** |
+| Text clipboard | **Clipboard** side tab |
+| Browse, upload/download, rename, copy | **Files** (user home jail) |
+| Terminal / CMD / PowerShell | **Terminal** (Windows ConPTY / macOS·Linux PTY) |
+| Session chat | **Chat** (the Agent window can reply) |
+| Process list / end task | **Processes** |
+| Service list | **Services** (read-only; no start/stop) |
+| Reboot / shut down | **Power** (confirm; delayed a few seconds) |
+| Host info, notify, lock, open http(s) | **Host** |
+| Session screenshot | Toolbar **Screenshot** (PNG on the controller) |
+| Consent / connection bar | Host **Allow**; always-on-top bar to disconnect |
+| Multiple displays | Toolbar switch; **multi-window** up to 2 streams |
+| Guest / share link | Pairing **link** / QR (one-shot, expires) |
+
+**Intentionally not Mesh-parity (do not look for these in-session):** Ctrl+Alt+Del / logon desktop, lock the remote user’s keyboard, wallpaper toggle, remote Run script, service start/stop, registry, remote print, Wake-on-LAN, AMT hardware KVM, USB, remote audio, JPEG quality presets, Agent console script push.
 
 ## Quick steps
 
@@ -76,7 +105,7 @@ After the session is connected and the host has armed control, the side panel ca
 - Open an **http/https** URL in the host’s default browser (`file:` / `javascript:` are rejected)
 - Toolbar **Screenshot**: save the current frame as a PNG on the controller (not via the server)
 
-Accounts without the matching permission do not see the terminal, services, power, or host tabs. VistaRemote does not include Intel AMT, remote printing, registry editing, Wake-on-LAN magic packets, service start/stop, or Windows Update.
+Accounts without the matching permission do not see the terminal, services, power, or host tabs. Pairing with **View only** also hides those tabs and does not create a keyboard/mouse channel.
 
 The host must **Allow** in the Agent window before keyboard, mouse, and ops channels work; **View only** keeps the video. The host desktop shows an always-on-top **connection bar** to disconnect. Inject and ops channels stop as soon as the session disconnects.
 
@@ -102,7 +131,7 @@ Run this on a **logged-in** Agent plus the Web controller. **Sign out and sign i
 | 14 | Toolbar Screenshot | PNG downloads locally |
 | 15 | Pairing page: check **View only**, then join | No terminal / services / power / host tabs; no mouse/keyboard channel |
 
-**Out of scope (do not test):** Intel AMT / IP-KVM, Mesh JPEG, remote printing, registry, service start/stop, Wake-on-LAN, UAC/logon desktop, file clipboard, USB, audio mix.
+**Out of scope (do not test):** Intel AMT / IP-KVM, Mesh JPEG KVM, remote printing, registry, service start/stop, Wake-on-LAN, UAC/logon desktop/Ctrl+Alt+Del, file clipboard, USB, audio mix, wallpaper toggle, remote scripts, locking the host keyboard.
 
 ## Security
 
