@@ -1,40 +1,56 @@
 # Admin Console (Users)
 
-For **enterprise IT / administrators** managing users, orders, and entitlements.
+For **enterprise IT / administrators** managing users, devices, sessions, and compliance data.
+
+As of **1.11.0**, the modules below use live server data, not demo data. Roles: [Authorization](/architecture/authorization).
 
 ## Access
 
 - URL is typically `https://<your-domain>/admin` (provided by your operator)
 - Sign in with a **platform admin** or **org admin** account
 
-Roles: [Authorization](/architecture/authorization).
-
 ## Modules
 
 | Module | Purpose |
 | :--- | :--- |
-| **Users** | View/disable accounts, assign org roles |
-| **Orders** | Purchase history and status |
-| **Permissions** | Plan and feature flags (SFU, cloud inference) |
-
-Some lists may show **demo data** until PostgreSQL persistence and production JWT are wired — see [Implementation status](/engineering/implementation-status).
+| **Users** | View / filter / create / disable accounts; assign org and plan |
+| **Devices** | Agent **online** status (heartbeat within about 120 seconds), **label** edit and filter, revoke device |
+| **Sessions** | Active remote rooms (p2p / SFU); admins can **force disconnect** |
+| **Recordings** | **Filter** by user, status, session, and trigger; built-in player with **seek** and **playback speed** |
+| **Audit** | **Filter** by actor, action presets, time, and resource; export **CSV** |
+| **Security events** | Exfiltration risk, bulk delete, behavior inference, and similar; type filter, high-severity banner; jump to a related recording timestamp |
+| **Organizations** | Orgs, seats/members, and policy (keywords, domains, and similar) |
+| **System** | Read-only ICE/TURN status (secrets masked); browser **ICE probe**; pairing-code policy |
+| **Jobs** | Background jobs (for example recording summaries): list, filter, retry failed jobs |
+| **Efficiency reports** | Weekly / monthly recording-minute totals (from recording metadata, not an LLM efficiency model) |
 
 ## Common tasks
 
 ### Grant Pro to a user
 
-1. Confirm payment (or internal contract workflow).
-2. Set plan to `pro` with valid expiry in Permissions or user detail.
-3. User refreshes client or signs in again.
+1. Confirm payment or your internal contract workflow (this release has **no** live WeChat Pay / Alipay checkout; entitlements are applied by changing the plan).
+2. In **Users**, set the account plan to `pro` with a valid expiry.
+3. User refreshes the client or signs in again.
 
 ### Disable a user
 
 1. Users → select user → disable.
-2. User cannot start new sessions; active sessions may be dropped per policy.
+2. The user cannot start new sessions. For an active session, open **Sessions** and **force disconnect**.
+
+## Not in this release
+
+Do not treat the following as delivered:
+
+- Agent **MediaRecorder** capture and a **MinIO** product player (you get a metadata list plus simple speed/seek playback)
+- An **editable permission matrix** (the Permissions page is a read-only reference)
+- A multi-stream **monitor wall**
+- Live **WeChat Pay / Alipay** checkout
+
+Remaining gaps: [Implementation status](/engineering/implementation-status).
 
 ## Security
 
-- Prefer VPN or private network for admin URL; MFA planned (P1).
-- Audit sensitive actions (user delete, plan changes).
+- Prefer VPN or a private network for the admin URL; MFA is planned (P1).
+- Audit sensitive actions (disable user, plan changes, force disconnect, device revoke); filter and export CSV as needed.
 
 Developers: [Admin getting started](/guide/admin-getting-started).
