@@ -30,6 +30,23 @@ Default private deployment uses **Ollama + self-hosted vector DB**; cloud infere
 **What does Desktop AI do?**  
 Local rules/light inference for behavior hints; heavy jobs go to the `ai` worker queue.
 
+## Admin & remote ops
+
+**How do I force-disconnect a session?**  
+Open the [Admin console](/user/admin-console) → **Sessions** and **force disconnect** the active room. The server closes the signaling WebSocket first, then clears the in-memory room. The host can also disconnect from the always-on-top connection bar; see [Remote control](/user/remote-control). Disabling a user does not kick an in-progress session — still disconnect it under Sessions.
+
+**When is a device “online”? What are labels?**  
+**Online** means the device’s last heartbeat was within about **120 seconds**; after that it is offline. Online is not “currently sharing the screen.” On **Devices** you can edit **labels** and filter by them. Revoking a device makes the next heartbeat fail; that is separate from the online check. See [Admin console](/user/admin-console).
+
+**How does recording playback work? Is it a MinIO player?**  
+No. In 1.11.0, playback is a **local browser `<video>`** on the Recordings page (seek / speed), not a MinIO product player. Agent MediaRecorder capture and MinIO chunk upload are not shipped; the list is metadata — do not accept a cloud object player.
+
+**ICE stuck — should I change DNS?**  
+Do not start by changing DNS. On Admin **System**, run the **ICE probe** (browser STUN gather) and check whether STUN candidates appear. If it still fails, check UDP/firewall and TURN; see [Remote control](/user/remote-control) connection quality. ICE servers come from the Server; secrets on the System page are masked.
+
+**Can I edit the permission matrix?**  
+No. The Permissions page is a **read-only** map of platform RBAC / org roles. **ADM-2** (editable role bindings) is not shipped; do not accept an editable matrix. See [Admin console](/user/admin-console).
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
