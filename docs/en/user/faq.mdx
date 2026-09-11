@@ -42,7 +42,7 @@ Open the [Admin console](/user/admin-console) → **Sessions** and **force disco
 No. In 1.11.0, playback is a **local browser `<video>`** on the Recordings page (seek / speed), not a MinIO product player. Agent MediaRecorder capture and MinIO chunk upload are not shipped; the list is metadata — do not accept a cloud object player.
 
 **ICE stuck — should I change DNS?**  
-Do not start by changing DNS. On Admin **System**, run the **ICE probe** (browser STUN gather) and check whether STUN candidates appear. If it still fails, check UDP/firewall and TURN; see [Remote control](/user/remote-control) connection quality. ICE servers come from the Server; secrets on the System page are masked.
+Do not start by changing DNS. On Admin **System**, run the **ICE probe** (browser STUN gather) and check whether STUN candidates appear. After the probe, you can copy the probe result / STUN URL for tickets. If it still fails, check UDP/firewall and TURN; see [Remote control](/user/remote-control) connection quality. ICE servers come from the Server; secrets on the System page are masked.
 
 **Can I edit the permission matrix?**  
 No. The Permissions page is a **read-only** map of platform RBAC / org roles. **ADM-2** (editable role bindings) is not shipped; do not accept an editable matrix. See [Admin console](/user/admin-console).

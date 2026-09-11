@@ -42,7 +42,7 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 不是。1.11.0 回放是录制页里的 **本机浏览器视频**（`<video>`，支持 seek / 倍速），不是 MinIO 产品播放器。端侧 MediaRecorder 出片与 MinIO 分片上传尚未交付；列表是元数据，不要按云对象播放器验收。
 
 **ICE 卡住要改 DNS 吗？**  
-不要先改 DNS。到管理台 **系统** 跑 **ICE 探测**（浏览器 STUN gather），看能否收集到 STUN 候选。仍失败再查 UDP/防火墙与 TURN，见 [远程控制](/user/remote-control) 连接质量。ICE 由 Server 下发，系统页密钥已掩码。
+不要先改 DNS。到管理台 **系统** 跑 **ICE 探测**（浏览器 STUN gather），看能否收集到 STUN 候选。探测后可复制探测结果 / STUN URL，便于工单排查。仍失败再查 UDP/防火墙与 TURN，见 [远程控制](/user/remote-control) 连接质量。ICE 由 Server 下发，系统页密钥已掩码。
 
 **权限矩阵可以编辑吗？**  
 不能。权限页是 **只读** 对照（平台 RBAC / 组织角色）。**ADM-2**（可编辑角色绑定）尚未交付；不要按可改矩阵做验收。说明见 [管理控制台](/user/admin-console)。
