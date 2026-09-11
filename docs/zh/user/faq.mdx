@@ -50,6 +50,9 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 **管理台 CSV 怎么导出？**  
 导出的是**当前筛选/已加载的列表**（默认客户端导出，除非该页另有说明；审计 CSV 走服务端筛选，含结果）。用户、设备、安全、任务、订单、组织、录制等页在已实现处有 CSV 按钮。这不是全库/数仓导出，也不是账单/支付导出。说明见 [管理控制台](/user/admin-console)。
 
+**概览卡片和列表筛选能用 URL 打开吗？**  
+可以。概览指标卡片和多数列表筛选支持 **URL 查询种子**（例如 `/devices?online=offline`、`/users?planExpiry=expired`、`/audit?result=denied`、`/recordings?status=failed`）。权限矩阵上的搜索只是只读筛选，不是可编辑角色。详见 [管理控制台](/user/admin-console)。
+
 ## 获取帮助
 
 - 企业客户：联系贵司 IT 或 VistaRemote 实施方

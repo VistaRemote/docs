@@ -50,6 +50,9 @@ No. The Permissions page is a **read-only** map of platform RBAC / org roles. **
 **How do Admin CSV exports work?**  
 They export the **currently filtered/loaded list** (client-side unless the page says otherwise; audit CSV is server-filtered, including result). Users, devices, security, jobs, orders, orgs, and recordings have CSV buttons where implemented. This is not a full warehouse dump, and not a billing/payment export. See [Admin console](/user/admin-console).
 
+**Can I open overview cards and list filters from a URL?**  
+Yes. Overview metric cards and most list filters support **URL query seeds** (for example `/devices?online=offline`, `/users?planExpiry=expired`, `/audit?result=denied`, `/recordings?status=failed`). Permission matrix search is a read-only filter, not editable roles. See [Admin console](/user/admin-console).
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
