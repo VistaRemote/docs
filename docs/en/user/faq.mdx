@@ -48,7 +48,7 @@ Do not start by changing DNS. On Admin **System**, run the **ICE probe** (browse
 No. The Permissions page is a **read-only** map of platform RBAC / org roles. **ADM-2** (editable role bindings) is not shipped; do not accept an editable matrix. See [Admin console](/user/admin-console).
 
 **How do Admin CSV exports work?**  
-They export the **currently filtered/loaded list** (client-side unless the page says otherwise; audit CSV is server-filtered, including result). Users, devices, security, jobs, orders, orgs, and recordings have CSV buttons where implemented. This is not a full warehouse dump, and not a billing/payment export. See [Admin console](/user/admin-console).
+They export the **currently filtered/loaded list** (client-side unless the page says otherwise; audit CSV is server-filtered, including result). Users, devices, security, jobs, orders, orgs, and recordings have CSV buttons where implemented; the org drawer **SupportGrant** table also has **export grants CSV** (1.33.0). This is not a full warehouse dump, and not a billing/payment export. See [Admin console](/user/admin-console).
 
 **Can I open overview cards and list filters from a URL?**  
 Yes. Overview metric cards and most list filters support **URL query seeds** (for example `/devices?online=offline`, `/users?planExpiry=expired`, `/audit?result=denied`, `/recordings?status=failed`). Permission matrix search is a read-only filter, not editable roles. See [Admin console](/user/admin-console).
@@ -57,13 +57,13 @@ Yes. Overview metric cards and most list filters support **URL query seeds** (fo
 On [Admin console](/user/admin-console) → **Security events**, configure muted types (alert rules lite). The list applies saved rules by default (Switch **Apply mute rules**); turn it off or open `?applyMute=false` to see all types. The high-severity banner count still excludes muted types.
 
 **Where is SupportGrant managed? Does revoke kick sessions?**  
-In the organization drawer: create / list / revoke **SupportGrant** temporary IT-assist grants. The revoke confirmation can check **Revoke and disconnect related sessions** (`?kickSessions=true`, off by default). The permission matrix stays read-only. See [Admin console](/user/admin-console).
+In the organization drawer: create / list / revoke **SupportGrant** temporary IT-assist grants, and **export grants CSV** (current filter/loaded rows). The revoke confirmation can check **Revoke and disconnect related sessions** (`?kickSessions=true`, off by default). The permission matrix stays read-only. See [Admin console](/user/admin-console).
 
 **What are the System page entitlement flags?**  
-The **System** page shows read-only flags such as `entitlementMode`, `baseUrlConfigured`, and `webhookSecretConfigured` — **no secrets** or webhook secret values. Use it to verify Entitlement configuration, not to change plans. See [Admin console](/user/admin-console).
+The **System** page shows read-only flags such as `entitlementMode`, `entitlementBaseUrlConfigured`, and `webhookSecretConfigured` — **no secrets** or webhook secret values. You can **copy entitlement status JSON** (those flags only, 1.33.0). Use it to verify Entitlement configuration, not to change plans. See [Admin console](/user/admin-console).
 
 **Recording playback URL expired? MinIO EntityTooSmall?**  
-The Recordings player fetches a short-lived signed **playback-url** (`expiresAt`; refresh on expiry). The Agent coalesces non-final multipart parts to **≥5 MiB** for S3/MinIO to avoid MinIO `EntityTooSmall`; `memory://` still allows small parts. See [Admin console](/user/admin-console).
+The Recordings player fetches a short-lived signed **playback-url** (`expiresAt`; refresh on expiry). When `failedReason` matches **EntityTooSmall / part size**, the list shows a hint that the Agent should coalesce non-final parts to **≥5 MiB** (Desktop ≥1.30; `memory://` still allows small parts). See [Admin console](/user/admin-console).
 
 **Monitor wall vs full SFU wall?**  
 Today you get a 2×2 shell with slot **in-wall observe** (single-stream embed) — **not** a full SFU multi-stream monitor wall; that remains later. Do not accept it as shipped. See [Admin console](/user/admin-console).

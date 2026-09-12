@@ -48,7 +48,7 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 不能。权限页是 **只读** 对照（平台 RBAC / 组织角色）。**ADM-2**（可编辑角色绑定）尚未交付；不要按可改矩阵做验收。说明见 [管理控制台](/user/admin-console)。
 
 **管理台 CSV 怎么导出？**  
-导出的是**当前筛选/已加载的列表**（默认客户端导出，除非该页另有说明；审计 CSV 走服务端筛选，含结果）。用户、设备、安全、任务、订单、组织、录制等页在已实现处有 CSV 按钮。这不是全库/数仓导出，也不是账单/支付导出。说明见 [管理控制台](/user/admin-console)。
+导出的是**当前筛选/已加载的列表**（默认客户端导出，除非该页另有说明；审计 CSV 走服务端筛选，含结果）。用户、设备、安全、任务、订单、组织、录制等页在已实现处有 CSV 按钮；组织详情抽屉内 **SupportGrant** 列表也可 **导出授权 CSV**（1.33.0）。这不是全库/数仓导出，也不是账单/支付导出。说明见 [管理控制台](/user/admin-console)。
 
 **概览卡片和列表筛选能用 URL 打开吗？**  
 可以。概览指标卡片和多数列表筛选支持 **URL 查询种子**（例如 `/devices?online=offline`、`/users?planExpiry=expired`、`/audit?result=denied`、`/recordings?status=failed`）。权限矩阵上的搜索只是只读筛选，不是可编辑角色。详见 [管理控制台](/user/admin-console)。
@@ -57,13 +57,13 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 在 [管理控制台](/user/admin-console) → **安全事件** 配置静音类型（告警规则 lite）。列表默认应用已保存规则（Switch「**应用静音规则**」）；关掉或通过 URL `?applyMute=false` 可查看全部类型。高危横幅计数仍排除静音类型。
 
 **SupportGrant 在哪管理？撤销会踢会话吗？**  
-组织详情抽屉内 **SupportGrant**：为 IT 协助创建 / 列出 / 撤销临时授权。撤销确认框可选「**撤销并断开相关会话**」（`?kickSessions=true`，默认关）。权限矩阵仍只读。详见 [管理控制台](/user/admin-console)。
+组织详情抽屉内 **SupportGrant**：为 IT 协助创建 / 列出 / 撤销临时授权，并可 **导出授权 CSV**（当前筛选/已加载行）。撤销确认框可选「**撤销并断开相关会话**」（`?kickSessions=true`，默认关）。权限矩阵仍只读。详见 [管理控制台](/user/admin-console)。
 
 **系统页的权益标志是什么？**  
-**系统** 页只读展示 `entitlementMode`、`baseUrlConfigured`、`webhookSecretConfigured` 等标志，**不展示**密钥或 webhook secret。用于核对 Entitlement 是否配置，不是改套餐入口。见 [管理控制台](/user/admin-console)。
+**系统** 页只读展示 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured` 等标志，**不展示**密钥或 webhook secret；可 **复制权益状态 JSON**（仅上述标志字段，1.33.0）。用于核对 Entitlement 是否配置，不是改套餐入口。见 [管理控制台](/user/admin-console)。
 
 **录制回放 URL 过期怎么办？MinIO EntityTooSmall？**  
-录制页播放器经短时签名 **playback-url** 拉流（含 `expiresAt`）；过期可刷新。Agent 对 S3/MinIO 将非终片合并至 **≥5 MiB**，避免 MinIO `EntityTooSmall`；`memory://` 仍允许小分片。见 [管理控制台](/user/admin-console)。
+录制页播放器经短时签名 **playback-url** 拉流（含 `expiresAt`）；过期可刷新。若 `failedReason` 含 **EntityTooSmall / part size**，列表会提示 Agent 应将非末片合并至 **≥5 MiB**（桌面端 ≥1.30；`memory://` 仍允许小分片）。见 [管理控制台](/user/admin-console)。
 
 **监控墙和完整 SFU 墙有什么区别？**  
 当前是 2×2 壳 + 槽位 **墙内旁观**（单路内嵌旁观），**不是**完整 SFU 多路监控墙；后者仍后置，不要按已交付验收。见 [管理控制台](/user/admin-console)。

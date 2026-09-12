@@ -15,8 +15,15 @@
 | **Orders** | Purchase history and status |
 | **Permissions** | Feature flags (SFU, cloud inference) |
 
-Some screens use **demo data** until PostgreSQL persistence and production JWT are wired — see [Implementation status](/engineering/implementation-status).
+See [Implementation status](/engineering/implementation-status) for remaining gaps (full SFU monitor wall, production PSP, and similar).
 
-End-user oriented guide: [Admin console (users)](/user/admin-console).
+## 1.33 ops surfaces (Scope C)
+
+- **Security alert rules** (muted types / banner threshold): [Admin console · Security events](/user/admin-console)
+- **Monitor wall** (2×2 shell + in-wall observe; full SFU multi-stream is later): [Admin console · Monitor wall](/user/admin-console)
+- **Entitlement flags** (read-only + copy JSON): [Admin console · System](/user/admin-console)
+- **SupportGrant** (org drawer IT-assist grants / CSV): [Admin console · Organizations](/user/admin-console)
+
+End-user guide: [Admin console](/user/admin-console) · [FAQ](/user/faq).
 
 Plans: [Commercial trial](/architecture/commercial-trial).
