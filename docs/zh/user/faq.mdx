@@ -92,6 +92,9 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 **会话怎么按用户 ID 筛选（1.38.0）？**  
 「**会话**」可按 **用户 ID** 筛选，并与 **`?userId=`** URL 同步（用户抽屉「查看会话」会种子此参数）。见 [管理控制台](/user/admin-console)。
 
+**管理台哪里看近期配对码（1.39.0）？**  
+打开 [管理控制台](/user/admin-console) → **运营管理** → **配对**（`/pairings`）。页面请求 **GET** `/api/v1/admin/pairings`（须 **admin.read**），列出 PostgreSQL 近期配对码（默认 **100** 条；可选 **`limit`** 1–500）。可按设备 ID、owner 用户 ID、配对码筛选，并与 **`?deviceId=`**、**`?userId=`**、**`?numericCode=`** URL 同步。行 **设备** / **用户** 分别打开 `/devices?deviceId=`、`/users?userId=`（设备 owner）。**只读** — 改码长/TTL 请到 **系统** 配对策略；被控端在 Agent 生成配对码。见 [管理控制台](/user/admin-console)。
+
 ## 获取帮助
 
 - 企业客户：联系贵司 IT 或 VistaRemote 实施方

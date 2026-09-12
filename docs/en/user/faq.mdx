@@ -92,6 +92,9 @@ On **Devices**, when a row has an active session, **Actions** shows **Monitor wa
 **How do I filter sessions by user ID (1.38.0)?**  
 On **Sessions**, filter by **user ID**; the filter syncs to **`?userId=`** in the URL (the user drawer **View sessions** button seeds this param). See [Admin console](/user/admin-console).
 
+**Where do I see recent pairing codes (1.39.0)?**  
+Open [Admin console](/user/admin-console) → **Operations** → **Pairings** (`/pairings`). The page loads **GET** `/api/v1/admin/pairings` (requires **admin.read**) and lists recent codes from PostgreSQL (default **100** rows; optional **`limit`** 1–500). Filter by device ID, owner user ID, or numeric code — filters sync to **`?deviceId=`**, **`?userId=`**, **`?numericCode=`**. Row **Device** / **User** links open `/devices?deviceId=` and `/users?userId=` (device owner). Read-only — change length/TTL under **System** pairing policy; hosts generate codes on the Agent. See [Admin console](/user/admin-console).
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
