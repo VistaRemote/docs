@@ -12,7 +12,33 @@ Architecture: [Commercial billing](/architecture/commercial-billing). Admin modu
 | **Sandbox** | `ENTITLEMENT_MODE=enforce`, central Entitlement reachable | Checkout `POST /api/v1/commerce/orders/:id/pay`: catalog `wechat` → `wechat_pay_v3`, `alipay` → `alipay_f2f`. Sandbox secrets live on **Entitlement**, not this repo. complete / status polling syncs local `User.plan`. |
 | **Production** | Same mode + production Entitlement / PSP (owner-ops) | VistaRemote lite webhook `POST /api/v1/commerce/webhooks/entitlement` can sync `User.plan`. **WeChat / Alipay platform notify lands on LuminaryWorks Entitlement**, not VistaRemote. Real merchant onboarding, certificates, and platform callbacks are **not shipped** with this repo. |
 
-Lite ingress requires header `X-Entitlement-Signature` to equal `ENTITLEMENT_WEBHOOK_SECRET` (shared secret, constant-time compare). That is **not** HMAC-SHA256 of the body and **not** WeChat / Alipay platform notify verification.
+Lite ingress `order.fulfilled` (`POST /api/v1/commerce/webhooks/entitlement`) uses HMAC headers (**FR-BILL-06**) — **not** WeChat / Alipay platform notify verification:
+
+| Header | Requirement |
+| :--- | :--- |
+| `content-type` | `application/json` |
+| `x-lw-timestamp` | Unix seconds (±300s window) |
+| `x-lw-nonce` | ≥8 chars; replay protection |
+| `x-lw-signature` | `v1=<base64url>` |
+| `x-lw-event-id` | Idempotent event id |
+
+Signature: `HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, \`${timestamp}.${nonce}.${rawBody}\`)` → base64url; verify on the **untouched raw body** (never re-serialize JSON). `ENTITLEMENT_WEBHOOK_SECRET` is this ingress HMAC secret and must equal Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`. Legacy `X-Entitlement-Signature` equality is a **hard-cut 401** with no fallback.
+
+## Webhook user mapping (Logto `sub`)
+
+After signature verification, `order.fulfilled` **`subjectId` must be the Logto OIDC `sub`**. The server resolves the local user via `users.logtoSub` (**not** the local User UUID; users are **never** auto-created).
+
+| User origin | `logtoSub` | Webhook can write `User.plan` |
+| :--- | :--- | :--- |
+| Web / OIDC login + `POST /api/v1/auth/oidc/exchange` | set | ✓ |
+| Admin local register / Controller JWT only | often `null` | ✗ → **400** `WEBHOOK_USER_NOT_FOUND` |
+
+For **local-only users** (no Logto binding), grant plans via:
+
+- Admin **Users** → change plan (Admin plan grant), or
+- Order owner commerce **`POST .../complete`** / **`GET .../orders/:id`** (`CommercePlanSyncService.syncForAccessToken` with the caller Bearer token)
+
+Closed-trial paths: Meta-Repo `plan/trial-ops-checklist.md`.
 
 ## VistaRemote server env names (names only)
 
@@ -25,7 +51,7 @@ This repo has **no** `COMMERCE_*` environment variables. The commerce BFF forwar
 | `ENTITLEMENT_MODE` | `off` \| `shadow` \| `enforce` \| `offline_license` |
 | `ENTITLEMENT_BASE_URL` | Central Entitlement base URL |
 | `ENTITLEMENT_SERVICE_API_KEY` | M2M `X-Service-Key` |
-| `ENTITLEMENT_WEBHOOK_SECRET` | Lite ingress shared secret; empty → webhook **always 401** |
+| `ENTITLEMENT_WEBHOOK_SECRET` | Lite ingress HMAC secret (= Entitlement `TARGETS.vistaremote.secret`); empty → webhook **always 401** |
 | `ENTITLEMENT_CACHE_TTL_MS` | Entitlement cache TTL |
 | `ENTITLEMENT_OFFLINE_GRACE_MS` | Offline grace |
 | `ENTITLEMENT_DEPLOYMENT_ID` | Deployment id |
@@ -41,10 +67,11 @@ WeChat / Alipay **merchant ids, APIv3 keys, certificates, and Alipay app secrets
 ## Checklist
 
 - [ ] **System page flags (FR-WAD-52)**: Admin **System** → entitlement/payment flags. `GET /api/v1/admin/system/entitlement` returns only `entitlementMode`, `entitlementBaseUrlConfigured`, and `webhookSecretConfigured`. It must **not** include `ENTITLEMENT_WEBHOOK_SECRET` or a raw base URL. Use **Copy entitlement status JSON** to confirm.
-- [ ] **Reject a bad signature**: `POST /api/v1/commerce/webhooks/entitlement` with a wrong or missing `X-Entitlement-Signature` must return **401** `ENTITLEMENT_WEBHOOK_UNAUTHORIZED` and must not change local `User.plan`. Unset secret → **401** as well.
+- [ ] **Reject a bad signature**: `POST /api/v1/commerce/webhooks/entitlement` with a wrong or missing `x-lw-signature` (or legacy `X-Entitlement-Signature` only) → **401**; local `User.plan` must not change. Unset secret → **401** as well.
 - [ ] **simulate-paid forbidden for commerce**: `POST /api/v1/admin/orders/:id/simulate-paid` on `source=commerce` returns **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN`. Do not call `POST /api/v1/billing/orders/:id/simulate-paid` with an Admin JWT.
 - [ ] **Disable simulate-paid in production**: when `NODE_ENV=production` and `BILLING_ALLOW_SIMULATE_PAID` is not `true`, simulate-paid returns **400** `SIMULATE_PAID_DISABLED`.
-- [ ] **Grant path**: after sandbox commerce **pay** + **complete** / **status** (or a lite webhook paid/fulfilled payload), the Admin **Users** list shows the matching `plan`. That is a local cache, not proof that production PSP settlement is complete.
+- [ ] **Webhook user mapping**: `subjectId` must be the Entitlement-side Logto `sub` with a matching local `users.logtoSub`; otherwise **400** `WEBHOOK_USER_NOT_FOUND`. Admin-created local users should use plan grant or commerce complete/status — **not** webhook auto-grant.
+- [ ] **Grant path**: after sandbox commerce **pay** + **complete** / **status** (or a signed lite webhook when the user is OIDC-bound), the Admin **Users** list shows the matching `plan`. That is a local cache, not proof that production PSP settlement is complete.
 - [ ] **No secrets in git**: `.env`, CI logs, and Admin JSON must not contain merchant secrets.
 
 ## Not shipped (owner-ops)

@@ -12,7 +12,33 @@
 | **Sandbox** | `ENTITLEMENT_MODE=enforce`，中央 Entitlement 可达 | 收银台 `POST /api/v1/commerce/orders/:id/pay`：catalog `wechat` → `wechat_pay_v3`，`alipay` → `alipay_f2f`。Sandbox 密钥只放在 **Entitlement** 环境，不进本仓。complete / status 轮询后同步本地 `User.plan`。 |
 | **Production** | 同上模式 + 生产 Entitlement / PSP（owner-ops） | VistaRemote lite webhook `POST /api/v1/commerce/webhooks/entitlement` 可同步 `User.plan`。**微信 / 支付宝平台 notify 入站在 LuminaryWorks Entitlement**，不在 VistaRemote。真实商户进件、证书与平台回调 **未随本仓交付**。 |
 
-Lite 入站头 `X-Entitlement-Signature` 必须等于 `ENTITLEMENT_WEBHOOK_SECRET`（共享密钥、常量时间比较）。这 **不是** 请求体 HMAC-SHA256，也 **不是** 微信 / 支付宝平台通知验签。
+Lite 入站 `order.fulfilled`（`POST /api/v1/commerce/webhooks/entitlement`）使用 HMAC 头（**FR-BILL-06**），**不是**微信 / 支付宝平台 notify 验签：
+
+| 头 | 要求 |
+| :--- | :--- |
+| `content-type` | `application/json` |
+| `x-lw-timestamp` | Unix 秒（±300s 时窗） |
+| `x-lw-nonce` | ≥8 字符；防重放 |
+| `x-lw-signature` | `v1=<base64url>` |
+| `x-lw-event-id` | 幂等事件 ID |
+
+签名：`HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, \`${timestamp}.${nonce}.${rawBody}\`)` → base64url；须对 **未改动的原始 body** 验签（勿重序列化 JSON）。`ENTITLEMENT_WEBHOOK_SECRET` 为本 ingress 的 HMAC secret，值须等于 Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`。旧头 `X-Entitlement-Signature` 常量相等 **硬切 401**，无 fallback。
+
+## Webhook 用户映射（Logto `sub`）
+
+验签通过后，`order.fulfilled` 载荷里的 **`subjectId` 必须是 Logto OIDC `sub`**，服务端用 `users.logtoSub` 查找本地用户（**不是**本地 User UUID，也不会自动建用户）。
+
+| 用户来源 | `logtoSub` | 能否靠 webhook 写 `User.plan` |
+| :--- | :--- | :--- |
+| Web / OIDC 登录后 `POST /api/v1/auth/oidc/exchange` | 已写入 | ✓ |
+| 管理台本地注册 / 仅 Controller JWT | 常为 `null` | ✗ → **400** `WEBHOOK_USER_NOT_FOUND` |
+
+**本地-only 用户**（无 Logto 绑定）开通套餐请用：
+
+- 管理台 **用户** → 改套餐（Admin plan grant），或
+- 订单所有者走 commerce **`POST .../complete`** / **`GET .../orders/:id`**（`CommercePlanSyncService.syncForAccessToken`，用 Bearer token 解析本地用户）
+
+试运营路径见 Meta-Repo `plan/trial-ops-checklist.md`。
 
 ## VistaRemote server 环境变量（仅名称）
 
@@ -25,7 +51,7 @@ Lite 入站头 `X-Entitlement-Signature` 必须等于 `ENTITLEMENT_WEBHOOK_SECRE
 | `ENTITLEMENT_MODE` | `off` \| `shadow` \| `enforce` \| `offline_license` |
 | `ENTITLEMENT_BASE_URL` | 中央 Entitlement 基址 |
 | `ENTITLEMENT_SERVICE_API_KEY` | M2M `X-Service-Key` |
-| `ENTITLEMENT_WEBHOOK_SECRET` | Lite 入站共享密钥；空则 webhook **一律 401** |
+| `ENTITLEMENT_WEBHOOK_SECRET` | Lite 入站 HMAC secret（= Entitlement `TARGETS.vistaremote.secret`）；空则 webhook **一律 401** |
 | `ENTITLEMENT_CACHE_TTL_MS` | 权益缓存 TTL |
 | `ENTITLEMENT_OFFLINE_GRACE_MS` | 离线宽限 |
 | `ENTITLEMENT_DEPLOYMENT_ID` | 部署标识 |
@@ -41,10 +67,11 @@ Lite 入站头 `X-Entitlement-Signature` 必须等于 `ENTITLEMENT_WEBHOOK_SECRE
 ## 核对清单
 
 - [ ] **系统页标志（FR-WAD-52）**：管理台 **系统** → 权益/支付配置。`GET /api/v1/admin/system/entitlement` 只返回 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`。**禁止**出现 `ENTITLEMENT_WEBHOOK_SECRET` 或 Base URL 明文。可 **复制权益状态 JSON** 核对。
-- [ ] **错误签名拒绝**：对 `POST /api/v1/commerce/webhooks/entitlement` 发送错误或缺失的 `X-Entitlement-Signature`，期望 **401** `ENTITLEMENT_WEBHOOK_UNAUTHORIZED`；本地 `User.plan` 不变。密钥未配置时同样 **401**。
+- [ ] **错误签名拒绝**：对 `POST /api/v1/commerce/webhooks/entitlement` 发送错误或缺失的 `x-lw-signature`（或仅旧 `X-Entitlement-Signature`）→ **401**；本地 `User.plan` 不变。密钥未配置时同样 **401**。
 - [ ] **commerce 禁止 simulate-paid**：`POST /api/v1/admin/orders/:id/simulate-paid` 对 `source=commerce` 返回 **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN`。不要用 Admin JWT 打 `POST /api/v1/billing/orders/:id/simulate-paid`。
 - [ ] **生产关闭模拟支付**：`NODE_ENV=production` 且未设 `BILLING_ALLOW_SIMULATE_PAID=true` 时，simulate-paid 返回 **400** `SIMULATE_PAID_DISABLED`。
-- [ ] **开通路径**：sandbox 走 commerce **pay** + **complete** / **status**（或 lite webhook paid/fulfilled）后，管理台 **用户** 列表出现对应 `plan`。这是本地缓存，不是生产 PSP 对账完成的证明。
+- [ ] **Webhook 用户映射**：`subjectId` 须为 Entitlement 侧 Logto `sub`，且本地 `users.logtoSub` 已绑定；否则 **400** `WEBHOOK_USER_NOT_FOUND`。Admin 本地注册用户请用改套餐或 commerce complete/status，**不要**指望 webhook 自动开通。
+- [ ] **开通路径**：sandbox 走 commerce **pay** + **complete** / **status**（或 lite webhook paid/fulfilled，且用户已 OIDC 绑定）后，管理台 **用户** 列表出现对应 `plan`。这是本地缓存，不是生产 PSP 对账完成的证明。
 - [ ] **密钥不进 git**：`.env`、CI 日志、Admin JSON 均无商户密钥。
 
 ## 未随仓交付（owner-ops）
