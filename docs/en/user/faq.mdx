@@ -68,6 +68,9 @@ The Recordings player fetches a short-lived signed **playback-url** (`expiresAt`
 **Monitor wall vs full SFU wall?**  
 Today you get a 2×2 shell with slot **in-wall observe** (single-stream embed, FR-WAD-72 MVP) — **not** a full cross-session SFU multi-stream wall. That is **FR-WAD-108** (Spec drafted; implementation open; depends on SFU multi-producer + MD-4). Do not accept it as shipped. See [Admin console](/user/admin-console).
 
+**What does the observe ticket return (1.36.0)?**  
+`POST /admin/rooms/:roomId/observe` returns the shared **AdminObserveTicket** DTO (`signalingTicket`, `role: observe`, …). SFU fields (`routerId`, `transport`, `consumer`) are **null stubs** — not mediasoup handshake yet.
+
 **Does the monitor wall layout save automatically?**  
 No. URL **`s0`–`s3`** take priority; without seeds the page restores from **GET** `/admin/monitor-wall/layout`; click **Save layout** (**PUT**, **admin.write**) to persist. See [Admin console](/user/admin-console).
 
