@@ -24,7 +24,7 @@ Same as [Trial and paid features](./commercial-trial): **SFU** and **cloud AI** 
 
 WeChat, Alipay, PayPal, Wise (integration P1). Bank cards later.
 
-Dev: `POST /api/v1/billing/orders/:id/simulate-paid`.
+Dev: owner `POST /api/v1/billing/orders/:id/simulate-paid`. With `ENTITLEMENT_MODE=enforce`, WeChat/Alipay go through Entitlement sandbox (`wechat`→`wechat_pay_v3`, `alipay`→`alipay_f2f`); no production secrets in git. Admin orders are `local_billing` only.
 
 ## Admin modules
 
