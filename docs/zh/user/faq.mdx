@@ -74,6 +74,15 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 **监控墙布局会随改槽位自动保存吗？**  
 不会。URL **`s0`–`s3`** 优先；无种子时从 **GET** `/admin/monitor-wall/layout` 恢复；须点 **保存布局**（**PUT**，**admin.write**）才会持久化。见 [管理控制台](/user/admin-console)。
 
+**录制摘要任务怎么跳到录制（1.37.0）？**  
+「**任务**」里类型 `recording.summarize`、id 为 `summarize-{recordingId}` 的行，**操作** 列点 **录制** → `/recordings?recordingId=…`。任务筛（`id`、`name`、`state`、`failedReason`）与 URL 同步；概览「失败任务」打开 `/jobs?state=failed`。
+
+**效率报告怎么打开录制列表（1.37.0）？**  
+「**效率报告**」点 **打开录制列表** — 把当前 `userId` / `sessionId` / `deviceId` / `recordingId` 子串筛带到 `/recordings`（汇总周期不会传递，仅筛选项）。
+
+**审计 layout 行与监控墙（1.37.0）？**  
+审计筛 **监控墙 layout**（`admin.monitor_wall.layout`）。匹配行 **关联** 列有 **监控墙** — `/monitor-wall`，或 meta 含 room id 时为 `/monitor-wall?s0=<roomId>`。仅槽位种子；**不是** SFU 多路已交付。见 [管理控制台](/user/admin-console)。
+
 ## 获取帮助
 
 - 企业客户：联系贵司 IT 或 VistaRemote 实施方

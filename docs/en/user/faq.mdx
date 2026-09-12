@@ -74,6 +74,15 @@ Today you get a 2×2 shell with slot **in-wall observe** (single-stream embed, F
 **Does the monitor wall layout save automatically?**  
 No. URL **`s0`–`s3`** take priority; without seeds the page restores from **GET** `/admin/monitor-wall/layout`; click **Save layout** (**PUT**, **admin.write**) to persist. See [Admin console](/user/admin-console).
 
+**How do I open a recording from a summarize job (1.37.0)?**  
+On **Jobs**, `recording.summarize` rows with id `summarize-{recordingId}` show **Recording** in **Actions** → `/recordings?recordingId=…`. Job filters (`id`, `name`, `state`, `failedReason`) sync to the URL; overview **failed jobs** opens `/jobs?state=failed`.
+
+**How do efficiency reports open the recordings list (1.37.0)?**  
+On **Efficiency reports**, click **Open recordings** — it carries active `userId` / `sessionId` / `deviceId` / `recordingId` substring filters to `/recordings` (rollup period is not passed; filters only).
+
+**Audit layout rows and monitor wall (1.37.0)?**  
+Filter audit by **monitor-wall layout** (`admin.monitor_wall.layout`). Matching rows show **Monitor wall** — `/monitor-wall` or `/monitor-wall?s0=<roomId>` when meta has a room id. Slot seed only; **not** SFU multi-stream shipped. See [Admin console](/user/admin-console).
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
