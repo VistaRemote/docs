@@ -40,4 +40,8 @@ Payment methods depend on deployment: WeChat Pay, Alipay, PayPal, Wise, etc.
 2. Entitlements apply after successful payment (production uses webhooks; dev may simulate).
 3. Renew before expiry to avoid SFU / cloud inference being blocked.
 
+## Client membership page (1.43.0)
+
+The Web **Client** `/membership` checkout page shows a muted footnote at the bottom: past orders and billing history are available in **Admin** for platform operators. There is **no Admin link** on that page — end users should contact IT or sales; operators use [Admin console](/user/admin-console) **Orders** and **Membership**.
+
 Integrators: [Commercial billing](/architecture/commercial-billing).

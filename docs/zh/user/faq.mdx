@@ -104,6 +104,12 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 **用户抽屉怎么打开配对？会员页怎么打开订单（1.42.0）？**  
 「**用户**」详情抽屉 **打开配对列表** → `/pairings?userId=…`；「**会员**」标题旁 **打开订单列表** → `/orders?userId=…`（URL `?userId=` 或本页 commerce 订单 **userId**）。见 [管理控制台](/user/admin-console)。
 
+**订单怎么打开会员？审计怎么筛配对（1.43.0）？**  
+「**订单**」**操作** 列 **会员** → `/membership?userId=…`（订单有 **userId** 时；与 1.42.0 会员→订单互为深链）。「**审计**」动作预设含 **`pairing.create`** / **`pairing.join`**（服务端自 1.12.0 起写入）。见 [管理控制台](/user/admin-console)。
+
+**用户端会员页的账单说明在哪（1.43.0）？**  
+Web **用户端** `/membership` 页底有灰色脚注：历史订单由平台管理员在管理后台查看 — **页内无管理台链接**。终端用户联系 IT 或销售；运维用管理台 **订单** / **会员**。见 [套餐与付费](/user/plans-and-billing)。
+
 ## 获取帮助
 
 - 企业客户：联系贵司 IT 或 VistaRemote 实施方

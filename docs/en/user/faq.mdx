@@ -104,6 +104,12 @@ On **Pairings**, use the **Consumed** select (**Consumed** / **Unused** / **All*
 **How do I open Pairings from the user drawer or Orders from Membership (1.42.0)?**  
 On **Users**, the detail drawer **Open pairings** → `/pairings?userId=…`; on **Membership**, **Open orders** in the header → `/orders?userId=…` (URL `?userId=` or the commerce order **userId** on that page). See [Admin console](/user/admin-console).
 
+**How do I open Membership from Orders or filter pairing audit (1.43.0)?**  
+On **Orders**, row **Membership** in **Actions** → `/membership?userId=…` when the order has **userId** (pairs with **Membership** **Open orders**, 1.42.0). On **Audit**, action presets include **`pairing.create`** and **`pairing.join`** (server has logged these since 1.12.0). See [Admin console](/user/admin-console).
+
+**Where is billing history on the Client membership page (1.43.0)?**  
+The Web **Client** `/membership` page shows a muted footnote that past orders are for platform operators in Admin — **no Admin link** on that page. End users contact IT or sales; operators use Admin **Orders** / **Membership**. See [Plans & billing](/user/plans-and-billing).
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
