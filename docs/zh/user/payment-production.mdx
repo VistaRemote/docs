@@ -1,0 +1,59 @@
+# 生产支付就绪（运维）
+
+面向部署方核对 **mock → sandbox → production**。Lite 收银（commerce **complete** / **status**、Entitlement 入站 webhook）可以把本地 `User.plan` 写到缓存；**微信 / 支付宝商户进件与生产 PSP 密钥是 owner-ops，不随 VistaRemote 交付**。不要把商户密钥写入 git。
+
+架构说明见 [商业化与计费](/architecture/commercial-billing)；管理台模块见 [管理控制台](/user/admin-console)。Spec：`spec/billing-commerce-spec.md`。
+
+## 路径：mock → sandbox → production
+
+| 阶段 | 典型配置 | 行为 |
+| :--- | :--- | :--- |
+| **Mock（本地）** | `ENTITLEMENT_MODE=off` | 本地订单 + 套餐。订单所有者可用 `POST /api/v1/billing/orders/:id/simulate-paid`（Controller JWT）。管理台「模拟支付」只打 `source=local_billing`。 |
+| **Sandbox** | `ENTITLEMENT_MODE=enforce`，中央 Entitlement 可达 | 收银台 `POST /api/v1/commerce/orders/:id/pay`：catalog `wechat` → `wechat_pay_v3`，`alipay` → `alipay_f2f`。Sandbox 密钥只放在 **Entitlement** 环境，不进本仓。complete / status 轮询后同步本地 `User.plan`。 |
+| **Production** | 同上模式 + 生产 Entitlement / PSP（owner-ops） | VistaRemote lite webhook `POST /api/v1/commerce/webhooks/entitlement` 可同步 `User.plan`。**微信 / 支付宝平台 notify 入站在 LuminaryWorks Entitlement**，不在 VistaRemote。真实商户进件、证书与平台回调 **未随本仓交付**。 |
+
+Lite 入站头 `X-Entitlement-Signature` 必须等于 `ENTITLEMENT_WEBHOOK_SECRET`（共享密钥、常量时间比较）。这 **不是** 请求体 HMAC-SHA256，也 **不是** 微信 / 支付宝平台通知验签。
+
+## VistaRemote server 环境变量（仅名称）
+
+下列名称来自 `server` 源码与 `server/.env.example`。**不要编造取值**；生产密钥放密钥库 / Entitlement 主机，不要提交。
+
+本仓 **没有** `COMMERCE_*` 环境变量。Commerce BFF 使用 `ENTITLEMENT_BASE_URL` 转发 `/v1/...`。
+
+| 名称 | 用途 |
+| :--- | :--- |
+| `ENTITLEMENT_MODE` | `off` \| `shadow` \| `enforce` \| `offline_license` |
+| `ENTITLEMENT_BASE_URL` | 中央 Entitlement 基址 |
+| `ENTITLEMENT_SERVICE_API_KEY` | M2M `X-Service-Key` |
+| `ENTITLEMENT_WEBHOOK_SECRET` | Lite 入站共享密钥；空则 webhook **一律 401** |
+| `ENTITLEMENT_CACHE_TTL_MS` | 权益缓存 TTL |
+| `ENTITLEMENT_OFFLINE_GRACE_MS` | 离线宽限 |
+| `ENTITLEMENT_DEPLOYMENT_ID` | 部署标识 |
+| `ENTITLEMENT_LICENSE_PUBLIC_KEYS` | 离线 License 公钥 JSON（`offline_license`） |
+| `ENTITLEMENT_LICENSE_PAYLOAD` | 离线 License 载荷（`offline_license`） |
+| `ENTITLEMENT_LICENSE_ALLOW_GRACE` | 离线 License 宽限开关 |
+| `PRODUCT_CODE` | 产品码（示例为 `vistaremote`） |
+| `BILLING_ALLOW_SIMULATE_PAID` | 仅当 `NODE_ENV=production` 时：设为 `true` 才允许 simulate-paid。生产应 **省略或非 true** |
+| `NODE_ENV` | `production` 时默认禁用 simulate-paid |
+
+微信 / 支付宝 **商户号、APIv3 密钥、证书、支付宝应用密钥** 属于 Entitlement / PSP，**不是** VistaRemote server 变量。`ENTITLEMENT_TRIAL_PURGE_*` 是试用录制清理，与支付回调无关。
+
+## 核对清单
+
+- [ ] **系统页标志（FR-WAD-52）**：管理台 **系统** → 权益/支付配置。`GET /api/v1/admin/system/entitlement` 只返回 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`。**禁止**出现 `ENTITLEMENT_WEBHOOK_SECRET` 或 Base URL 明文。可 **复制权益状态 JSON** 核对。
+- [ ] **错误签名拒绝**：对 `POST /api/v1/commerce/webhooks/entitlement` 发送错误或缺失的 `X-Entitlement-Signature`，期望 **401** `ENTITLEMENT_WEBHOOK_UNAUTHORIZED`；本地 `User.plan` 不变。密钥未配置时同样 **401**。
+- [ ] **commerce 禁止 simulate-paid**：`POST /api/v1/admin/orders/:id/simulate-paid` 对 `source=commerce` 返回 **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN`。不要用 Admin JWT 打 `POST /api/v1/billing/orders/:id/simulate-paid`。
+- [ ] **生产关闭模拟支付**：`NODE_ENV=production` 且未设 `BILLING_ALLOW_SIMULATE_PAID=true` 时，simulate-paid 返回 **400** `SIMULATE_PAID_DISABLED`。
+- [ ] **开通路径**：sandbox 走 commerce **pay** + **complete** / **status**（或 lite webhook paid/fulfilled）后，管理台 **用户** 列表出现对应 `plan`。这是本地缓存，不是生产 PSP 对账完成的证明。
+- [ ] **密钥不进 git**：`.env`、CI 日志、Admin JSON 均无商户密钥。
+
+## 未随仓交付（owner-ops）
+
+以下由部署方在 **LuminaryWorks Entitlement / 支付平台控制台** 完成。VistaRemote **不**接收微信 / 支付宝平台 notify；本仓只有 lite `POST /api/v1/commerce/webhooks/entitlement`。不附带生产商户包：
+
+- 微信商户进件、APIv3 密钥与平台证书、**指向 Entitlement** 的支付回调 URL
+- 支付宝应用与密钥、当面付 / 沙箱切生产
+- PayPal / Wise 等其它渠道的生产凭据
+- 把上述密钥写入 **Entitlement** 环境（不要写入 `server/.env` 并提交）
+
+完成进件后，仍用本页清单核对系统页标志、错误签名 401、以及 commerce 不可 simulate-paid。

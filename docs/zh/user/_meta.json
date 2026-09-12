@@ -1,1 +1,8 @@
-["remote-control", "agent-installation", "plans-and-billing", "admin-console", "faq"]
+[
+  "remote-control",
+  "agent-installation",
+  "plans-and-billing",
+  "payment-production",
+  "admin-console",
+  "faq"
+]

@@ -117,3 +117,5 @@ Developers: [Admin getting started](/guide/admin-getting-started).
 | Mock / dev | Owner `POST /api/v1/billing/orders/:id/simulate-paid` (local order) |
 | Sandbox WeChat / Alipay | `POST /api/v1/commerce/orders/:id/pay`; `wechat`→`wechat_pay_v3`, `alipay`→`alipay_f2f`; secrets only in Entitlement env |
 | Lite Entitlement webhook | `POST /api/v1/commerce/webhooks/entitlement`; `X-Entitlement-Signature` = `ENTITLEMENT_WEBHOOK_SECRET`; syncs **User.plan** (not production WeChat/Alipay PSP) |
+
+Production checklist (System flags, bad-signature 401, commerce simulate-paid forbidden, env **names**): [Production payment readiness](/user/payment-production). Real merchant onboarding is owner-ops, not shipped.

@@ -1,35 +1,78 @@
 # Docker 部署
 
-## 组件清单
+分层 Compose 栈位于 **`deploy`** 子仓（MetaRepo 内路径：`deploy/`）。规格见 Meta-Repo `spec/deploy-spec.md`（FR-STD-01 … FR-STD-07）。
 
-| 服务 | 说明 |
+## Compose 分层
+
+| 文件 | 作用 |
 | :--- | :--- |
-| **postgres** | PostgreSQL 16（**唯一**关系型 OLTP；宿主机 **:5436**） |
-| **redis** | 会话、BullMQ |
-| **minio** | Pro+ 录制对象存储 |
-| **server** | NestJS API + 信令 |
-| **ai** | AI Worker（内网） |
-| **coturn** | TURN/STUN |
-| **web-client** / **web-admin** | 静态资源 |
+| `compose/docker-compose.core.yml` | **server + PostgreSQL + Redis**（必需基线） |
+| `compose/docker-compose.dev.yml` | 本地宿主机端口；可选 profile |
+| `compose/docker-compose.prod.yml` | Caddy TLS；**不**暴露 DB/Redis 到宿主机 |
+| `compose/docker-compose.external-db.yml` | 使用托管 Postgres/Redis，替代内置容器 |
+| `compose/docker-compose.control-plane.yml` | 注入 Entitlement `:3040` + OIDC（不含 IdP 容器） |
 
-> 与 **LuminaryWorks** 生态一致，全栈使用 **PostgreSQL** 作为唯一 OLTP。
+根目录 `docker-compose.yml` 仅为 **core + dev** 的 `include` 快捷方式；运维文档仍推荐显式 `-f`。
 
-## 快速开始（规划）
+## 本地（core + dev）
 
 ```bash
 cd deploy
-cp compose/.env.example compose/.env
-# 编辑 PostgreSQL、JWT、MinIO、AI 等变量
-docker compose -f compose/docker-compose.dev.yml up -d
+cp compose/.env.example .env    # 或 --env-file compose/.env.example
+
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml up -d
 ```
 
-具体 Compose 文件见 `deploy/compose/`；规格见 Meta-Repo `spec/deploy-spec.md` 与 [ADR-0008](https://github.com/VistaRemote/vibeCode/blob/main/adr/0008-postgresql-oltp.md)。
+| 服务 | 宿主机端口 | 说明 |
+| :--- | :--- | :--- |
+| **postgres** | **5637** | PostgreSQL 16（**唯一**关系型 OLTP；与 LuminaryWorks 一致） |
+| **redis** | **6380** | 会话、BullMQ |
+| **server** | **3000** | NestJS API + 信令 |
 
-## 防火墙
+可选能力通过 dev 层 **profile** 按需启用（默认不启动 lab / 演示发布器）：
 
-- TCP：443（HTTPS）、3000（API，可内网）
-- UDP：3478（TURN）、SFU 端口段（按配置文档）
+| Profile | 服务 | 宿主机端口 |
+| :--- | :--- | :--- |
+| `turn` | coturn | `3478`/`5349`，中继 `49160–49200/udp` |
+| `ai` | Ollama、Qdrant、python-worker | **11435**、**6335**、`4100` — 见 [本地 AI 开发](/deploy/ai-local-dev) |
+| `recording` | MinIO | API **19000**，控制台 **19001** |
+| `admin` | 静态管理台（Caddy） | **8081** |
+| `edge` | Caddy 80/443 | 本地 TLS 边缘 |
+
+```bash
+# 示例
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml --profile turn up -d
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml --profile recording up -d
+```
+
+在 MetaRepo 根目录（等价路径）：
+
+```bash
+docker compose -f deploy/compose/docker-compose.core.yml -f deploy/compose/docker-compose.dev.yml up -d
+```
+
+更多细节见 `deploy/README.md`（deploy-stack 子仓或 MetaRepo 内 `deploy/README.md`）。
+
+## 生产
+
+以 **core + prod** 为准（非 SFU 基线；仅在本机运行 VistaRemote coturn 时加 `--profile turn`）。
+
+```bash
+cd deploy
+cp compose/.env.prod.example compose/.env.prod
+# 填写 DOMAIN、密钥、TURN_EXTERNAL_IP
+pnpm assert:prod-env
+
+docker compose --env-file compose/.env.prod \
+  -f compose/docker-compose.core.yml -f compose/docker-compose.prod.yml up -d --build
+```
+
+生产环境 **勿** 将 Postgres / Redis 映射到宿主机。DNS、防火墙、健康检查、备份与回滚完整清单 → MetaRepo **`plan/v1-golive-checklist.md`**。
+
+## 共用 TURN
+
+若 VistaCast 已占用 `3478`/`5349`，**不要**启用 `--profile turn`。在 server 环境变量中配置现有实例：`TURN_URL`、`TURN_REALM=turn.vistaremote.<domain>`、`TURN_USERNAME_PREFIX=vr:`。
 
 ## 私有化 LLM
 
-Enterprise 可将 `AI_BASE_URL` 指向内网 **Ollama**，无需公网 LLM。参见 [产品定位](/architecture/positioning)。
+Enterprise 可将 `AI_BASE_URL` 指向内网 **Ollama**（dev 层 `--profile ai`，宿主机 **11435**），无需公网 LLM。参见 [产品定位](/architecture/positioning) 与 [本地 AI 开发](/deploy/ai-local-dev)。

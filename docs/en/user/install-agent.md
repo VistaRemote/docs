@@ -26,3 +26,5 @@ VISTAREMOTE_SIGNALING_URL=wss://api.example.com/signaling
 3. Sign in on Web / Android controller and enter the code
 
 See [Login and pairing](./login-and-pairing.md).
+
+**Developers / ops**: local E2E acceptance — Meta repo [`plan/mvp-e2e-runbook.md`](https://github.com/VistaRemote/vibeCode/blob/main/plan/mvp-e2e-runbook.md).

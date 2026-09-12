@@ -1,17 +1,74 @@
 # Docker Deployment
 
-Planned stack (`deploy` repo):
+Layered Compose stack in the **`deploy`** repo (MetaRepo sibling: `deploy/` at the repo root). Spec: [deploy-spec](https://github.com/VistaRemote/vibeCode/blob/main/spec/deploy-spec.md) (FR-STD-01 … FR-STD-07).
 
-- **PostgreSQL 16** (only relational DB)
-- Redis, MinIO, server, ai, coturn
-- web-client & web-admin static sites
+## Layers
 
-PostgreSQL 16 is the **only** relational OLTP database (aligned with LuminaryWorks).
+| File | Role |
+| :--- | :--- |
+| `compose/docker-compose.core.yml` | **server + PostgreSQL + Redis** (required baseline) |
+| `compose/docker-compose.dev.yml` | Local host ports; optional profiles |
+| `compose/docker-compose.prod.yml` | Caddy TLS; **no** DB/Redis on the host |
+| `compose/docker-compose.external-db.yml` | Managed Postgres/Redis instead of bundled containers |
+| `compose/docker-compose.control-plane.yml` | Entitlement `:3040` + OIDC (no IdP container) |
+
+Root `docker-compose.yml` is a convenience `include` of **core + dev** — prefer explicit `-f` flags in runbooks.
+
+## Local (core + dev)
 
 ```bash
 cd deploy
-cp compose/.env.example compose/.env
-docker compose -f compose/docker-compose.yml up -d
+cp compose/.env.example .env    # or --env-file compose/.env.example
+
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml up -d
 ```
 
-See Meta-Repo `spec/deploy-spec.md` for requirements.
+| Service | Host port | Notes |
+| :--- | :--- | :--- |
+| **postgres** | **5637** | PostgreSQL 16 — **only** relational OLTP (LuminaryWorks default) |
+| **redis** | **6380** | Sessions, BullMQ |
+| **server** | **3000** | NestJS API + signaling |
+
+Optional services use **profiles** on the dev overlay (opt-in; lab publishers stay off by default):
+
+| Profile | Services | Host ports |
+| :--- | :--- | :--- |
+| `turn` | coturn | `3478`/`5349`, relay `49160–49200/udp` |
+| `ai` | Ollama, Qdrant, python-worker | **11435**, **6335**, `4100` — see [Local AI dev](/deploy/ai-local-dev) |
+| `recording` | MinIO | API **19000**, console **19001** |
+| `admin` | static admin (Caddy) | **8081** |
+| `edge` | Caddy 80/443 | dev TLS edge |
+
+```bash
+# examples
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml --profile turn up -d
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml --profile recording up -d
+```
+
+From the MetaRepo root (equivalent paths):
+
+```bash
+docker compose -f deploy/compose/docker-compose.core.yml -f deploy/compose/docker-compose.dev.yml up -d
+```
+
+More detail: [`deploy/README.md`](https://github.com/VistaRemote/deploy-stack/blob/main/README.md) in the deploy-stack repo (or MetaRepo `deploy/README.md`).
+
+## Production
+
+Use **core + prod** (non-SFU baseline; optional `--profile turn` only when this host runs VistaRemote coturn).
+
+```bash
+cd deploy
+cp compose/.env.prod.example compose/.env.prod
+# edit DOMAIN, secrets, TURN_EXTERNAL_IP
+pnpm assert:prod-env
+
+docker compose --env-file compose/.env.prod \
+  -f compose/docker-compose.core.yml -f compose/docker-compose.prod.yml up -d --build
+```
+
+**Do not** publish Postgres or Redis on the host in production. Full DNS, firewall, health checks, backup, and rollback steps → MetaRepo **[v1 Go-Live checklist](https://github.com/VistaRemote/vibeCode/blob/main/plan/v1-golive-checklist.md)** (`plan/v1-golive-checklist.md`).
+
+## Shared TURN
+
+If VistaCast already binds `3478`/`5349`, **do not** enable `--profile turn`. Point server env at the existing instance: `TURN_URL`, `TURN_REALM=turn.vistaremote.<domain>`, `TURN_USERNAME_PREFIX=vr:`.

@@ -117,3 +117,5 @@
 | Mock / 开发 | 用户 `POST /api/v1/billing/orders/:id/simulate-paid`（自己的本地单） |
 | Sandbox 微信/支付宝 | `POST /api/v1/commerce/orders/:id/pay`，`wechat`→`wechat_pay_v3`、`alipay`→`alipay_f2f`；密钥只在 Entitlement 环境变量 |
 | Lite Entitlement webhook | `POST /api/v1/commerce/webhooks/entitlement`；`X-Entitlement-Signature` = `ENTITLEMENT_WEBHOOK_SECRET`；同步 **User.plan**（非生产微信/支付宝 PSP） |
+
+生产核对（系统页标志、错误签名 401、commerce 禁 simulate-paid、env **名称**）见 [生产支付就绪](/user/payment-production)。真实商户进件是 owner-ops，不随仓交付。

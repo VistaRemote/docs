@@ -2,22 +2,33 @@
 
 Debug **behavior analytics + self-hosted LLM + vector DB + Python ML** without public API keys.
 
+Requires the **core + dev** layers; AI services are on the dev overlay **`ai`** profile (opt-in).
+
 ## Start stack
 
 ```bash
-cd deploy/compose
-docker compose -f docker-compose.dev.yml up -d
-docker compose -f docker-compose.dev.yml --profile ai up -d
+cd deploy
+cp compose/.env.example .env
+
+# baseline (postgres, redis, server)
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml up -d
+
+# Ollama + Qdrant + python-worker
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml --profile ai up -d
 ```
 
 | Service | URL |
 | :--- | :--- |
-| Ollama (LLM) | `http://localhost:11434` |
-| Qdrant | `http://localhost:6333` |
+| PostgreSQL | `localhost:5637` |
+| Redis | `localhost:6380` |
+| Ollama (LLM) | `http://localhost:11435` |
+| Qdrant | `http://localhost:6335` |
 | python-worker | `http://localhost:4100` |
 
+Host ports **11435** / **6335** avoid clashes with VistaCast defaults (`11434` / `6333`).
+
 ```bash
-docker exec vistaremote-ollama ollama pull llama3.2
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml exec ollama ollama pull llama3.2
 ```
 
 ## Run apps
@@ -31,9 +42,11 @@ cd ai && cp .env.example .env && pnpm install && pnpm start:dev
 `ai/.env`:
 
 ```ini
-AI_BASE_URL=http://localhost:11434/v1
-VECTOR_DB_URL=http://localhost:6333
+REDIS_URL=redis://localhost:6380
+AI_BASE_URL=http://localhost:11435/v1
+AI_MODEL=llama3.2
+VECTOR_DB_URL=http://localhost:6335
 PYTHON_ML_URL=http://localhost:4100
 ```
 
-See [AI platform](/en/architecture/ai-platform) and [AI behavior](/en/architecture/ai-behavior).
+See [AI platform](/architecture/ai-platform) and [AI behavior](/architecture/ai-behavior). Compose details: MetaRepo `deploy/README.md`.

@@ -19,6 +19,14 @@ Anonymous pairing join returns `401 UNAUTHORIZED`.
 - After trial, free tier keeps **1:1 P2P**; SFU needs upgrade
 - v1.0 billing is **Admin plan grants** (real payments in v1.1)
 
+## Developers / ops (local E2E)
+
+End-user docs stop at pairing and control basics. For **local 1:1 P2P** acceptance — login, pairing, video, input, clipboard / files / terminal — use the Meta repo runbook:
+
+- [`plan/mvp-e2e-runbook.md`](https://github.com/VistaRemote/vibeCode/blob/main/plan/mvp-e2e-runbook.md) (relative path in a Meta checkout: `plan/mvp-e2e-runbook.md`)
+
+Production go-live: Meta `plan/v1-golive-checklist.md`. Ops-channel FRs: Meta `spec/remote-session-ops-spec.md`. SFU multi-viewer acceptance is **not** covered here.
+
 ## Troubleshooting
 
 | Symptom | Hint |

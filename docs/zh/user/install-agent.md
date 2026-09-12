@@ -26,3 +26,5 @@ VISTAREMOTE_SIGNALING_URL=wss://api.example.com/signaling
 3. 在 Web / Android 主控登录后输入配对码即可控制
 
 详见 [登录与配对](./login-and-pairing.md)。
+
+**开发者 / 运维**：本地端到端验收见 Meta 仓库 [`plan/mvp-e2e-runbook.md`](https://github.com/VistaRemote/vibeCode/blob/main/plan/mvp-e2e-runbook.md)。
