@@ -53,6 +53,26 @@ docker compose -f deploy/compose/docker-compose.core.yml -f deploy/compose/docke
 
 More detail: [`deploy/README.md`](https://github.com/VistaRemote/deploy-stack/blob/main/README.md) in the deploy-stack repo (or MetaRepo `deploy/README.md`).
 
+## Recording (MinIO)
+
+Phase 1 desktop recording uses the dev overlay **`recording`** profile (MinIO). The default **production** stack has **no** MinIO — set `OBJECT_STORAGE_ENDPOINT` to external S3 in `.env.prod`.
+
+```bash
+docker compose -f compose/docker-compose.core.yml -f compose/docker-compose.dev.yml --profile recording up -d
+```
+
+| Caller | Endpoint | Notes |
+| :--- | :--- | :--- |
+| **server** (in compose) | `http://minio:9000` | Docker-internal DNS |
+| **Desktop Agent** (on host) | `http://127.0.0.1:19000` | Presigned URLs must be host-reachable |
+| **MinIO Console** | http://127.0.0.1:19001 | Create the bucket if needed |
+
+Bucket: **`vistaremote-recordings`**. Desktop `OBJECT_STORAGE_*` must match `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD`; set `OBJECT_STORAGE_FORCE_PATH_STYLE=true`.
+
+**Without the profile** — unit tests or local dev without MinIO: `OBJECT_STORAGE_DRIVER=memory` (no compose profile).
+
+**Part size** — Desktop coalesces non-final parts to **≥5 MiB** before multipart PUT (S3/MinIO return `EntityTooSmall` otherwise); the final part may be smaller. With **`memory`**, the server still accepts small parts via `/parts`. Ops hints: [Admin console](/user/admin-console) · [FAQ](/user/faq).
+
 ## Production
 
 Use **core + prod** (non-SFU baseline; optional `--profile turn` only when this host runs VistaRemote coturn).
@@ -67,7 +87,19 @@ docker compose --env-file compose/.env.prod \
   -f compose/docker-compose.core.yml -f compose/docker-compose.prod.yml up -d --build
 ```
 
-**Do not** publish Postgres or Redis on the host in production. Full DNS, firewall, health checks, backup, and rollback steps → MetaRepo **[v1 Go-Live checklist](https://github.com/VistaRemote/vibeCode/blob/main/plan/v1-golive-checklist.md)** (`plan/v1-golive-checklist.md`).
+**Do not** publish Postgres or Redis on the host in production. The default prod stack has **no** MinIO `recording` profile — use external S3 for recordings. Full DNS, firewall, health checks, backup, and rollback steps → MetaRepo **[v1 Go-Live checklist](https://github.com/VistaRemote/vibeCode/blob/main/plan/v1-golive-checklist.md)** (`plan/v1-golive-checklist.md`).
+
+### `pnpm assert:prod-env`
+
+Run from `deploy/` after editing `compose/.env.prod`, before `docker compose up`. Read-only checks; exits `1` on failure without modifying files.
+
+| Target | What is checked |
+| :--- | :--- |
+| `compose/.env.prod.example` (**always**) | File exists; required keys present: `DOMAIN`, `DB_PASSWORD`, three `VISTAREMOTE_*_JWT_SECRET`, `VISTAREMOTE_ADMIN_PASSWORD`, `TURN_USERNAME_PREFIX=vr:`, `TURN_REALM`, `ENTITLEMENT_MODE` / `ENTITLEMENT_BASE_URL` / `ENTITLEMENT_SERVICE_API_KEY` / `ENTITLEMENT_WEBHOOK_SECRET`, `INTERVENTION_HMAC_KEYS` / `INTERVENTION_MAX_SKEW_SEC` / `INTERVENTION_LINK_TTL_SEC`; `ENTITLEMENT_BASE_URL` must include **`:3040`** (retired `7090` is rejected) |
+| `compose/.env.prod` (**if present**) | Rejects weak placeholders: `CHANGE_ME`, `vistaremote`, `miniosecret`, `password` / `admin` / `123456`, `dev-*` JWTs, `host.docker.internal`; requires `TURN_USERNAME_PREFIX=vr:`; when Entitlement is on, `ENTITLEMENT_BASE_URL` should target **`:3040`**; with `ENTITLEMENT_MODE=enforce`, **`ENTITLEMENT_WEBHOOK_SECRET` must be non-empty** (empty → inbound webhook always 401) |
+| `compose/.env.prod` (**if missing**) | Example-only pass with `WARN … example checked only` |
+
+`CHANGE_ME_*` in the example is documentation-only; your real `compose/.env.prod` must use strong secrets. Passing this check does **not** mean a production payment PSP is shipped — see the Go-Live checklist and `deploy/README.md` for sandbox credentials.
 
 ## Shared TURN
 
