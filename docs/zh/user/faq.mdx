@@ -101,6 +101,9 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 **怎么筛已消费配对码？概览/设备怎么进配对（1.41.0）？**  
 **配对** 页 **已消费** 下拉（**已消费** / **未使用** / **全部**），与 **`?consumed=yes|no`** 及 **GET** `/api/v1/admin/pairings` 同步（`yes` = 有 `consumedAt`）。也可从 **概览** → **配对** 卡片，或 **设备** → **操作** → **配对**（预填 `?deviceId=`）进入。见 [管理控制台](/user/admin-console)。
 
+**用户抽屉怎么打开配对？会员页怎么打开订单（1.42.0）？**  
+「**用户**」详情抽屉 **打开配对列表** → `/pairings?userId=…`；「**会员**」标题旁 **打开订单列表** → `/orders?userId=…`（URL `?userId=` 或本页 commerce 订单 **userId**）。见 [管理控制台](/user/admin-console)。
+
 ## 获取帮助
 
 - 企业客户：联系贵司 IT 或 VistaRemote 实施方

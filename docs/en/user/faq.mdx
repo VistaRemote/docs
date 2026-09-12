@@ -101,6 +101,9 @@ Open [Admin console](/user/admin-console) → **Operations** → **Pairings** (`
 **How do I filter consumed pairing codes or open Pairings from Overview/Devices (1.41.0)?**  
 On **Pairings**, use the **Consumed** select (**Consumed** / **Unused** / **All**); it syncs to **`?consumed=yes|no`** and **GET** `/api/v1/admin/pairings` (`yes` = `consumedAt` set). Also open from **Overview** → **Pairings** card, or **Devices** → **Actions** → **Pairings** (`?deviceId=` pre-filled). See [Admin console](/user/admin-console).
 
+**How do I open Pairings from the user drawer or Orders from Membership (1.42.0)?**  
+On **Users**, the detail drawer **Open pairings** → `/pairings?userId=…`; on **Membership**, **Open orders** in the header → `/orders?userId=…` (URL `?userId=` or the commerce order **userId** on that page). See [Admin console](/user/admin-console).
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
