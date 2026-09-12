@@ -1,6 +1,6 @@
 # 生产支付就绪（运维）
 
-面向部署方核对 **mock → sandbox → production**。Lite 收银（commerce **complete** / **status**、Entitlement 入站 webhook）可以把本地 `User.plan` 写到缓存；**微信 / 支付宝商户进件与生产 PSP 密钥是 owner-ops，不随 VistaRemote 交付**。不要把商户密钥写入 git。
+面向部署方核对 **mock → sandbox → production**。LuminaryWorks Entitlement 已实现支付 **adapter**；这不等于 live 商户已启用。Lite 收银（commerce **complete** / **status**、Entitlement 入站 webhook）可以把本地 `User.plan` 写到缓存；**微信 / 支付宝商户进件、notify DNS 与生产 PSP 密钥是 owner-ops，不随 VistaRemote 交付**。产品侧 outbox 履约投递可能仍在推进。不要把商户密钥写入 git。
 
 架构说明见 [商业化与计费](/architecture/commercial-billing)；管理台模块见 [管理控制台](/user/admin-console)。Spec：`spec/billing-commerce-spec.md`。
 

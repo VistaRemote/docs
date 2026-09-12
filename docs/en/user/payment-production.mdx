@@ -1,6 +1,6 @@
 # Production payment readiness (ops)
 
-Use this page to walk **mock → sandbox → production**. Lite checkout (commerce **complete** / **status**, plus the Entitlement ingress webhook) can cache local `User.plan`. **WeChat Pay / Alipay merchant onboarding and production PSP secrets are owner-ops — not shipped with VistaRemote.** Never commit merchant secrets.
+Use this page to walk **mock → sandbox → production**. LuminaryWorks Entitlement already ships payment **adapters**; that is not live merchant enablement. Lite checkout (commerce **complete** / **status**, plus the Entitlement ingress webhook) can cache local `User.plan`. **WeChat Pay / Alipay merchant onboarding, notify DNS, and production PSP secrets are owner-ops — not shipped with VistaRemote.** Product outbox delivery may still be in progress. Never commit merchant secrets.
 
 Architecture: [Commercial billing](/architecture/commercial-billing). Admin modules: [Admin console](/user/admin-console). Spec: `spec/billing-commerce-spec.md`.
 

@@ -134,7 +134,7 @@ Yes. **Orders**: `id`, `userId`, `sku`, `provider`, `currency`, `status`; **User
 ## Deploy & go-live
 
 **What to verify before production payments?**  
-Walk [Production payment readiness · Checklist](/user/payment-production#checklist) (mock → sandbox → production). WeChat / Alipay merchant onboarding and production PSP secrets are owner-ops — not shipped in the VistaRemote repo.
+Walk [Production payment readiness · Checklist](/user/payment-production#checklist) (mock → sandbox → production). Entitlement payment adapters exist; live merchant enablement (credentials, notify DNS) is owner-ops — not shipped in the VistaRemote repo. Adapters ≠ production PSP live.
 
 **Where is the 15-step remote control acceptance?**  
 On a logged-in host Agent plus the Web controller, follow [Remote control · Manual acceptance checklist](/user/remote-control#manual-acceptance-checklist-one-pass). **Sign out and sign in** on the controller first so the ops JWT is fresh; use power/host dry-run env vars on dev machines.
