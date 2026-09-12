@@ -98,6 +98,9 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 **系统配对策略与配对行怎么跳转（1.40.0）？**  
 **系统** 页 **配对策略** 区 **打开配对** → `/pairings`；**配对** 列表行 **会话** → `/sessions?sessionId=…`（有 sessionId 时）。
 
+**怎么筛已消费配对码？概览/设备怎么进配对（1.41.0）？**  
+**配对** 页 **已消费** 下拉（**已消费** / **未使用** / **全部**），与 **`?consumed=yes|no`** 及 **GET** `/api/v1/admin/pairings` 同步（`yes` = 有 `consumedAt`）。也可从 **概览** → **配对** 卡片，或 **设备** → **操作** → **配对**（预填 `?deviceId=`）进入。见 [管理控制台](/user/admin-console)。
+
 ## 获取帮助
 
 - 企业客户：联系贵司 IT 或 VistaRemote 实施方

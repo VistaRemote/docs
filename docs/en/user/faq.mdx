@@ -98,6 +98,9 @@ Open [Admin console](/user/admin-console) → **Operations** → **Pairings** (`
 **System pairing policy and Pairings row jumps (1.40.0)?**  
 **System** → pairing-policy section **Open pairings** → `/pairings`; **Pairings** row **Session** → `/sessions?sessionId=…` when **sessionId** is present.
 
+**How do I filter consumed pairing codes or open Pairings from Overview/Devices (1.41.0)?**  
+On **Pairings**, use the **Consumed** select (**Consumed** / **Unused** / **All**); it syncs to **`?consumed=yes|no`** and **GET** `/api/v1/admin/pairings` (`yes` = `consumedAt` set). Also open from **Overview** → **Pairings** card, or **Devices** → **Actions** → **Pairings** (`?deviceId=` pre-filled). See [Admin console](/user/admin-console).
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
