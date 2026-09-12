@@ -24,7 +24,7 @@ Same as [Trial and paid features](./commercial-trial): **SFU** and **cloud AI** 
 
 WeChat, Alipay, PayPal, Wise (integration P1). Bank cards later.
 
-Dev: owner `POST /api/v1/billing/orders/:id/simulate-paid`. With `ENTITLEMENT_MODE=enforce`, WeChat/Alipay go through Entitlement sandbox (`wechat`→`wechat_pay_v3`, `alipay`→`alipay_f2f`); no production secrets in git. Admin orders are `local_billing` only. **1.27.0**: Client Membership checkout uses catalog **`providerHint`** (`wechat` / `alipay`); the BFF maps to Entitlement adapters — do not surface adapter ids in the UI.
+Dev: owner `POST /api/v1/billing/orders/:id/simulate-paid`. With `ENTITLEMENT_MODE=enforce`, WeChat/Alipay go through Entitlement sandbox (`wechat`→`wechat_pay_v3`, `alipay`→`alipay_f2f`); no production secrets in git. Admin orders are `local_billing` only. **1.27.0**: Client Membership checkout uses catalog **`providerHint`** (`wechat` / `alipay`); the BFF maps to Entitlement adapters — do not surface adapter ids in the UI. **1.28.0**: after commerce payment, the client polls **complete** and syncs local **User.plan** so the Admin Users list reflects the tier immediately without production webhook delay.
 
 ## Admin modules
 

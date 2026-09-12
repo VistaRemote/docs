@@ -27,7 +27,7 @@
 | 微信支付 / 支付宝 / PayPal / Wise | 规范已定义，对接 P1 |
 | 银行卡 | 后续开发 |
 
-开发环境可用 `POST /api/v1/billing/orders/:id/simulate-paid`（订单所有者）模拟开通。`ENTITLEMENT_MODE=enforce` 时微信/支付宝走 Entitlement sandbox（`wechat`→`wechat_pay_v3`，`alipay`→`alipay_f2f`），密钥不进 git。管理台订单页仅本地 `local_billing`。**1.27.0**：Client Membership 收银台选 catalog **`providerHint`**（`wechat` / `alipay`），由 BFF 映射到上述 Entitlement adapter，勿在 UI 暴露 adapter id。
+开发环境可用 `POST /api/v1/billing/orders/:id/simulate-paid`（订单所有者）模拟开通。`ENTITLEMENT_MODE=enforce` 时微信/支付宝走 Entitlement sandbox（`wechat`→`wechat_pay_v3`，`alipay`→`alipay_f2f`），密钥不进 git。管理台订单页仅本地 `local_billing`。**1.27.0**：Client Membership 收银台选 catalog **`providerHint`**（`wechat` / `alipay`），由 BFF 映射到上述 Entitlement adapter，勿在 UI 暴露 adapter id。**1.28.0**：commerce 支付后轮询 **complete** 并同步本地 **User.plan**，Admin 用户列表即时反映套餐，不依赖生产 webhook 延迟。
 
 ## 管理台模块
 
