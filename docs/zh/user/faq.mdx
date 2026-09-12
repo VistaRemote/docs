@@ -68,6 +68,9 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 **监控墙和完整 SFU 墙有什么区别？**  
 当前是 2×2 壳 + 槽位 **墙内旁观**（单路内嵌旁观，FR-WAD-72 MVP），**不是**完整跨会话 SFU 多路监控墙。后者规划为 **FR-WAD-108**（Spec 已定，实现仍开；依赖 SFU multi-producer + MD-4）——不要按已交付验收。见 [管理控制台](/user/admin-console)。
 
+**监控墙布局会随改槽位自动保存吗？**  
+不会。URL **`s0`–`s3`** 优先；无种子时从 **GET** `/admin/monitor-wall/layout` 恢复；须点 **保存布局**（**PUT**，**admin.write**）才会持久化。见 [管理控制台](/user/admin-console)。
+
 ## 获取帮助
 
 - 企业客户：联系贵司 IT 或 VistaRemote 实施方

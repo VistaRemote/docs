@@ -2,7 +2,7 @@
 
 面向 **企业 IT / 管理员**，管理用户、设备、会话与合规数据。
 
-**1.11.0** 起，下列列表来自服务端真实数据，不是演示数据。**1.13.0** 起，订单 / 组织 / 录制支持 **CSV 导出**（用户、设备、安全事件、任务此前已支持）；设备可按 **在线 / 离线** 筛选；审计可按结果 **ok | denied | error** 筛选；安全事件可按 **设备 ID** 筛选；概览展示 **组织数** 与 **待支付订单**。**1.14.0** 起，会话 / 权限矩阵也可导出 **CSV**；用户可按 **组织 ID** 筛选；效率报告可按 **用户 ID / 会话 ID** 筛选；任务可按 **ID** 筛选；审计可按 **资源类型** 筛选。**1.15.0** 起，用户 / 安全事件可按 **用户 ID** 筛选；设备可按 **owner / org** 筛选且概览「在线设备」可深链；订单可按 **支付渠道** 筛选；组织详情可导出 **成员 CSV**；系统页可 **复制 ICE 探测结果**；录制可按 **录制 ID / 设备 ID** 筛选。**1.18.0** 起，设备 / 录制 / 组织 / 会话 / 任务 / 订单列表筛选走 **服务端 query**；概览「失败录制」可深链；效率报告可按 **设备 ID** 筛选。**1.19.0** 起，多数列表支持 **URL 查询种子**（含用户套餐过期、组织席位、审计结果、会话模式等）；概览可深链到过期用户 / 席位超额 / 拒绝审计 / SFU 会话；系统页可 **复制 TURN URL**；效率报告可按 **录制 ID** 筛选。**1.20.0** 起，录制 / 订单 / 会话 / 组织 / 任务 / 安全 / 报告 URL 种子补齐；权限矩阵可按权限字搜索；概览增加离线设备 / 席位可用 / 过期录制 / 已支付订单深链。**1.21.0** 起，审计可按 **fromTs / toTs** URL 种子；系统页可复制 **ICE 摘要 / 配对策略 JSON**；权限搜索支持 `q` / `perm` URL；组织成员可按角色筛选；概览有 **效率报告** 入口。**1.25.0**（Scope C）起：Agent **MediaRecorder** 分片上传可回放；**权限**页可改平台操作员角色、组织可改成员 `orgRole`（矩阵仍只读）；订单区分 local_billing / commerce；安全事件可跳会话/设备；会话可 **旁观**；运行时有 **2×2 监控墙**壳（完整 SFU 多路仍后置）。**1.27.0** 起：组织抽屉可管理 **SupportGrant**（IT 协助临时授权：创建 / 列表 / 撤销；权限矩阵仍只读）；录制回放走 **短时签名 playback-url**（`expiresAt`、过期可刷新；经 memory `/media` 代理）；Client **Membership** 收银台选微信/支付宝 **catalog `providerHint`**（`wechat` / `alipay`，非 Entitlement adapter id）。**1.28.0** 起：企业设备安装行可切换 **allowOrgSupport**（POL-02 路径 A）；Consumer 设备显示 **—**；Membership commerce 订单 **complete** / 已支付状态轮询后本地 **User.plan** 同步，管理台用户列表可即时显示 Pro/Enterprise，无需等待生产 PSP webhook。**1.29.0** 起：安全 **告警规则 lite**（FR-WAD-107）：可编辑横幅最低严重度 + 静音事件类型；非完整关联引擎；监控墙槽位 **墙内旁观** 内嵌单路旁观（完整 SFU 多路仍后置）；lite Entitlement webhook `POST /api/v1/commerce/webhooks/entitlement`，`X-Entitlement-Signature` = `ENTITLEMENT_WEBHOOK_SECRET` 同步 **User.plan**（非生产微信/支付宝 PSP）。**1.30.0** 起：系统页只读展示权益/支付配置标志（`entitlementMode`、`baseUrlConfigured`、`webhookSecretConfigured`；不暴露密钥）；组织 **SupportGrant** 撤销确认框可选「撤销并断开相关会话」（`?kickSessions=true`，默认关）；Agent 录制对 S3/MinIO 的非终片 PUT 由 Desktop 合并至 **≥5 MiB**（`memory://` 仍允许小分片）。**1.31.0** 起：安全事件列表 **默认应用已保存的静音规则**（`applyMute=true`）；Switch「**应用静音规则**」（关掉即 `applyMute=false`，列表显示全部类型）；概览可深链到 **/security**、**/system**（权益配置标志）、**/monitor-wall**。**1.32.0** 起：安全事件 **`applyMute` URL 种子**（`?applyMute=true|false`，与 Switch 同步）；审计动作预设补 **旁观 / SupportGrant / 操作员与成员角色**。**1.33.0** 起：组织抽屉 **SupportGrant** 可 **导出 CSV**；系统页 **复制权益状态 JSON**（仅 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`）；录制 `failed` 且 **EntityTooSmall / part size** 时在列表与告警条提示 **≥5 MiB 合并**（Agent 自 1.30 起 coalesce）。运维问答见 [常见问题](/user/faq)（静音、SupportGrant、权益标志、录制分片、监控墙）。角色说明见 [认证与授权](/architecture/authorization)。
+**1.11.0** 起，下列列表来自服务端真实数据，不是演示数据。**1.13.0** 起，订单 / 组织 / 录制支持 **CSV 导出**（用户、设备、安全事件、任务此前已支持）；设备可按 **在线 / 离线** 筛选；审计可按结果 **ok | denied | error** 筛选；安全事件可按 **设备 ID** 筛选；概览展示 **组织数** 与 **待支付订单**。**1.14.0** 起，会话 / 权限矩阵也可导出 **CSV**；用户可按 **组织 ID** 筛选；效率报告可按 **用户 ID / 会话 ID** 筛选；任务可按 **ID** 筛选；审计可按 **资源类型** 筛选。**1.15.0** 起，用户 / 安全事件可按 **用户 ID** 筛选；设备可按 **owner / org** 筛选且概览「在线设备」可深链；订单可按 **支付渠道** 筛选；组织详情可导出 **成员 CSV**；系统页可 **复制 ICE 探测结果**；录制可按 **录制 ID / 设备 ID** 筛选。**1.18.0** 起，设备 / 录制 / 组织 / 会话 / 任务 / 订单列表筛选走 **服务端 query**；概览「失败录制」可深链；效率报告可按 **设备 ID** 筛选。**1.19.0** 起，多数列表支持 **URL 查询种子**（含用户套餐过期、组织席位、审计结果、会话模式等）；概览可深链到过期用户 / 席位超额 / 拒绝审计 / SFU 会话；系统页可 **复制 TURN URL**；效率报告可按 **录制 ID** 筛选。**1.20.0** 起，录制 / 订单 / 会话 / 组织 / 任务 / 安全 / 报告 URL 种子补齐；权限矩阵可按权限字搜索；概览增加离线设备 / 席位可用 / 过期录制 / 已支付订单深链。**1.21.0** 起，审计可按 **fromTs / toTs** URL 种子；系统页可复制 **ICE 摘要 / 配对策略 JSON**；权限搜索支持 `q` / `perm` URL；组织成员可按角色筛选；概览有 **效率报告** 入口。**1.25.0**（Scope C）起：Agent **MediaRecorder** 分片上传可回放；**权限**页可改平台操作员角色、组织可改成员 `orgRole`（矩阵仍只读）；订单区分 local_billing / commerce；安全事件可跳会话/设备；会话可 **旁观**；运行时有 **2×2 监控墙**壳（完整 SFU 多路仍后置）。**1.27.0** 起：组织抽屉可管理 **SupportGrant**（IT 协助临时授权：创建 / 列表 / 撤销；权限矩阵仍只读）；录制回放走 **短时签名 playback-url**（`expiresAt`、过期可刷新；经 memory `/media` 代理）；Client **Membership** 收银台选微信/支付宝 **catalog `providerHint`**（`wechat` / `alipay`，非 Entitlement adapter id）。**1.28.0** 起：企业设备安装行可切换 **allowOrgSupport**（POL-02 路径 A）；Consumer 设备显示 **—**；Membership commerce 订单 **complete** / 已支付状态轮询后本地 **User.plan** 同步，管理台用户列表可即时显示 Pro/Enterprise，无需等待生产 PSP webhook。**1.29.0** 起：安全 **告警规则 lite**（FR-WAD-107）：可编辑横幅最低严重度 + 静音事件类型；非完整关联引擎；监控墙槽位 **墙内旁观** 内嵌单路旁观（完整 SFU 多路仍后置）；lite Entitlement webhook `POST /api/v1/commerce/webhooks/entitlement`，`X-Entitlement-Signature` = `ENTITLEMENT_WEBHOOK_SECRET` 同步 **User.plan**（非生产微信/支付宝 PSP）。**1.30.0** 起：系统页只读展示权益/支付配置标志（`entitlementMode`、`baseUrlConfigured`、`webhookSecretConfigured`；不暴露密钥）；组织 **SupportGrant** 撤销确认框可选「撤销并断开相关会话」（`?kickSessions=true`，默认关）；Agent 录制对 S3/MinIO 的非终片 PUT 由 Desktop 合并至 **≥5 MiB**（`memory://` 仍允许小分片）。**1.31.0** 起：安全事件列表 **默认应用已保存的静音规则**（`applyMute=true`）；Switch「**应用静音规则**」（关掉即 `applyMute=false`，列表显示全部类型）；概览可深链到 **/security**、**/system**（权益配置标志）、**/monitor-wall**。**1.32.0** 起：安全事件 **`applyMute` URL 种子**（`?applyMute=true|false`，与 Switch 同步）；审计动作预设补 **旁观 / SupportGrant / 操作员与成员角色**。**1.33.0** 起：组织抽屉 **SupportGrant** 可 **导出 CSV**；系统页 **复制权益状态 JSON**（仅 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`）；录制 `failed` 且 **EntityTooSmall / part size** 时在列表与告警条提示 **≥5 MiB 合并**（Agent 自 1.30 起 coalesce）。**1.35.0** 起：监控墙 **布局持久化**（FR-WAD-108 layout 切片）— URL `s0`–`s3` 优先；无种子时 **GET** `/admin/monitor-wall/layout` 恢复；**保存布局** **PUT** 同一接口（须 **admin.write**）；槽位 **墙内旁观** 仍为 **FR-WAD-72** 单路；跨会话 **SFU 多路** **FR-WAD-108** 仍开。运维问答见 [常见问题](/user/faq)（静音、SupportGrant、权益标志、录制分片、监控墙）。角色说明见 [认证与授权](/architecture/authorization)。
 
 ## 访问
 
@@ -26,7 +26,7 @@
 | **任务** | 后台任务（如录制摘要）列表；按 **ID / 名称 / 状态** 筛选与失败重试；导出 **CSV** |
 | **效率报告** | 按本周/本月汇总录制分钟数；可按 **用户 ID / 会话 ID** 筛选后再汇总（基于录制元数据，不是 LLM 效率模型）；导出 **CSV** |
 | **权限** | 平台/组织权限矩阵 **只读**；可导出对照 **CSV**；可分配 **平台操作员** 角色（非勾选改 Permission） |
-| **监控墙** | **FR-WAD-72 MVP**：2×2 网格壳 + 槽位 **墙内旁观**（单路内嵌旁观）；完整跨会话多路 SFU 墙为下一里程碑 **FR-WAD-108**（Spec 已定，实现仍开；依赖 SFU multi-producer + MD-4） |
+| **监控墙** | **FR-WAD-72 MVP**：2×2 壳 + 槽位 **墙内旁观**（单路）；**1.35.0** 布局 GET/PUT + **保存布局**；**FR-WAD-108** 跨会话 SFU 多路仍开 — 见 [监控墙布局](#监控墙布局) |
 
 ## 常见操作
 
@@ -40,6 +40,15 @@
 
 1. 用户列表 → 选择用户 → 禁用。
 2. 该用户无法新建远程会话。进行中的会话请到「会话」执行 **强制断开**。
+
+### 监控墙布局
+
+**FR-WAD-108 layout 切片（1.35.0）** — 持久化槽位与会话绑定；**不含**跨会话 SFU 多路 live 订阅（该部分 **FR-WAD-108** 仍开，勿按已交付验收）。
+
+1. 打开 **/monitor-wall**。URL 查询 **`s0`–`s3`**（兼容 `slot0`–`slot3`）若带有会话 ID，**优先**填充对应槽位，**不会**被已保存布局覆盖。
+2. **无** URL 种子时，页面 **GET** `/admin/monitor-wall/layout` 恢复上次保存的槽位绑定。
+3. 调整槽位后须点 **保存布局**，才会 **PUT** 同一接口持久化（须 **admin.write**；只读管理员按钮禁用）。保存布局 **不会**自动发起墙内旁观或 SFU 连接。
+4. 各槽 **墙内旁观** 仍是 **FR-WAD-72 MVP** 单路内嵌旁观；完整跨会话 **SFU 多路** 监控墙为 **FR-WAD-108**（Spec 已定，**未交付**；依赖 SFU multi-producer + MD-4）。
 
 ## 本版本尚未提供
 
