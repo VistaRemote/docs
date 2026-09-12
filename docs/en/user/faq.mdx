@@ -53,6 +53,21 @@ They export the **currently filtered/loaded list** (client-side unless the page 
 **Can I open overview cards and list filters from a URL?**  
 Yes. Overview metric cards and most list filters support **URL query seeds** (for example `/devices?online=offline`, `/users?planExpiry=expired`, `/audit?result=denied`, `/recordings?status=failed`). Permission matrix search is a read-only filter, not editable roles. See [Admin console](/user/admin-console).
 
+**How do security mute rules work?**  
+On [Admin console](/user/admin-console) → **Security events**, configure muted types (alert rules lite). The list applies saved rules by default (Switch **Apply mute rules**); turn it off or open `?applyMute=false` to see all types. The high-severity banner count still excludes muted types.
+
+**Where is SupportGrant managed? Does revoke kick sessions?**  
+In the organization drawer: create / list / revoke **SupportGrant** temporary IT-assist grants. The revoke confirmation can check **Revoke and disconnect related sessions** (`?kickSessions=true`, off by default). The permission matrix stays read-only. See [Admin console](/user/admin-console).
+
+**What are the System page entitlement flags?**  
+The **System** page shows read-only flags such as `entitlementMode`, `baseUrlConfigured`, and `webhookSecretConfigured` — **no secrets** or webhook secret values. Use it to verify Entitlement configuration, not to change plans. See [Admin console](/user/admin-console).
+
+**Recording playback URL expired? MinIO EntityTooSmall?**  
+The Recordings player fetches a short-lived signed **playback-url** (`expiresAt`; refresh on expiry). The Agent coalesces non-final multipart parts to **≥5 MiB** for S3/MinIO to avoid MinIO `EntityTooSmall`; `memory://` still allows small parts. See [Admin console](/user/admin-console).
+
+**Monitor wall vs full SFU wall?**  
+Today you get a 2×2 shell with slot **in-wall observe** (single-stream embed) — **not** a full SFU multi-stream monitor wall; that remains later. Do not accept it as shipped. See [Admin console](/user/admin-console).
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
