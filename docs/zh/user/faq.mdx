@@ -119,6 +119,17 @@ Web **用户端** `/membership` 页底有灰色脚注：历史订单由平台管
 **监控墙提示条写什么（1.44.0）？**  
 布局持久化 ✅；多路 SFU 槽位订阅仍开；**FR-WAD-72 MVP**（2×2 + 墙内旁观）仍可用。见 [管理控制台](/user/admin-console)。
 
+## 部署与上线
+
+**生产支付上线前要核对什么？**  
+按 [生产支付就绪 · 核对清单](/user/payment-production#核对清单) 逐项勾选（mock → sandbox → production）。微信 / 支付宝商户进件与生产 PSP 为 owner-ops，不在 VistaRemote 仓内。
+
+**远程控制 15 步验收在哪？**  
+在已登录被控 Agent + Web 主控上按序走完，见 [远程控制 · 人工验收清单](/user/remote-control#人工验收清单一次走完)。验收前须 **退出并重新登录** 以刷新运维 JWT；电源 / 锁屏在开发机可先设 dry-run。
+
+**本地 Docker 默认端口？**  
+`core` + `dev` 栈宿主机端口见 [Docker 部署](/deploy/docker)（Postgres **5637**、Redis **6380**、Server **3000**；`turn` / `ai` / `recording` / `admin` 等同页 profile 表）。生产勿将 DB/Redis 映射到宿主机。
+
 ## 获取帮助
 
 - 企业客户：联系贵司 IT 或 VistaRemote 实施方

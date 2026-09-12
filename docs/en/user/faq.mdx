@@ -119,6 +119,17 @@ On **Pairings**, **Create audit** / **Join audit** open `/audit?action=pairing.c
 **What does the monitor-wall info alert say (1.44.0)?**  
 Layout persistence ✅; multi-stream SFU per slot still open; **FR-WAD-72 MVP** (2×2 + in-wall observe) remains. See [Admin console](/user/admin-console).
 
+## Deploy & go-live
+
+**What to verify before production payments?**  
+Walk [Production payment readiness · Checklist](/user/payment-production#checklist) (mock → sandbox → production). WeChat / Alipay merchant onboarding and production PSP secrets are owner-ops — not shipped in the VistaRemote repo.
+
+**Where is the 15-step remote control acceptance?**  
+On a logged-in host Agent plus the Web controller, follow [Remote control · Manual acceptance checklist](/user/remote-control#manual-acceptance-checklist-one-pass). **Sign out and sign in** on the controller first so the ops JWT is fresh; use power/host dry-run env vars on dev machines.
+
+**What are the local Docker host ports?**  
+See [Docker deployment](/deploy/docker) for the **core** + **dev** table (Postgres **5637**, Redis **6380**, Server **3000**; optional `turn` / `ai` / `recording` / `admin` profiles on the same page). Production must not expose DB/Redis on the host.
+
 ## Get help
 
 - Enterprise: contact your IT or VistaRemote implementer
