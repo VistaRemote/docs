@@ -119,6 +119,18 @@ Web **用户端** `/membership` 页底有灰色脚注：历史订单由平台管
 **监控墙提示条写什么（1.44.0）？**  
 布局持久化 ✅；多路 SFU 槽位订阅仍开；**FR-WAD-72 MVP**（2×2 + 墙内旁观）仍可用。见 [管理控制台](/user/admin-console)。
 
+**已登录还能打开 `/login` 吗（1.45.0）？**  
+会 **自动跳回控制台**（`/`），并显示「已登录」与回控制台链接。见 [管理控制台](/user/admin-console)。
+
+**审计里怎么快速筛配对动作（1.45.0）？**  
+**审计** → 动作筛选下方点 **`pairing.create`** / **`pairing.join`** 芯片（等同 Pairings 页头审计深链）。见 [管理控制台](/user/admin-console)。
+
+**系统页 `enforce` 为何出现 webhook 告警（1.47.0）？**  
+`entitlementMode=enforce` 且 **Webhook 密钥未配置** 时，管理台 **系统** 会告警：入站 `POST /api/v1/commerce/webhooks/entitlement` **一律 401**，直至服务端设非空 `ENTITLEMENT_WEBHOOK_SECRET`。核对标志见 [管理控制台](/user/admin-console)；生产清单见 [生产支付就绪](/user/payment-production)。
+
+**订单 / 用户列表筛选项会写回 URL 吗（1.47.0）？**  
+会。**订单**：`id`、`userId`、`sku`、`provider`、`currency`、`status`；**用户**：`userId`、`email`、`status`、`plan`、`billingKind`、`orgId`、`planExpiry`。可书签或分享链接；会员 / 用户抽屉深链仍会种子 `?userId=`。见 [管理控制台](/user/admin-console)。
+
 ## 部署与上线
 
 **生产支付上线前要核对什么？**  
@@ -129,6 +141,12 @@ Web **用户端** `/membership` 页底有灰色脚注：历史订单由平台管
 
 **本地 Docker 默认端口？**  
 `core` + `dev` 栈宿主机端口见 [Docker 部署](/deploy/docker)（Postgres **5637**、Redis **6380**、Server **3000**；`turn` / `ai` / `recording` / `admin` 等同页 profile 表）。生产勿将 DB/Redis 映射到宿主机。
+
+**`pnpm assert:prod-env` 做什么？**  
+在 `deploy/` 目录、启动生产 compose **之前** 的只读校验：检查 `.env.prod.example` 必填键；若已有 `compose/.env.prod` 则拒绝弱占位；`ENTITLEMENT_MODE=enforce` 时要求 **非空** `ENTITLEMENT_WEBHOOK_SECRET`。**不**表示 PSP 已交付。见 [Docker 部署 · assert:prod-env](/deploy/docker#pnpm-assertprod-env) 与 [生产支付就绪](/user/payment-production)。
+
+**本地录制 MinIO 用哪个端点？**  
+dev 层 **`recording`** profile：compose 内 server → `http://minio:9000`；宿主机 **Desktop Agent** → `http://127.0.0.1:19000`；控制台 **19001**。生产默认栈 **不含** MinIO，须外部 S3。见 [Docker 部署 · 录制（MinIO）](/deploy/docker#录制minio)。
 
 ## 获取帮助
 

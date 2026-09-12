@@ -119,6 +119,18 @@ On **Pairings**, **Create audit** / **Join audit** open `/audit?action=pairing.c
 **What does the monitor-wall info alert say (1.44.0)?**  
 Layout persistence ✅; multi-stream SFU per slot still open; **FR-WAD-72 MVP** (2×2 + in-wall observe) remains. See [Admin console](/user/admin-console).
 
+**Already signed in on `/login` (1.45.0)?**  
+You are **redirected to the dashboard** (`/`) with an “already signed in” link. See [Admin console](/user/admin-console).
+
+**How do I quickly filter pairing audit actions (1.45.0)?**  
+On **Audit**, under the action filter, click the **`pairing.create`** / **`pairing.join`** chips (same targets as the Pairings header audit links). See [Admin console](/user/admin-console).
+
+**Why does System warn about webhook under enforce (1.47.0)?**  
+When `entitlementMode` is `enforce` and the **webhook secret is not configured**, Admin **System** shows a warning: inbound `POST /api/v1/commerce/webhooks/entitlement` **always returns 401** until the server has a non-empty `ENTITLEMENT_WEBHOOK_SECRET`. Verify flags on [Admin console](/user/admin-console); production checklist on [Production payment readiness](/user/payment-production).
+
+**Do Orders and Users filters sync to the URL (1.47.0)?**  
+Yes. **Orders**: `id`, `userId`, `sku`, `provider`, `currency`, `status`; **Users**: `userId`, `email`, `status`, `plan`, `billingKind`, `orgId`, `planExpiry`. Bookmark or share links; Membership / user drawer deep links still seed `?userId=`. See [Admin console](/user/admin-console).
+
 ## Deploy & go-live
 
 **What to verify before production payments?**  
@@ -129,6 +141,12 @@ On a logged-in host Agent plus the Web controller, follow [Remote control · Man
 
 **What are the local Docker host ports?**  
 See [Docker deployment](/deploy/docker) for the **core** + **dev** table (Postgres **5637**, Redis **6380**, Server **3000**; optional `turn` / `ai` / `recording` / `admin` profiles on the same page). Production must not expose DB/Redis on the host.
+
+**What does `pnpm assert:prod-env` do?**  
+Read-only check in `deploy/` **before** production `docker compose up`: validates `.env.prod.example` required keys; when `compose/.env.prod` exists, rejects weak placeholders; with `ENTITLEMENT_MODE=enforce`, requires a **non-empty** `ENTITLEMENT_WEBHOOK_SECRET`. Passing does **not** mean a production PSP is shipped. See [Docker deployment · assert:prod-env](/deploy/docker#pnpm-assertprod-env) and [Production payment readiness](/user/payment-production).
+
+**Which MinIO endpoints for local recording?**  
+Dev **`recording`** profile: server in compose → `http://minio:9000`; **Desktop Agent** on the host → `http://127.0.0.1:19000`; console **19001**. The default **production** stack has **no** MinIO — use external S3. See [Docker deployment · Recording (MinIO)](/deploy/docker#recording-minio).
 
 ## Get help
 
