@@ -26,7 +26,7 @@ As of **1.11.0**, the modules below use live server data, not demo data. **1.13.
 | **Jobs** | Background jobs (for example recording summaries): list; filter by **id / name / state**; retry failed jobs; export **CSV** |
 | **Efficiency reports** | Weekly / monthly recording-minute totals; filter by **userId / sessionId** before rollup (from recording metadata, not an LLM efficiency model); export **CSV** |
 | **Permissions** | Platform / org permission matrices are **read-only**; export reference **CSV**; assign **platform operator** roles (not checkbox Permission edits) |
-| **Monitor wall** | 2×2 session shell; slot **in-wall observe** embeds single-stream observe; full SFU multi-stream wall is later |
+| **Monitor wall** | **FR-WAD-72 MVP**: 2×2 grid shell + slot **in-wall observe** (single-stream embed); full cross-session SFU wall is next milestone **FR-WAD-108** (Spec drafted; implementation open; depends on SFU multi-producer + MD-4) |
 
 ## Common tasks
 
@@ -47,7 +47,7 @@ Do not treat the following as delivered:
 
 - Agent **MediaRecorder** capture and a **MinIO** product player (you get a metadata list plus simple speed/seek playback)
 - An **editable permission matrix** (the Permissions page is a read-only reference)
-- A full multi-stream **SFU monitor wall** (slots embed single-stream observe in a 2×2 shell only)
+- A full cross-session multi-stream **SFU monitor wall** (**FR-WAD-108**: Spec drafted; implementation open; depends on SFU multi-producer + MD-4; current product is **FR-WAD-72 MVP**: 2×2 shell + in-wall single-stream observe)
 - A **correlation engine** or alert **DSL** (alert rules lite is banner threshold + mute types only)
 - Production **WeChat Pay / Alipay** secrets (never commit them; sandbox lives on Entitlement)
 

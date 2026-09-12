@@ -66,7 +66,7 @@ The **System** page shows read-only flags such as `entitlementMode`, `entitlemen
 The Recordings player fetches a short-lived signed **playback-url** (`expiresAt`; refresh on expiry). When `failedReason` matches **EntityTooSmall / part size**, the list shows a hint that the Agent should coalesce non-final parts to **≥5 MiB** (Desktop ≥1.30; `memory://` still allows small parts). See [Admin console](/user/admin-console).
 
 **Monitor wall vs full SFU wall?**  
-Today you get a 2×2 shell with slot **in-wall observe** (single-stream embed) — **not** a full SFU multi-stream monitor wall; that remains later. Do not accept it as shipped. See [Admin console](/user/admin-console).
+Today you get a 2×2 shell with slot **in-wall observe** (single-stream embed, FR-WAD-72 MVP) — **not** a full cross-session SFU multi-stream wall. That is **FR-WAD-108** (Spec drafted; implementation open; depends on SFU multi-producer + MD-4). Do not accept it as shipped. See [Admin console](/user/admin-console).
 
 ## Get help
 
