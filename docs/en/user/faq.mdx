@@ -80,8 +80,17 @@ On **Jobs**, `recording.summarize` rows with id `summarize-{recordingId}` show *
 **How do efficiency reports open the recordings list (1.37.0)?**  
 On **Efficiency reports**, click **Open recordings** — it carries active `userId` / `sessionId` / `deviceId` / `recordingId` substring filters to `/recordings` (rollup period is not passed; filters only).
 
-**Audit layout rows and monitor wall (1.37.0)?**  
-Filter audit by **monitor-wall layout** (`admin.monitor_wall.layout`). Matching rows show **Monitor wall** — `/monitor-wall` or `/monitor-wall?s0=<roomId>` when meta has a room id. Slot seed only; **not** SFU multi-stream shipped. See [Admin console](/user/admin-console).
+**Audit layout rows and monitor wall (1.37.0 / 1.38.0)?**  
+Filter audit by **monitor-wall layout** (`admin.monitor_wall.layout`). **1.38.0** — **Save layout** audit meta includes **`roomIds`** and the first **`roomId`**. Matching rows show **Monitor wall** — `/monitor-wall` or `/monitor-wall?s0=<roomId>` from meta / resource / target `roomId` / `room_id`. Slot 0 seed only; **not** SFU multi-stream shipped. See [Admin console](/user/admin-console).
+
+**How do user drawer related links work (1.38.0)?**  
+On **Users**, open the detail drawer and click **View sessions / recordings / orders / devices / audit** — they open `/sessions?userId=…`, `/recordings?userId=…`, `/orders?userId=…`, `/devices?ownerId=…`, and `/audit?actorId=…`. See [Admin console](/user/admin-console).
+
+**How do I jump to the monitor wall from an active device session (1.38.0)?**  
+On **Devices**, when a row has an active session, **Actions** shows **Monitor wall** → `/monitor-wall?s0=<sessionId>`. Slot 0 seed only — does **not** start SFU multi-stream or in-wall observe. See [Admin console](/user/admin-console).
+
+**How do I filter sessions by user ID (1.38.0)?**  
+On **Sessions**, filter by **user ID**; the filter syncs to **`?userId=`** in the URL (the user drawer **View sessions** button seeds this param). See [Admin console](/user/admin-console).
 
 ## Get help
 
