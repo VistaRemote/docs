@@ -16,8 +16,27 @@ VistaRemote uses **per-repository builds and releases**: each sub-repo has its o
 | **docs** | `docs-v*` | `docs-v0.2.0` | GitHub Pages |
 | **deploy** | `deploy-v*` | `deploy-v0.2.0` | Compose validation / release notes |
 | **mobile** | `mobile-v*` | `mobile-v0.2.0` | Build verification (stores P1) |
+| **downloads** (public) | `v*` | `v1.0.0` | Windows Agent + Android APK (anonymous download) |
 
 **Tags are the source of truth** for releases; keep `package.json#version` aligned when possible.
+
+## End-user installers (public bucket)
+
+`desktop` / `mobile` source may stay **private**. User-facing binaries are published to the public repo **[VistaRemote/downloads](https://github.com/VistaRemote/downloads)**. The marketing site `/download` page defaults to that repo’s `releases/latest/download`.
+
+From the Meta-Repo:
+
+```bash
+pnpm pack:publish          # pack:all + upload to VistaRemote/downloads Release
+pnpm publish:downloads     # upload existing artifacts only
+```
+
+Requires `gh auth login` and matching `desktop` / `mobile` package versions. Prefer building the Windows Agent on Windows or via the `desktop` Actions workflow (`windows-latest`); Android APK can be built on macOS with `pnpm pack:mobile`.
+
+Website defaults:
+
+- `NEXT_PUBLIC_RELEASE_BASE=https://github.com/VistaRemote/downloads/releases/latest/download`
+- `NEXT_PUBLIC_RELEASE_VERSION=1.0.0` (must match asset filenames)
 
 ## Recommended release order
 

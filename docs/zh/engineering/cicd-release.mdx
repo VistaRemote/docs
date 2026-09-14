@@ -16,8 +16,27 @@ VistaRemote 采用 **分仓构建、分仓发布**：每个子仓库独立 SemVe
 | **docs** | `docs-v*` | `docs-v0.2.0` | GitHub Pages |
 | **deploy** | `deploy-v*` | `deploy-v0.2.0` | Compose 校验 / 发布说明 |
 | **mobile** | `mobile-v*` | `mobile-v0.2.0` | 构建校验（商店 P1） |
+| **downloads**（公开） | `v*` | `v1.0.0` | Windows Agent + Android APK（用户可匿名下载） |
 
 各仓 `package.json#version` 可与 tag 对齐，但 **以 tag 为发版真相来源**。
+
+## 用户侧安装包（公开仓）
+
+源码仓（`desktop` / `mobile`）可保持 **私有**。面向用户的安装包统一发布到公开仓库 **[VistaRemote/downloads](https://github.com/VistaRemote/downloads)**，官网 `/download` 默认指向该仓的 `releases/latest/download`。
+
+Meta-Repo 一键：
+
+```bash
+pnpm pack:publish          # pack:all + 上传到 VistaRemote/downloads Release
+pnpm publish:downloads     # 仅上传已有产物（跳过打包）
+```
+
+要求：本机已 `gh auth login`，且 `desktop` / `mobile` 的 `package.json` version 一致。Windows Agent 建议在 Windows 或 `desktop` 仓 Actions（`windows-latest`）产出后再上传；Android APK 可在 macOS 本地 `pnpm pack:mobile`。
+
+官网默认：
+
+- `NEXT_PUBLIC_RELEASE_BASE=https://github.com/VistaRemote/downloads/releases/latest/download`
+- `NEXT_PUBLIC_RELEASE_VERSION=1.0.0`（与资产文件名中的版本一致）
 
 ## 发布流程（推荐顺序）
 
