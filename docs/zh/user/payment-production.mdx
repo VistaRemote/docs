@@ -4,6 +4,17 @@
 
 架构说明见 [商业化与计费](/architecture/commercial-billing)；管理台模块见 [管理控制台](/user/admin-console)。Spec：`spec/billing-commerce-spec.md`。
 
+## 会员购买 vs 钱包
+
+VistaRemote **没有**预付费钱包、余额或「充值」SKU。用户购买的是 **Pro / Ultra 订阅 offerings**（Client `/membership` → commerce BFF → Entitlement）。
+
+沙箱打通要点：
+
+1. 统一 OIDC 登录一次，写入 `users.logtoSub`（commerce `X-Act-As-Subject` 用 Logto `sub`，不是本地 User UUID）
+2. Entitlement 非生产且配置了 `PAYMENT_CONFIG_MASTER_KEY` 时，可自动种子 **mock** 支付配置；或在 Admin 启用 mock/alipay sandbox
+3. Membership 选套餐 → 支付方式（优先 mock）→ **完成支付**；mock 会在 complete 时履约并同步本地 `User.plan`
+4. 生产微信/支付宝商户进件仍在 Entitlement owner-ops；本产品不提供跨产品钱包
+
 ## 路径：mock → sandbox → production
 
 | 阶段 | 典型配置 | 行为 |

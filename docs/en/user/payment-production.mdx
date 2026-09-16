@@ -4,6 +4,17 @@ Use this page to walk **mock → sandbox → production**. LuminaryWorks Entitle
 
 Architecture: [Commercial billing](/architecture/commercial-billing). Admin modules: [Admin console](/user/admin-console). Spec: `spec/billing-commerce-spec.md`.
 
+## Membership vs wallet
+
+VistaRemote has **no** prepaid wallet, balance, or top-up SKU. Buyers purchase **Pro / Ultra subscription offerings** (Client `/membership` → commerce BFF → Entitlement).
+
+Sandbox path:
+
+1. Sign in once with unified OIDC so `users.logtoSub` is set (commerce `X-Act-As-Subject` is the Logto `sub`, not the local User UUID)
+2. Non-production Entitlement with `PAYMENT_CONFIG_MASTER_KEY` can auto-seed a **mock** payment config; or enable mock/alipay sandbox in Admin
+3. Membership: pick SKU → payment method (mock preferred) → **Complete payment**; mock captures on complete and syncs local `User.plan`
+4. Live WeChat/Alipay merchant onboarding remains Entitlement owner-ops; this product does not ship a cross-product wallet
+
 ## Path: mock → sandbox → production
 
 | Stage | Typical config | Behavior |
