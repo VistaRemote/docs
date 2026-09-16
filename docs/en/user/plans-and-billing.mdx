@@ -37,11 +37,11 @@ Payment methods depend on deployment: WeChat Pay, Alipay, PayPal, Wise, etc.
 ## Upgrade & renewal
 
 1. Sign in to the web client or contact sales for checkout.
-2. Entitlements apply after successful payment (production uses webhooks; dev may simulate). Ops go-live checklist: [Production payment readiness](/user/payment-production).
+2. Entitlements apply after successful payment (sandbox: Client Membership poll / complete; production webhooks land on Entitlement). Dev may simulate **local** orders in Admin. Ops go-live checklist: [Production payment readiness](/user/payment-production).
 3. Renew before expiry to avoid SFU / cloud inference being blocked.
 
-## Client membership page (1.43.0)
+## Client membership page (1.43.0 / 1.52.0)
 
-The Web **Client** `/membership` checkout page shows a muted footnote at the bottom: past orders and billing history are available in **Admin** for platform operators. There is **no Admin link** on that page — end users should contact IT or sales; operators use [Admin console](/user/admin-console) **Orders** and **Membership**.
+Web **Client** `/membership`: pick catalog `providerHint` (WeChat Pay / Alipay), show QR or a payment link, then **poll order status** and optionally **Complete payment**. The on-page sandbox note is **not** live merchant notify. A muted footnote says past orders are for platform operators in **Admin**. There is **no Admin link** on that page. Operators use [Admin console](/user/admin-console) **Users** (plan grant) or **Orders** (local simulate-paid only).
 
 Integrators: [Commercial billing](/architecture/commercial-billing).

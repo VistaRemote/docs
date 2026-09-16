@@ -4,6 +4,10 @@
 
 **1.11.0** 起，下列列表来自服务端真实数据，不是演示数据。**1.13.0** 起，订单 / 组织 / 录制支持 **CSV 导出**（用户、设备、安全事件、任务此前已支持）；设备可按 **在线 / 离线** 筛选；审计可按结果 **ok | denied | error** 筛选；安全事件可按 **设备 ID** 筛选；概览展示 **组织数** 与 **待支付订单**。**1.14.0** 起，会话 / 权限矩阵也可导出 **CSV**；用户可按 **组织 ID** 筛选；效率报告可按 **用户 ID / 会话 ID** 筛选；任务可按 **ID** 筛选；审计可按 **资源类型** 筛选。**1.15.0** 起，用户 / 安全事件可按 **用户 ID** 筛选；设备可按 **owner / org** 筛选且概览「在线设备」可深链；订单可按 **支付渠道** 筛选；组织详情可导出 **成员 CSV**；系统页可 **复制 ICE 探测结果**；录制可按 **录制 ID / 设备 ID** 筛选。**1.18.0** 起，设备 / 录制 / 组织 / 会话 / 任务 / 订单列表筛选走 **服务端 query**；概览「失败录制」可深链；效率报告可按 **设备 ID** 筛选。**1.19.0** 起，多数列表支持 **URL 查询种子**（含用户套餐过期、组织席位、审计结果、会话模式等）；概览可深链到过期用户 / 席位超额 / 拒绝审计 / SFU 会话；系统页可 **复制 TURN URL**；效率报告可按 **录制 ID** 筛选。**1.20.0** 起，录制 / 订单 / 会话 / 组织 / 任务 / 安全 / 报告 URL 种子补齐；权限矩阵可按权限字搜索；概览增加离线设备 / 席位可用 / 过期录制 / 已支付订单深链。**1.21.0** 起，审计可按 **fromTs / toTs** URL 种子；系统页可复制 **ICE 摘要 / 配对策略 JSON**；权限搜索支持 `q` / `perm` URL；组织成员可按角色筛选；概览有 **效率报告** 入口。**1.25.0**（Scope C）起：Agent **MediaRecorder** 分片上传可回放；**权限**页可改平台操作员角色、组织可改成员 `orgRole`（矩阵仍只读）；订单区分 local_billing / commerce；安全事件可跳会话/设备；会话可 **旁观**；运行时有 **2×2 监控墙**壳（完整 SFU 多路仍后置）。**1.27.0** 起：组织抽屉可管理 **SupportGrant**（IT 协助临时授权：创建 / 列表 / 撤销；权限矩阵仍只读）；录制回放走 **短时签名 playback-url**（`expiresAt`、过期可刷新；经 memory `/media` 代理）；Client **Membership** 收银台选微信/支付宝 **catalog `providerHint`**（`wechat` / `alipay`，非 Entitlement adapter id）。**1.28.0** 起：企业设备安装行可切换 **allowOrgSupport**（POL-02 路径 A）；Consumer 设备显示 **—**；Membership commerce 订单 **complete** / 已支付状态轮询后本地 **User.plan** 同步，管理台用户列表可即时显示 Pro/Enterprise，无需等待生产 PSP webhook。**1.29.0** 起：安全 **告警规则 lite**（FR-WAD-107）：可编辑横幅最低严重度 + 静音事件类型；非完整关联引擎；监控墙槽位 **墙内旁观** 内嵌单路旁观（完整 SFU 多路仍后置）；lite Entitlement webhook `POST /api/v1/commerce/webhooks/entitlement`（`x-lw-signature: v1=<base64url>`；HMAC `${timestamp}.${nonce}.${rawBody}`）同步 **User.plan**（非生产微信/支付宝 PSP）。**1.30.0** 起：系统页只读展示权益/支付配置标志（`entitlementMode`、`baseUrlConfigured`、`webhookSecretConfigured`；不暴露密钥）；组织 **SupportGrant** 撤销确认框可选「撤销并断开相关会话」（`?kickSessions=true`，默认关）；Agent 录制对 S3/MinIO 的非终片 PUT 由 Desktop 合并至 **≥5 MiB**（`memory://` 仍允许小分片）。**1.31.0** 起：安全事件列表 **默认应用已保存的静音规则**（`applyMute=true`）；Switch「**应用静音规则**」（关掉即 `applyMute=false`，列表显示全部类型）；概览可深链到 **/security**、**/system**（权益配置标志）、**/monitor-wall**。**1.32.0** 起：安全事件 **`applyMute` URL 种子**（`?applyMute=true|false`，与 Switch 同步）；审计动作预设补 **旁观 / SupportGrant / 操作员与成员角色**。**1.33.0** 起：组织抽屉 **SupportGrant** 可 **导出 CSV**；系统页 **复制权益状态 JSON**（仅 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`）；录制 `failed` 且 **EntityTooSmall / part size** 时在列表与告警条提示 **≥5 MiB 合并**（Agent 自 1.30 起 coalesce）。**1.35.0** 起：监控墙 **布局持久化**（FR-WAD-108 layout 切片）— URL `s0`–`s3` 优先；无种子时 **GET** `/admin/monitor-wall/layout` 恢复；**保存布局** **PUT** 同一接口（须 **admin.write**）；槽位 **墙内旁观** 仍为 **FR-WAD-72** 单路；跨会话 **SFU 多路** **FR-WAD-108** 仍开。**1.36.0** 起：`POST /admin/rooms/:roomId/observe` 返回 shared **AdminObserveTicket**（`signalingTicket`、`role: observe` 等）；SFU 字段（`routerId` / `transport` / `consumer`）为 **null 桩** — 尚未接 mediasoup 握手；概览 / 会话 / 安全事件可深链监控墙；审计 **layout** 预设。**1.37.0** 起：**任务** 列表筛（`id` / `name` / `state` / `failedReason`）**与 URL 同步**（概览「失败任务」→ `/jobs?state=failed`）；`recording.summarize` 行（`summarize-{recordingId}`）可点 **录制** → `/recordings?recordingId=…`；**效率报告** **打开录制列表** 携带当前子串筛到 `/recordings`；审计 **`admin.monitor_wall.layout`** 行可跳 **监控墙**（meta 含 `roomId` 时 `s0=roomId` — 仅布局种子，非 SFU 多路）。**1.38.0** 起：用户详情抽屉 **关联深链**（会话 / 录制 / 订单 / 设备 / 审计，携带 `userId` / `ownerId` / `actorId`）；设备有活跃会话时 **操作** 可跳 **监控墙**（`/monitor-wall?s0=<sessionId>` — 仅槽位种子）；会话列表 **`?userId=`** 筛选与 URL 同步；**保存布局** 审计 meta 含 **`roomIds`**（及首个 `roomId`），审计 layout 行可 **`?s0=`** 跳监控墙 — **不是** SFU 多路已交付。**1.39.0** 起：**配对**（**FR-WAD-109**）只读列表 **`/pairings`**，**GET** `/api/v1/admin/pairings`（须 **admin.read**）；筛 **`deviceId` / `userId` / `numericCode`** 与 URL 同步；行 **设备** / **用户** 深链 `/devices?deviceId=`、`/users?userId=`（设备 owner，若有）。**1.40.0** 起：系统页 **配对策略** 区 **打开配对** → `/pairings`；配对列表行 **会话** → `/sessions?sessionId=…`（有 **sessionId** 时）。**1.41.0** 起：配对 **consumed** 筛选（`?consumed=yes|no`，服务端 + URL 同步）；**概览** **配对** NavCard → `/pairings`；**设备** **操作** **配对** → `/pairings?deviceId=`。**1.42.0** 起：用户详情抽屉 **打开配对列表** → `/pairings?userId=`；**会员** 页 **打开订单列表** → `/orders?userId=`（URL `?userId=` 或当前 commerce 订单 **userId**）。**1.43.0** 起：**订单** 行 **会员** → `/membership?userId=…`（补全 **会员**↔**订单**）；审计动作预设增 **`pairing.create`** / **`pairing.join`**（服务端审计自 1.12.0 起已有）。**1.44.0** 起：**Forbidden**（**403**）页新增 **返回控制台**（→ `/`）；已登录可 **使用其他账号登录**；**配对** 页标题旁 **创建审计** / **加入审计** → `/audit?action=pairing.create|join`；监控墙 **提示条** 区分 **FR-WAD-108 布局持久化 ✅** 与多路 **SFU 仍开**。运维问答见 [常见问题](/user/faq)（静音、SupportGrant、权益标志、录制分片、监控墙、用户抽屉深链、任务/报告跳转、审计 layout→监控墙、配对列表、consumed 筛选与会话深链、用户→配对、会员↔订单、配对审计预设、Forbidden 回控制台、配对→审计页头、监控墙布局 vs SFU 提示）。角色说明见 [认证与授权](/architecture/authorization)。
 
+**1.52.0 当前 viewer Admin（诚实边界，勿按未挂路由的页验收）**
+
+当前 `apps/admin` 已挂路由：**概览、用户、设备、订单、会话、录制、权限、审计、系统**。下列模块在历史 Admin / API 中可能存在，但 **当前 viewer 未挂 UI**：会员、配对、组织、任务、效率报告、监控墙、安全事件。收银走 Web **用户端** `/membership`（轮询 / QR / `providerHint`）；管理台 **订单**「模拟支付」仅本地单。详见模块表与 [生产支付就绪](/user/payment-production)。
+
 ## 访问
 
 - 地址通常为 `https://<your-domain>/admin`（由部署方提供）
@@ -13,7 +17,7 @@
 
 | 模块 | 作用 |
 | :--- | :--- |
-| **概览** | 实时计数卡片，含 **组织数**、**待支付订单**，以及用户、会话、录制、设备 / 在线设备等；可深链到 **/security**、**/system**（权益配置标志）、**/monitor-wall**；**配对** NavCard → `/pairings`（**1.41.0**） |
+| **概览** | 实时计数卡片，含 **组织数**、**待支付订单**，以及用户、会话、录制、设备 / 在线设备等。**/system** 已挂（权益标志）。历史深链 **/security**、**/monitor-wall**、**配对** NavCard → `/pairings`（**1.41.0**）在当前 viewer **可能 404**（见文首 1.52 边界） |
 | **用户** | 查看/筛选（含 **用户 ID**、**组织 ID**）/创建/禁用账号，分配组织与套餐；详情抽屉 **关联深链**（会话 / 录制 / 配对 / 订单 / 设备 / 审计，**1.38.0**；**1.42.0** 补 **配对**）；导出 **CSV** |
 | **设备** | 被控机 **在线** 状态（心跳约 120 秒内视为在线）、**在线 / 离线**、**owner / org**、**标签** 筛选、标签编辑、吊销设备；**操作** 列 **配对** → `/pairings?deviceId=`（**1.41.0**）；有活跃会话时 **操作** 可跳 **监控墙**（`s0` 种子，**1.38.0**）；导出 **CSV**（概览「在线设备」可深链到在线筛） |
 | **配对** | PostgreSQL 近期配对码 **只读** 列表（**FR-WAD-109**，**1.39.0**）；按 **设备 ID**、**owner 用户 ID**、**配对码**、**已消费**（`yes` = 有 `consumedAt`，`no` = 未使用 — URL 同步，**1.41.0**）筛选；行 **设备** / **用户** / **会话** 链到 `/devices?deviceId=`、`/users?userId=`、`/sessions?sessionId=`（**1.40.0** 会话深链）；页头 **创建审计** / **加入审计** → `/audit?action=pairing.create|join`（**1.44.0**）；配对 **策略**（长度 / TTL）在 **系统** 页，策略区可 **打开配对** → `/pairings` |
@@ -22,9 +26,9 @@
 | **审计** | 按主体、动作预设（含 **旁观 / SupportGrant / 操作员与成员角色**、**`pairing.create` / `pairing.join`**（**1.43.0**）与 **监控墙 layout**）、时间、资源 / **资源类型**、**结果（ok / denied / error）** 筛选；**`admin.monitor_wall.layout`** 行可跳 **监控墙**（meta **`roomIds`** / `roomId` → `?s0=`，仅槽位种子，**1.38.0**）；导出 **CSV** |
 | **安全事件** | 外发风险、批量删除、行为推理等；按类型、**设备 ID**、**用户 ID**、**组织 ID** 筛选；可编辑 **告警规则 lite**（横幅最低严重度 + 静音类型；非关联引擎）；列表 **默认应用已保存的静音规则**（Switch「**应用静音规则**」；`applyMute=false` 或 URL `?applyMute=false` 显示全部类型）；高危有横幅；可跳转到关联录制时间点 / **会话 / 设备**；导出 **CSV** |
 | **组织** | 组织、席位/成员与策略（关键词、域名等）；可改成员 **orgRole**；抽屉内 **SupportGrant**（IT 协助授权）创建 / 列表 / 撤销 / **导出 CSV**（可选「撤销并断开相关会话」，`?kickSessions=true`）；列表导出 **CSV**；详情可导出 **成员 CSV** |
-| **订单** | 按用户、SKU、**支付渠道**、**来源（local_billing）**、状态筛选套餐订单；导出 **CSV**。本页是 **本地计费** 订单，不是 Entitlement 商务单。开发环境可对本地 pending 单点「模拟支付」；**禁止**用 Admin JWT 去 `/billing/.../simulate-paid` 或代付他人 commerce 订单。行 **会员** → `/membership?userId=…`（有 **userId** 时，**1.43.0**）；**会员** 页 **打开订单列表** 深链到此页 **`?userId=`**（**1.42.0**） |
-| **会员** | Commerce 收银台（试用倒计时、条款接受、SKU 下单与 sandbox 支付）；URL **`?userId=`** 可种子主体用户；有 userId 时标题旁 **打开订单列表** → `/orders?userId=…`（**1.42.0**；亦可在下单 / complete 后从订单响应带出 userId） |
-| **系统** | ICE/TURN 只读状态（密钥已掩码）；权益/支付配置标志只读（`entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`；无密钥）；`enforce` 且 webhook 未配置时告警：入站 webhook 一律 401；**复制权益状态 JSON**（仅上述标志）；浏览器 **ICE 探测** 与 **复制探测结果**；配对码策略（**1.40.0** 策略区 **打开配对** → `/pairings`） |
+| **订单** | 按用户、SKU、**支付渠道**、**来源**、状态筛选套餐订单。本页列出本地计费与 commerce 镜像行。「**模拟支付**」只出现在 `source=local_billing` 且 pending，走 `POST /api/v1/admin/orders/:id/simulate-paid`。commerce 单无按钮；API 返回 **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN`（请走 Client Membership complete / webhook）。生产未开 `BILLING_ALLOW_SIMULATE_PAID` 时 **400** `SIMULATE_PAID_DISABLED`。**禁止**用 Admin JWT 打 `/billing/.../simulate-paid`。页头说明：微信/支付宝生产 notify 在 Entitlement，不在本页。历史行 **会员** → `/membership?userId=…` 在当前 viewer Admin **无会员路由** |
+| **会员** | **收银在 Web 用户端 `/membership`**（当前 viewer Admin **无此路由**）：试用倒计时、条款、SKU、catalog `providerHint`（`wechat` / `alipay`）、QR/`codeUrl`/跳转；支付后 **status 轮询** + **complete** 刷新权益。页内沙箱文案 **不是** 生产 PSP。历史 Admin 会员页（`?userId=`、打开订单列表）属未挂路由能力 |
+| **系统** | **FR-WAD-52** 权益/支付配置标志（只读）：`entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`；可 **复制权益状态 JSON**。不暴露密钥或 Base URL 明文。enforce 就绪 ≠ 微信/支付宝生产商户已上线 |
 | **任务** | 后台任务（如录制摘要）列表；按 **ID / 名称 / 状态 / 失败原因** 筛选（**URL 同步**；概览「失败任务」→ `?state=failed`）；**`recording.summarize`** 行可跳 **录制**；失败重试；导出 **CSV** |
 | **效率报告** | 按本周/本月汇总录制分钟数；可按 **用户 ID / 会话 ID / 设备 ID / 录制 ID** 子串筛选后再汇总（基于录制元数据，不是 LLM 效率模型）；**打开录制列表** 深链携带当前筛；导出 **CSV** |
 | **权限** | 平台/组织权限矩阵 **只读**；可导出对照 **CSV**；可分配 **平台操作员** 角色（非勾选改 Permission） |
@@ -34,9 +38,10 @@
 
 ### 为用户开通 Pro
 
-1. 生产开通：走 Entitlement **sandbox** 微信/支付宝（见下文），或确认合同后在「用户」改套餐。
-2. 开发快捷：用户用 **Controller JWT** 调 `POST /api/v1/billing/orders/:id/simulate-paid`（仅自己的 **本地** 订单）。管理台「模拟支付」只打本地 `source=local_billing` 单，**不会**代付 commerce。
-3. 用户重新登录或刷新客户端后生效。
+1. 封闭试用首选：管理台 **用户** → 改套餐（立即写本地 `User.plan`）。
+2. Sandbox 收银：用户打开 Web **用户端** `/membership`，选 `providerHint`（微信/支付宝），支付后等待轮询或点 **完成支付**。这不是生产商户 notify。
+3. 仅本地 pending 单：管理台 **订单**「模拟支付」（`POST /api/v1/admin/orders/:id/simulate-paid`）。订单所有者也可用 Controller JWT 打 `/api/v1/billing/orders/:id/simulate-paid`。commerce 单会 `COMMERCE_SIMULATE_PAID_FORBIDDEN`。
+4. 用户刷新客户端或重新登录后权益生效。
 
 ### 禁用用户
 
@@ -79,11 +84,11 @@
 2. **设备** — 行关联 **活跃会话**（与内存房间匹配）时，**操作** 列 **监控墙** → `/monitor-wall?s0=<sessionId>`（槽位 0 种子；**不是** SFU 多路已交付）。
 3. **会话** — 可按 **用户 ID** 筛选；筛选项与 **`?userId=`** URL 同步（用户抽屉「查看会话」会种子此参数）。客户端按行 `userId` 过滤（行无 `userId` 时不匹配）。
 
-### 会员与订单（1.42.0 / 1.43.0）
+### 会员与订单（1.42.0 / 1.43.0 / 1.52.0）
 
-1. **会员** — 打开 **/membership**（侧栏 **运营管理** → **会员**）。标题旁 **打开订单列表** 在已知 **userId** 时出现，链到 `/orders?userId=…`（**1.42.0**）。
-2. **userId 来源** — URL **`?userId=`** 种子；或在本页 **去支付** / **完成支付** 后 commerce 订单响应里的 **userId**（下单或轮询 complete 后写入页面状态）。
-3. **订单** — 列表 **`?userId=`** 筛与 URL 同步（与用户抽屉「查看订单」相同参数）；**操作** 列 **会员** → `/membership?userId=…`（订单有 **userId** 时，**1.43.0**）。本页仍以 **local_billing** 列表为主，commerce 单请结合 **会员** 流程理解。
+1. **收银** — Web **用户端** `/membership`（当前 viewer Admin **无会员路由**）：`providerHint`、QR/跳转、支付后轮询 status，并可 **完成支付**（`complete`）。沙箱文案不是生产 PSP。
+2. **订单** — 管理台 **订单** 看本地单；「模拟支付」仅 `local_billing` pending。commerce 请结合用户端 Membership 理解。历史 Admin 会员↔订单深链在当前 viewer **未挂**。
+3. **开通** — 试用用户卡住 Free 时，优先 **用户** 改套餐，不要对 commerce 单点模拟支付。
 
 ## 本版本尚未提供
 
@@ -113,8 +118,8 @@
 | :--- | :--- |
 | `ENTITLEMENT_MODE=off`（默认） | 本地套餐/订单；不访问中央 Entitlement |
 | `ENTITLEMENT_MODE=enforce` | 商务权益与 checkout 以 Entitlement 为准 |
-| Mock / 开发 | 用户 `POST /api/v1/billing/orders/:id/simulate-paid`（自己的本地单） |
-| Sandbox 微信/支付宝 | `POST /api/v1/commerce/orders/:id/pay`，`wechat`→`wechat_pay_v3`、`alipay`→`alipay_f2f`；密钥只在 Entitlement 环境变量 |
+| Mock / 开发 | 订单所有者 `POST /api/v1/billing/orders/:id/simulate-paid`；管理台 `POST /api/v1/admin/orders/:id/simulate-paid`（仅 `local_billing`） |
+| Sandbox 微信/支付宝 | 用户端 `/membership`：`providerHint` `wechat`→`wechat_pay_v3`、`alipay`→`alipay_f2f`；轮询 status + `complete`；密钥只在 Entitlement |
 | Lite Entitlement webhook | `POST /api/v1/commerce/webhooks/entitlement`；`x-lw-timestamp` / `x-lw-nonce` / `x-lw-signature: v1=<base64url>` / `x-lw-event-id`；HMAC `${timestamp}.${nonce}.${rawBody}`；同步 **User.plan**（非生产微信/支付宝 PSP） |
 
-生产核对（系统页标志、错误签名 401、commerce 禁 simulate-paid、env **名称**）见 [生产支付就绪](/user/payment-production)。真实商户进件是 owner-ops，不随仓交付。
+生产核对（entitlement **API** 标志、错误签名 401、commerce 禁 simulate-paid、env **名称**）见 [生产支付就绪](/user/payment-production)。真实商户进件是 owner-ops，不随仓交付。

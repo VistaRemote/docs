@@ -42,7 +42,7 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 不是。回放是录制页里的 **本机浏览器视频**（`<video>`，支持 seek / 倍速），不是 MinIO 产品播放器。端侧 **MediaRecorder** 分片上传与 MinIO 可通过 dev 层 **`recording`** profile 启用 — 见 [Docker 部署](/deploy/docker)。
 
 **ICE 卡住要改 DNS 吗？**  
-不要先改 DNS。到管理台 **系统** 跑 **ICE 探测**（浏览器 STUN gather），看能否收集到 STUN 候选。探测后可复制探测结果 / STUN URL，便于工单排查。仍失败再查 UDP/防火墙与 TURN，见 [远程控制](/user/remote-control) 连接质量。ICE 由 Server 下发，系统页密钥已掩码。
+不要先改 DNS。ICE 候选由 Server 下发。管理台 **系统** 可核对权益标志（FR-WAD-52）。仍失败再查 UDP/防火墙与 TURN，见 [远程控制](/user/remote-control) 连接质量。
 
 **权限矩阵可以编辑吗？**  
 不能。权限页是 **只读** 对照（平台 RBAC / 组织角色）。**ADM-2**（可编辑角色绑定）尚未交付；不要按可改矩阵做验收。说明见 [管理控制台](/user/admin-console)。
@@ -60,7 +60,7 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 组织详情抽屉内 **SupportGrant**：为 IT 协助创建 / 列出 / 撤销临时授权，并可 **导出授权 CSV**（当前筛选/已加载行）。撤销确认框可选「**撤销并断开相关会话**」（`?kickSessions=true`，默认关）。权限矩阵仍只读。详见 [管理控制台](/user/admin-console)。
 
 **系统页的权益标志是什么？**  
-**系统** 页只读展示 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured` 等标志，**不展示**密钥或 webhook secret；可 **复制权益状态 JSON**（仅上述标志字段，1.33.0）。用于核对 Entitlement 是否配置，不是改套餐入口。见 [管理控制台](/user/admin-console)。生产 webhook / 模拟支付核对见 [生产支付就绪](/user/payment-production)。
+管理台 **系统** 只读展示 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`（`GET /api/v1/admin/system/entitlement`，FR-WAD-52），**不展示**密钥。可复制权益状态 JSON；不是改套餐入口。见 [管理控制台](/user/admin-console)。生产 webhook / 模拟支付核对见 [生产支付就绪](/user/payment-production)。
 
 **录制回放 URL 过期怎么办？MinIO EntityTooSmall？**  
 录制页播放器经短时签名 **playback-url** 拉流（含 `expiresAt`）；过期可刷新。若 `failedReason` 含 **EntityTooSmall / part size**，列表会提示 Agent 应将非末片合并至 **≥5 MiB**（桌面端 ≥1.30；`memory://` 仍允许小分片）。见 [管理控制台](/user/admin-console)。
@@ -126,7 +126,7 @@ Web **用户端** `/membership` 页底有灰色脚注：历史订单由平台管
 **审计** → 动作筛选下方点 **`pairing.create`** / **`pairing.join`** 芯片（等同 Pairings 页头审计深链）。见 [管理控制台](/user/admin-console)。
 
 **系统页 `enforce` 为何出现 webhook 告警（1.47.0）？**  
-`entitlementMode=enforce` 且 **Webhook 密钥未配置** 时，管理台 **系统** 会告警：入站 `POST /api/v1/commerce/webhooks/entitlement` **一律 401**，直至服务端设非空 `ENTITLEMENT_WEBHOOK_SECRET`。核对标志见 [管理控制台](/user/admin-console)；生产清单见 [生产支付就绪](/user/payment-production)。
+`entitlementMode=enforce` 且 **Webhook 密钥未配置** 时，入站 `POST /api/v1/commerce/webhooks/entitlement` **一律 401**，直至服务端设非空 `ENTITLEMENT_WEBHOOK_SECRET`。管理台 **系统** 可看 `webhookSecretConfigured`。见 [管理控制台](/user/admin-console)；生产清单见 [生产支付就绪](/user/payment-production)。
 
 **订单 / 用户列表筛选项会写回 URL 吗（1.47.0）？**  
 会。**订单**：`id`、`userId`、`sku`、`provider`、`currency`、`status`；**用户**：`userId`、`email`、`status`、`plan`、`billingKind`、`orgId`、`planExpiry`。可书签或分享链接；会员 / 用户抽屉深链仍会种子 `?userId=`。见 [管理控制台](/user/admin-console)。

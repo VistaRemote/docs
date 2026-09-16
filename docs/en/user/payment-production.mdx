@@ -8,8 +8,8 @@ Architecture: [Commercial billing](/architecture/commercial-billing). Admin modu
 
 | Stage | Typical config | Behavior |
 | :--- | :--- | :--- |
-| **Mock (local)** | `ENTITLEMENT_MODE=off` | Local orders and plans. The order owner may call `POST /api/v1/billing/orders/:id/simulate-paid` (Controller JWT). Admin **Simulate paid** applies only to `source=local_billing`. |
-| **Sandbox** | `ENTITLEMENT_MODE=enforce`, central Entitlement reachable | Checkout `POST /api/v1/commerce/orders/:id/pay`: catalog `wechat` → `wechat_pay_v3`, `alipay` → `alipay_f2f`. Sandbox secrets live on **Entitlement**, not this repo. complete / status polling syncs local `User.plan`. |
+| **Mock (local)** | `ENTITLEMENT_MODE=off` | Local orders and plans. The order owner may call `POST /api/v1/billing/orders/:id/simulate-paid` (Controller JWT). Admin **Orders** **Simulate paid** calls `POST /api/v1/admin/orders/:id/simulate-paid` and applies only to `source=local_billing`. |
+| **Sandbox** | `ENTITLEMENT_MODE=enforce`, central Entitlement reachable | Web **Client** `/membership`: catalog `providerHint` `wechat` → `wechat_pay_v3`, `alipay` → `alipay_f2f`; may show QR / `codeUrl` / redirect. After pay the page **polls** `GET .../orders/:id` (~2s, ~2 min cap); return or **Complete payment** posts `.../complete`, then refreshes local entitlements. Sandbox secrets live on **Entitlement**, not this repo. **Not** production WeChat / Alipay merchant notify. |
 | **Production** | Same mode + production Entitlement / PSP (owner-ops) | VistaRemote lite webhook `POST /api/v1/commerce/webhooks/entitlement` can sync `User.plan`. **WeChat / Alipay platform notify lands on LuminaryWorks Entitlement**, not VistaRemote. Real merchant onboarding, certificates, and platform callbacks are **not shipped** with this repo. |
 
 Lite ingress `order.fulfilled` (`POST /api/v1/commerce/webhooks/entitlement`) uses HMAC headers (**FR-BILL-06**) — **not** WeChat / Alipay platform notify verification:
@@ -64,14 +64,25 @@ This repo has **no** `COMMERCE_*` environment variables. The commerce BFF forwar
 
 WeChat / Alipay **merchant ids, APIv3 keys, certificates, and Alipay app secrets** belong on Entitlement / the PSP — **not** VistaRemote server env vars. `ENTITLEMENT_TRIAL_PURGE_*` is trial recording purge, not a payment callback.
 
+## Client Membership (sandbox, not PSP live)
+
+Web **Client** `/membership` (the current viewer Admin has **no** `/membership` route):
+
+1. Accept policies → pick a Pro/Ultra SKU → choose **WeChat Pay** or **Alipay** (catalog `providerHint`, not Entitlement adapter ids).
+2. **Checkout** → `POST /api/v1/commerce/orders` then `.../pay`. A QR, payment link, or redirect may appear.
+3. The page shows “Waiting for payment confirmation…” and polls order status; **Complete payment** also posts `complete`.
+4. When status is `paid` / `fulfilled` / `completed` / `success`, entitlements refresh. The on-page sandbox note is **not** live merchant notify.
+
+Closed trial can also grant via Admin **Users** → change plan, without checkout.
+
 ## Checklist
 
-- [ ] **System page flags (FR-WAD-52)**: Admin **System** → entitlement/payment flags. `GET /api/v1/admin/system/entitlement` returns only `entitlementMode`, `entitlementBaseUrlConfigured`, and `webhookSecretConfigured`. It must **not** include `ENTITLEMENT_WEBHOOK_SECRET` or a raw base URL. Use **Copy entitlement status JSON** to confirm.
+- [ ] **System entitlement flags (FR-WAD-52)**: Admin **System** → entitlement/payment config. `GET /api/v1/admin/system/entitlement` returns only `entitlementMode`, `entitlementBaseUrlConfigured`, and `webhookSecretConfigured`. It must **not** include `ENTITLEMENT_WEBHOOK_SECRET` or a raw base URL. Use **Copy entitlement status JSON** to verify.
 - [ ] **Reject a bad signature**: `POST /api/v1/commerce/webhooks/entitlement` with a wrong or missing `x-lw-signature` (or legacy `X-Entitlement-Signature` only) → **401**; local `User.plan` must not change. Unset secret → **401** as well.
-- [ ] **simulate-paid forbidden for commerce**: `POST /api/v1/admin/orders/:id/simulate-paid` on `source=commerce` returns **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN`. Do not call `POST /api/v1/billing/orders/:id/simulate-paid` with an Admin JWT.
-- [ ] **Disable simulate-paid in production**: when `NODE_ENV=production` and `BILLING_ALLOW_SIMULATE_PAID` is not `true`, simulate-paid returns **400** `SIMULATE_PAID_DISABLED`.
-- [ ] **Webhook user mapping**: `subjectId` must be the Entitlement-side Logto `sub` with a matching local `users.logtoSub`; otherwise **400** `WEBHOOK_USER_NOT_FOUND`. Admin-created local users should use plan grant or commerce complete/status — **not** webhook auto-grant.
-- [ ] **Grant path**: after sandbox commerce **pay** + **complete** / **status** (or a signed lite webhook when the user is OIDC-bound), the Admin **Users** list shows the matching `plan`. That is a local cache, not proof that production PSP settlement is complete.
+- [ ] **simulate-paid forbidden for commerce**: Admin **Simulate paid** is shown only on `local_billing` pending rows. `POST /api/v1/admin/orders/:id/simulate-paid` on `source=commerce` returns **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN` (UI: use Membership complete / webhook). Do not call `POST /api/v1/billing/orders/:id/simulate-paid` with an Admin JWT.
+- [ ] **Disable simulate-paid in production**: when `NODE_ENV=production` and `BILLING_ALLOW_SIMULATE_PAID` is not `true`, simulate-paid returns **400** `SIMULATE_PAID_DISABLED` (UI: simulate paid disabled in production).
+- [ ] **Webhook user mapping**: `subjectId` must be the Entitlement-side Logto `sub` with a matching local `users.logtoSub`; otherwise **400** `WEBHOOK_USER_NOT_FOUND`. Admin-created local users should use plan grant or Client Membership complete/status — **not** webhook auto-grant.
+- [ ] **Grant path**: after sandbox Client Membership **pay** + **complete** / **status** polling (or a signed lite webhook when the user is OIDC-bound), the Admin **Users** list shows the matching `plan`. That is a local cache, not proof that production PSP settlement is complete.
 - [ ] **No secrets in git**: `.env`, CI logs, and Admin JSON must not contain merchant secrets.
 
 ## Not shipped (owner-ops)
@@ -83,4 +94,4 @@ Complete these on the **LuminaryWorks Entitlement / PSP consoles**. VistaRemote 
 - Production credentials for PayPal / Wise and other channels
 - Store those secrets in the **Entitlement** environment (do not commit them in `server/.env`)
 
-After onboarding, re-run this checklist: System flags, bad-signature 401, and commerce simulate-paid still forbidden.
+After onboarding, re-run this checklist: entitlement **API** flags, bad-signature 401, and commerce simulate-paid still forbidden.
