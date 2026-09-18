@@ -21,17 +21,21 @@ cd d:\www\VistaRemote
 2. **配对**：浏览器打开配对页，输入码 → 进入会话
 3. **校验**：网页 `sess:` 后 8 位 = Agent 会话 ID 后 8 位；Agent `sent-offer`，网页 `streaming`
 
-## 多显示器说明（MVP）
+## 多显示器说明
 
-当前 **MVP-B 仅支持单屏**：Agent 会自动采集**主显示器**。若你有两块或更多屏幕，副屏内容**暂时无法**单独选择或同时查看。
-
-后续版本规划（详见 [多屏 Spec](../../spec/multi-display-spec.md)）：
-
-| 版本 | 能力 |
+| 场景 | 行为 |
 |------|------|
-| **MD-1** | 像向日葵一样，连接前**选择要控制的屏幕** |
-| **MD-2** | 会话中切换屏幕；未观看的屏降低编码负载 |
-| **MD-3** | 像 TeamViewer 一样，多窗口各显示一块屏 |
+| **单屏** | 默认采集**主显示器**（`isPrimary`），无选屏 UI |
+| **多屏（已交付）** | **选屏**（MD-1）→ 会话中**热切换**（MD-2）→ **多窗口**各绑一块屏（MD-3，P2P≤**2** 路） |
+| **≥3 路 / SFU** | 未交付；第三块及以上屏用工具栏切屏，或等后续 SFU Multi-Stream |
+
+### 已知限制
+
+- P2P 并行最多 **2** 路画面；同时开多窗口不会超过 2
+- 合屏（stitched）、原生 Dirty Rect（MD-4）、跨会话 SFU 监控墙多 producer 仍属后续
+- 用户操作细则见 [远程控制 · 多显示器](../docs/zh/user/remote-control.mdx)（[EN](../docs/en/user/remote-control.mdx)）
+
+阶段与 Spec：[多屏 Spec](../../spec/multi-display-spec.md) · [多屏迭代计划](../../plan/multi-display-iteration-roadmap.md)
 
 ## 仍无画面？
 

@@ -1,0 +1,44 @@
+# Plugin development (PLUGIN-β starter)
+
+VistaRemote uses a **core + plugins** model. Contracts live in `@vistaremote/shared` (Manifest, permissions, `apiVersion`). This guide covers the **scaffold CLI** only — signing, marketplace, and dynamic install into production Agents are **not** shipped yet.
+
+See Spec: [plugin-architecture-spec](https://github.com/VistaRemote/VistaRemote/blob/main/spec/plugin-architecture-spec.md).
+
+## Prerequisites
+
+- Local Meta-Repo with `pnpm --dir shared build`
+- Node.js ≥ 24
+
+## CLI (`tooling/vt-cli`)
+
+```bash
+# Scaffold
+pnpm vt-cli create plugin --id com.acme.demo --name "Demo" --targets server,web
+
+# Validate Manifest (shared validatePluginManifest)
+pnpm vt-cli validate ./demo
+
+# Pack (unsigned)
+pnpm vt-cli pack ./demo --format zip
+pnpm vt-cli pack ./demo --format tgz
+```
+
+The scaffold includes `plugin.manifest.json`, per-target stubs, and Biome config.
+
+## Minimal Manifest fields
+
+| Field | Notes |
+| :--- | :--- |
+| `id` | Reverse-domain, e.g. `com.acme.demo` |
+| `name` / `version` | Display name and semver |
+| `apiVersion` | Currently `vistaremote-host/1` |
+| `targets` | `server` \| `web` \| `desktop` \| `mobile` |
+| `permissions` | e.g. `ui.overlay` (must be a known shared permission) |
+| `entry` | Per-target entry paths |
+| `publisher` | `{ name }` (public-key fingerprint comes with signing later) |
+
+## Limits
+
+- **No** ed25519 signing
+- **No** `vt publish` / plugin-index market
+- Hosts still load the in-process hello Manifest; archives are not dynamically installed into production Agents

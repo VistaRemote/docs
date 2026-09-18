@@ -1,0 +1,44 @@
+# 插件开发（PLUGIN-β 起步）
+
+VistaRemote 采用「核心 + 插件」架构。契约在 `@vistaremote/shared`（Manifest、权限、`apiVersion`）。本页覆盖 **脚手架 CLI**；签名、插件市场、动态安装到生产 Agent **尚未交付**。
+
+详见 Spec：[plugin-architecture-spec](https://github.com/VistaRemote/VistaRemote/blob/main/spec/plugin-architecture-spec.md)。
+
+## 前置
+
+- Meta-Repo 本地已 `pnpm --dir shared build`
+- Node.js ≥ 24
+
+## CLI（`tooling/vt-cli`）
+
+```bash
+# 脚手架
+pnpm vt-cli create plugin --id com.acme.demo --name "Demo" --targets server,web
+
+# 校验 Manifest（shared validatePluginManifest）
+pnpm vt-cli validate ./demo
+
+# 打包（无签名）
+pnpm vt-cli pack ./demo --format zip
+pnpm vt-cli pack ./demo --format tgz
+```
+
+生成目录含 `plugin.manifest.json`、各端 stub、Biome 配置。
+
+## Manifest 最小字段
+
+| 字段 | 说明 |
+| :--- | :--- |
+| `id` | 反向域名，如 `com.acme.demo` |
+| `name` / `version` | 显示名与 semver |
+| `apiVersion` | 当前为 `vistaremote-host/1` |
+| `targets` | `server` \| `web` \| `desktop` \| `mobile` |
+| `permissions` | 如 `ui.overlay`（须为 shared 已知权限） |
+| `entry` | 各端入口路径 |
+| `publisher` | `{ name }`（公钥指纹为后续签名阶段） |
+
+## 局限
+
+- **无** ed25519 签名校验
+- **无** `vt publish` / plugin-index 市场
+- Host 仍以内嵌 hello Manifest 为主；归档包不会被生产 Agent 动态加载
