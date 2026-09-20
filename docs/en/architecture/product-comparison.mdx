@@ -2,72 +2,67 @@
 
 | Metadata | Value |
 | :--- | :--- |
-| **Doc** | Competitor capability matrix |
-| **Version** | 1.1.1 |
+| **Doc** | Competitor capability matrix (customer-facing) |
+| **Version** | 1.2.0 |
 | **Updated** | 2026-09-20 |
-| **See also** | [Positioning](./positioning) · Spec `spec/competitor-parity-spec.md` · `spec/product-pillars-spec.md` |
+| **See also** | [Positioning](./positioning) · [Device Fleet & Enterprise](/user/fleet-and-enterprise) |
 
 ---
 
 ## 1. Three one-liners
 
-**VistaRemote** is WebRTC remote control of an already logged-in desktop, with a planned **edge device fleet** (group control, thumbnail screen wall). Signaling is NestJS. Media is WebRTC (P2P, TURN, or mediasoup). State can stay in your own PostgreSQL. Fleet features require **Enterprise**. With VistaCast: Cast watches business video; Remote manages Edge boxes.
+**VistaRemote** is WebRTC remote control of an already logged-in desktop, plus a **device fleet**: group control, batch commands, multi-screen monitor wall, virtual display, and more. Signaling is NestJS; media is P2P / TURN / mediasoup; state can stay in your PostgreSQL. Fleet capabilities are **Enterprise** scope and enabled after purchase. With VistaCast: Cast watches business video; Remote manages Edge boxes.
 
-**BilldDesk** is a ToDesk-style remote desktop. The [open-source repo](https://github.com/galaxy-s10/billd-desk) is not a stable release; the author says permission and input problems are not fixable on that architecture. Pro is a rewrite and its source is not public. The “open source” column below follows the cloned source, not the README checklist.
+**BilldDesk** is a ToDesk-style remote desktop. The [open-source repo](https://github.com/galaxy-s10/billd-desk) is not a stable release; Pro source is not public. The “open source” column follows the cloned source.
 
-**MeshCentral** is self-hosted machine management. The browser reaches MeshAgent through a server relay. Remote desktop is not WebRTC by default. It also covers terminal, files, device-group ACL, audit, and Intel AMT.
+**MeshCentral** is self-hosted machine management with a server relay to MeshAgent (remote desktop is not WebRTC by default), plus terminal, files, device ACL, audit, and Intel AMT.
 
-Broader positioning (legacy monitoring vs commercial monitoring) stays in [Positioning](./positioning). This page only compares remote-desktop and RMM products.
+See [Positioning](./positioning) and [Device Fleet & Enterprise](/user/fleet-and-enterprise).
 
 ---
 
 ## 2. Capability matrix
 
-Each cell is one of: **Have** (code exists; most flows still need human sign-off), **This wave** (`FR-PARITY-*` wired, not signed off), **Not now**.
+| Marker | Meaning |
+| :--- | :--- |
+| **Have** | In product scope |
+| **Enterprise** | Requires enterprise service |
+| **Contract** | Delivered / add-on under purchase |
 
-| Capability | VistaRemote | BilldDesk open source | BilldDesk Pro (marketing only) | MeshCentral |
+| Capability | VistaRemote | BilldDesk open source | BilldDesk Pro (marketing) | MeshCentral |
 | :--- | :--- | :--- | :--- | :--- |
-| 1:1 remote desktop | Have (WebRTC) | Have (WebRTC; author: not stable) | Claimed | Have (server relay; WebRTC off by default) |
-| Ephemeral pairing code | Have | No (stable device code instead) | Custom device code claimed | No (device groups + agent) |
-| Stable device code + password | Have (this wave; unsigned) | Have (plaintext password compare) | Claimed | No; account ACL |
-| Keyboard and mouse | Have (consent required; Win/mac/X11) | Have (nut.js, often needs admin) | Driver-level claimed | Have (agent) |
-| Text clipboard / files / terminal | Have (single file ≤ 256 MiB) | File and clipboard are stubs | Claimed | Have (first-class) |
-| Multiple displays | Have (P2P, at most 2) | Capture takes the first screen only | Claimed | Have |
-| Screen wall / observe | Shell + auto SFU subscribe (≤4); **target** thumbnail tier (~256×144 / ~5 FPS) then click-up to HD control (Enterprise, `FR-FLEET-SW-*`); full-wall live E2E / displayId still open | Not in source | Claimed, tiered pricing | Device list, not a ToDesk wall |
-| Group control | **Roadmap priority** (Enterprise, `FR-FLEET-GC-*`; batch commands before mouse swarm) | Not in source | Claimed | Commands to many devices, not mouse swarm |
-| Local privacy screen | Have (Windows only; unsigned) | Not in source | Claimed | Consent bar, not a desktop blank |
-| Virtual / extended display | Stage 2 (`FR-FLEET-VD-*`) | Not in source | Claimed | No |
-| Wake-on-LAN | Have (same /24 magic packet; unsigned) | Not in source | Claimed | Have (server or LAN agent) |
-| Start at login | Have (login item, not a service watchdog) | README marks it as a bug | Claimed | Agent runs as a service |
-| Lock after session | Have (unsigned) | Not in source; lock drops the socket | Claimed | Power actions |
-| Host quick actions | Have (show desktop / task manager; no SAS) | No dedicated panel in open source | Shortcut panel claimed | Terminal and power |
-| Controller ICE/TURN override | Have (local settings; unsigned) | Custom coturn | Claimed | Server config |
-| My devices list | Have (labels as light grouping; unsigned) | Local recent connections | Device groups claimed | Device groups are core |
-| In-session recording control | Have (signaling → agent recorder; unsigned) | Not in source | Claimed | Session recording |
-| Hardware encode / zero-copy | Not now (performance roadmap is spec-only) | Browser constraints, not hardware encode | Claimed | Native encode in the agent |
-| Intel AMT / registry / service start-stop | AMT is Enterprise OOB **later**; registry / service control no | No | No | Have |
-| UAC / login window / Ctrl+Alt+Del | No (logged-in session only) | Open-source architecture cannot fix this | Shortcut panel claimed | Partial console and power |
-| Self-host | Have (Docker Compose skeleton) | No complete compose | Claimed | Have (one process + data dir) |
-| Admin / audit | Have (not signed off) | Admin API only; UI not in this clone | Claimed | Have (events, recording, fine ACL) |
+| 1:1 remote desktop | Have (WebRTC) | Have | Claimed | Have (server relay) |
+| Ephemeral pairing code | Have | No | Claimed | No |
+| Stable device code + password | Have | Have | Claimed | Account ACL |
+| Keyboard / clipboard / files / terminal | Have | Weak / stubs | Claimed | Have |
+| Multiple displays | Have | Weak | Claimed | Have |
+| **Multi-screen monitor wall** | **Have (Enterprise)**: thumbnail observe + click-up HD control; larger slots as contract add-on | No | Claimed | Device list |
+| **Group keyboard & batch commands** | **Have (Enterprise)** | No | Claimed | Batch commands |
+| **Virtual display** | **Have (Enterprise)** | No | Claimed | No |
+| Local privacy screen | Have (Windows) | No | Claimed | Consent bar |
+| Wake-on-LAN | Have (same LAN) | No | Claimed | Have |
+| Start at login / lock on end / host actions | Have | Weak | Claimed | Have |
+| My devices / recording control | Have | Weak | Claimed | Have |
+| **Intel AMT / OOB** | **Have (Enterprise private-deploy contract)** | No | No | Have |
+| Registry / service start-stop / login-window inject | No | No | Partial claims | Partial |
+| Self-host / admin audit | Have | Weak | Claimed | Have |
 
 ---
 
-## 3. Copy capabilities, not stacks
+## 3. Stack differences (for technical buyers)
 
-| | VistaRemote (kept) | BilldDesk open source | MeshCentral |
+| | VistaRemote | BilldDesk open source | MeshCentral |
 | :--- | :--- | :--- | :--- |
 | HTTP | NestJS + **Fastify** | Koa2 | Express |
-| Database | **PostgreSQL** + TypeORM, UUIDv7 keys | MySQL + Sequelize | NeDB by default |
-| Realtime | Own WebSocket signaling; media is WebRTC | Socket.io rooms | Own WebSocket; server relays bytes |
-| Desktop | Electron + existing injectors (no nut.js) | Electron + nut.js | Prebuilt MeshAgent |
-| UI | React + Rsbuild + Sass Modules | Vue 3 | Handlebars |
+| Database | **PostgreSQL** + TypeORM | MySQL | NeDB by default |
+| Media | WebRTC (P2P / TURN / SFU) | WebRTC | Often server relay |
+| Desktop | Electron | Electron + nut.js | MeshAgent |
+| UI | React + Rsbuild | Vue 3 | Handlebars |
 
-Do not import live-room models, Socket.io, Mesh JPEG relay, or AMT into VistaRemote. The Pro author already says the open-source architecture cannot fix permission and control, so only product capabilities are aligned.
+We align on product capabilities, not on copying another stack.
 
 ---
 
-## 4. Why this wave stops
+## 4. How to talk to enterprise buyers
 
-Out-of-band management (AMT), the registry, service start/stop, and login-window injection would turn the product into a different RMM and break the logged-in-session boundary. **AMT stays a later Enterprise / private-deployment capability** and must not consume early R&D.
-
-Group control and the thumbnail screen wall are defined in the [product pillars Spec](https://github.com/VistaRemote/vibeCode/blob/main/spec/product-pillars-spec.md): group control first; wall defaults to low-cost thumbnails with click-up to HD sessions; **do not** promise 128–500 simultaneous HD streams by default (validate slot counts after Enterprise purchase; public marketing often cites ~24 / ~128). Virtual display is Stage 2.
+Group control, monitor wall, virtual display, and OOB are **in product scope**, enabled with **Enterprise**, and delivered on a **contract schedule** when needed. Customer docs do not use internal engineering stage language. Details: [Device Fleet & Enterprise](/user/fleet-and-enterprise).

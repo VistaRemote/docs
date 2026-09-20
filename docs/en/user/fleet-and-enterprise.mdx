@@ -1,0 +1,113 @@
+# Device Fleet & Enterprise Capabilities
+
+| Metadata | Value |
+| :--- | :--- |
+| **Doc** | User / customer-facing product capabilities |
+| **Version** | 1.0.0 |
+| **Updated** | 2026-09-20 |
+| **Plan** | Primarily **Enterprise** (enabled after enterprise service is purchased) |
+
+---
+
+## 1. What the product includes
+
+**VistaRemote** is more than one-to-one remote desktop. For enterprises and edge sites, it includes a full **Device Fleet** capability set:
+
+| Capability | In one line | Typical use |
+| :--- | :--- | :--- |
+| **1:1 remote desktop** | High-quality view + keyboard/mouse + files / terminal | Support desks, break/fix |
+| **Group keyboard & mouse** | One controller operates many authorized devices in sync | Lab tours, mass config, training |
+| **Batch commands** | Notify, lock, reboot, open URL across devices | End-of-day lock, alerts, incident response |
+| **Multi-screen monitor wall** | Low-cost thumbnail observe; click into HD control | NOC walls, edge-site patrol |
+| **Virtual display** | Dedicated virtual screen for remote sessions | Helpdesk remote, unattended stations |
+| **Out-of-band (OOB)** | Intel AMT power / BIOS / KVM (enterprise private deploy) | Machines that are powered off or pre-OS |
+| **Audit & RBAC** | Traceable actions, org roles | Compliance, IT separation of duties |
+
+With **VistaCast**: Cast watches business video; Remote manages edge compute boxes — a natural B2B bundle (cameras + Edge AI Box + VistaRemote management).
+
+---
+
+## 2. Who gets it and how to enable
+
+| Capability family | Plan | How to enable |
+| :--- | :--- | :--- |
+| Core 1:1 remote | Free / Pro / Enterprise | Default product path |
+| Fleet: group control, batch commands, wall, virtual display | **Enterprise** | Purchase enterprise service, then enable entitlements |
+| OOB / AMT | **Enterprise + private deployment** | Defined in the contract and delivery scope |
+| Larger wall slot counts | **Enterprise contract add-on** | Validate slots and SLA against purchase |
+
+**Sales & delivery posture (product commitment)**
+
+- The capabilities above are **in product scope**: you can present them in proposals and RFPs as “supported.”
+- After an enterprise purchase or signed contract, the team **enables, tunes, or add-ons** to the site’s needs. Some capabilities are delivered and accepted on the contract’s schedule.
+- Endpoint management can be priced on its own (per device / seat), not only as a remote-desktop checkbox.
+
+Pricing and enablement: contact sales or your implementer. Overview: [Plans & billing](/user/plans-and-billing).
+
+---
+
+## 3. Monitor wall: observe cheaply, control when needed
+
+```text
+Thumbnail wall (low-cost observe)
+        ↓ anomaly
+Click device (enterprise entitlement)
+        ↓
+High-quality Remote Session (control)
+```
+
+| Mode | Purpose |
+| :--- | :--- |
+| **Thumbnail observe** | Low resolution / frame rate preview across many online devices |
+| **High-quality control** | Click into a 720p / 1080p-class remote session |
+
+This separates “100 devices online” from “100 simultaneous HD streams.” The latter is a **contract add-on**, not a default catalog promise. Larger walls (market messaging often cites tens to ~100+ observe slots) can be enabled and validated under contract on the existing architecture.
+
+Entry: Admin **Monitor wall**; click a live slot to open a control session. See [Admin console](/user/admin-console).
+
+---
+
+## 4. Group control & batch commands
+
+### Batch commands
+
+From **My devices** (Client) or Admin **Devices**, multi-select devices and send:
+
+- Desktop notification  
+- Lock screen  
+- Reboot / shutdown (typed confirm required)  
+- Open an http(s) URL  
+
+Each device returns its own result; actions are audited.
+
+### Group keyboard & mouse
+
+Select multiple online devices and enter **group control**: input on the primary canvas fans out to devices that have granted consent. Agents can disconnect at any time; unauthorized devices are never controlled implicitly.
+
+---
+
+## 5. Virtual display
+
+The product supports a **virtual display** for remote sessions so work happens on a dedicated virtual screen and disturbs the physical desktop less. It works with privacy-screen and multi-display policies.
+
+- Enable after the enterprise **virtual display** entitlement is granted (Agent UI).  
+- Windows is the priority delivery platform; other OSes follow the contract.  
+- Driver / imaging integrations can be delivered after purchase against the site design.
+
+---
+
+## 6. Out-of-band (AMT and similar)
+
+For powered-off or pre-OS machines, Enterprise private deployments can include **out-of-band management** (e.g. Intel AMT: power, BIOS, OOB KVM). The default cloud path focuses on online Agents; OOB is enabled under **enterprise contract + private deployment**.
+
+---
+
+## 7. Related docs
+
+| Doc | Notes |
+| :--- | :--- |
+| [Plans & billing](/user/plans-and-billing) | Free / Pro / Enterprise |
+| [Admin console](/user/admin-console) | Wall, devices, audit |
+| [Remote control](/user/remote-control) | 1:1 session ops |
+| [Positioning](/architecture/positioning) | Positioning & VistaCast |
+| [Product comparison](/architecture/product-comparison) | vs BilldDesk / MeshCentral |

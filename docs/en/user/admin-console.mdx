@@ -32,7 +32,7 @@ Current `apps/admin` routes: **Overview, Users, Devices, Orders, Sessions, Recor
 | **Jobs** | Background jobs (for example recording summaries): list; filter by **id / name / state / failedReason** (URL-synced; overview **failed jobs** → `?state=failed`); **`recording.summarize`** rows link to **Recordings**; retry failed jobs; export **CSV** |
 | **Efficiency reports** | Weekly / monthly recording-minute totals; filter by **userId / sessionId / deviceId / recordingId** before rollup (from recording metadata, not an LLM efficiency model); **Open recordings** deep-link with active filters; export **CSV** |
 | **Permissions** | Platform / org permission matrices are **read-only**; export reference **CSV**; assign **platform operator** roles (not checkbox Permission edits) |
-| **Monitor wall** | **FR-WAD-72 MVP**: 2×2 shell + slot **in-wall observe** (single stream); **1.35.0** layout GET/PUT + **Save layout**; **1.44.0** **info alert** states layout persistence ✅ vs multi-stream SFU still open; **FR-WAD-108** cross-session SFU multi-stream still open — see [Monitor wall layout](#monitor-wall-layout) |
+| **Monitor wall** | **Enterprise multi-screen wall**: thumbnail observe, click-up to HD control; layout can be saved. See [Device Fleet & Enterprise](/user/fleet-and-enterprise) and [Monitor wall layout](#monitor-wall-layout) |
 
 ## Common tasks
 

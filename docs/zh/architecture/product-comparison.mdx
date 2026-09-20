@@ -2,72 +2,67 @@
 
 | Metadata | Value |
 | :--- | :--- |
-| **文档** | 竞品能力对照（对内对外统一口径） |
-| **版本** | 1.1.1 |
+| **文档** | 竞品能力对照（用户 / 客户口径） |
+| **版本** | 1.2.0 |
 | **更新** | 2026-09-20 |
-| **关联** | [产品定位](./positioning) · Spec `spec/competitor-parity-spec.md` · `spec/product-pillars-spec.md` |
+| **关联** | [产品定位](./positioning) · [设备舰队与企业能力](/user/fleet-and-enterprise) |
 
 ---
 
 ## 1. 三句话定位
 
-**VistaRemote** 是已登录桌面的 WebRTC 远程控制，并规划 **边缘设备舰队**（群控、缩略图屏幕墙）：信令在 NestJS，媒体走 P2P / TURN / mediasoup，数据可留在自有 PostgreSQL。Fleet 相关能力须 **Enterprise 开通**；与 VistaCast「看业务视频 / 管 Edge 设备」可组合销售。
+**VistaRemote** 是已登录桌面的 WebRTC 远程控制，并具备 **设备舰队** 能力（群控、批量命令、多屏监控墙、虚拟显示器等）。信令在 NestJS，媒体走 P2P / TURN / mediasoup，数据可留在自有 PostgreSQL。舰队相关能力属 **Enterprise** 产品范围，购买企业服务后开通。与 VistaCast「看业务视频 / 管 Edge 设备」可组合销售。
 
-**BilldDesk** 是 ToDesk 类远控。[开源仓](https://github.com/galaxy-s10/billd-desk) 作者声明尚未发布稳定版，权限与控制在现有架构下几乎不可修；Pro 是重写且源码不开放。下面「开源」列以克隆源码为准，不以 README 勾选为准。
+**BilldDesk** 是 ToDesk 类远控。[开源仓](https://github.com/galaxy-s10/billd-desk) 作者声明尚未发布稳定版；Pro 源码不开放。下表「开源」列以克隆源码为准。
 
-**MeshCentral** 是自托管整机管理：浏览器经服务器中继连到 MeshAgent，远程桌面默认不是 WebRTC。它还覆盖终端、文件、设备组 ACL、审计，以及 Intel AMT 等带外能力。
+**MeshCentral** 是自托管整机管理：浏览器经服务器中继连到 MeshAgent，远程桌面默认不是 WebRTC；并覆盖终端、文件、设备组 ACL、审计与 Intel AMT 等。
 
-选型背景仍见 [产品定位](./positioning)（传统监控 / 商业监控）。本页只对比远控与整机管理产品，不改那篇口径。
+选型见 [产品定位](./positioning)；舰队能力见 [设备舰队与企业能力](/user/fleet-and-enterprise)。
 
 ---
 
 ## 2. 能力矩阵
 
-格子只有三态：**已有**（代码在，多数仍待人工签收）、**本轮补**（`FR-PARITY-*` 已接线，未人工签收）、**不做或后续**。
+| 标记 | 含义 |
+| :--- | :--- |
+| **有** | 产品能力范围内 |
+| **Enterprise** | 须购买企业服务开通 |
+| **合同** | 按采购范围交付 / 加购验收 |
 
-| 能力 | VistaRemote | BilldDesk 开源 | BilldDesk Pro（仅宣传） | MeshCentral |
+| 能力 | VistaRemote | BilldDesk 开源 | BilldDesk Pro（宣传） | MeshCentral |
 | :--- | :--- | :--- | :--- | :--- |
-| 一对一远程桌面 | 已有（WebRTC） | 已有（WebRTC，作者标未稳定） | 宣传有 | 已有（默认服务器中继，WebRTC 默认关） |
-| 临时配对码 | 已有 | 无（用稳定设备码） | 宣传有自定义设备码 | 无此产品概念（设备组 + Agent） |
-| 稳定设备码 + 密码 | 已有（本波接线） | 已有（密码明文比对） | 宣传有 | 无；用账号 ACL |
-| 键鼠注入 | 已有（须被控允许；Win/mac/Linux X11） | 已有（nut.js 用户态，常要管理员） | 宣传驱动级 | 已有（Agent） |
-| 文本剪贴板 / 文件 / 终端 | 已有（单文件 ≤256 MiB） | 文件与剪贴板基本是桩 | 宣传有 | 已有（文件与终端是一等能力） |
-| 多显示器 | 已有（P2P 最多 2 路） | 开源采集只取第一块屏 | 宣传多屏 | 已有 |
-| 屏幕墙 / 旁观 | 已有壳 + 墙槽自动 SFU 订阅（≤4）；**目标**缩略图档（约 256×144 / ~5 FPS）+ 点选高质量控制（Enterprise，`FR-FLEET-SW-*`）；整墙 live E2E / displayId 仍开 | 源码无 | 宣传有，阶梯收费 | 无 ToDesk 式屏幕墙；有设备列表 |
-| 批量群控 | **路线图重点**（Enterprise，`FR-FLEET-GC-*`；批量命令优先于键鼠广播） | 源码无 | 宣传有 | 可对多设备下命令，不是键鼠群控 |
-| 本机隐私屏 | 已有（仅 Windows，未签收） | 源码无 | 宣传有 | 有同意与隐私条，不是遮罩桌面 |
-| 虚拟屏 / 扩展屏 | 第二阶段（`FR-FLEET-VD-*`） | 源码无 | 宣传有 | 不做 |
-| 远程开机 WOL | 已有（同 /24 魔术包，未签收） | 源码无 | 宣传有 | 已有（服务器或同网 Agent） |
-| 开机自启 | 已有（登录项，非服务保活） | README 标 BUG | 宣传有 | Agent 以服务运行 |
-| 会话结束锁屏 | 已有（未签收） | 源码无；锁屏会断开连接 | 宣传有 | 有电源动作 |
-| Host 快捷操作 | 已有（显示桌面/任务管理器等，无 SAS） | 开源无专门面板 | 宣传有快捷操作 | 有终端与电源 |
-| 主控 ICE/TURN 覆盖 | 已有（本机设置，未签收） | 可自定义 coturn | 宣传有 | 服务器配置 |
-| 我的设备列表 | 已有（labels 轻量分组，未签收） | 本机最近连接 | 宣传设备分组 | 设备组是核心模型 |
-| 会话内录制控制 | 已有（信令触发端侧录制，未签收） | 源码无 | 宣传有 | 可会话录像 |
-| 硬件编解码 / 零拷贝 | 不做或后续（性能路线仅内部 Spec） | 浏览器约束，不是硬编 | 宣传有 | Agent 原生编码 |
-| Intel AMT / 注册表 / 服务启停 | AMT 为 Enterprise OOB **后置**；注册表/服务启停不做 | 无 | 无 | 已有 |
-| UAC / 登录窗 / Ctrl+Alt+Del | 不做（只做已登录会话） | 开源架构修不好权限 | 宣传有快捷操作 | 部分电源与控制台 |
-| 私有化部署 | 已有（Docker Compose 骨架） | 无完整 compose | 宣传有 | 已有（单进程 + 数据目录） |
-| 管理台 / 审计 | 已有（Admin，待签收） | 后台 API 有，管理前端未在本克隆 | 宣传有 | 已有（事件、录像、细粒度 ACL） |
+| 一对一远程桌面 | 有（WebRTC） | 有 | 宣传有 | 有（默认服务器中继） |
+| 临时配对码 | 有 | 无 | 宣传有 | 无 |
+| 稳定设备码 + 密码 | 有 | 有 | 宣传有 | 账号 ACL |
+| 键鼠 / 剪贴板 / 文件 / 终端 | 有 | 弱 / 桩 | 宣传有 | 有 |
+| 多显示器 | 有 | 弱 | 宣传有 | 有 |
+| **多屏监控墙** | **有（Enterprise）**：缩略图观察 + 点选高质量控制；更大槽位可合同加购 | 无 | 宣传有 | 设备列表 |
+| **群控键鼠 / 批量命令** | **有（Enterprise）** | 无 | 宣传有 | 可批量命令 |
+| **虚拟显示器** | **有（Enterprise）** | 无 | 宣传有 | 不做 |
+| 本机隐私屏 | 有（Windows） | 无 | 宣传有 | 同意条 |
+| 远程开机 WOL | 有（同网段） | 无 | 宣传有 | 有 |
+| 开机自启 / 结束锁屏 / Host 快捷操作 | 有 | 弱 | 宣传有 | 有 |
+| 我的设备 / 录制控制 | 有 | 弱 | 宣传有 | 有 |
+| **Intel AMT / 带外** | **有（Enterprise 私有化合同）** | 无 | 无 | 有 |
+| 注册表 / 服务启停 / 登录窗注入 | 不做 | 无 | 部分宣传 | 部分有 |
+| 私有化部署 / 管理台审计 | 有 | 弱 | 宣传有 | 有 |
 
 ---
 
-## 3. 借鉴能力，不借鉴技术栈
+## 3. 技术栈差异（给技术选型）
 
-| | VistaRemote（保持） | BilldDesk 开源 | MeshCentral |
+| | VistaRemote | BilldDesk 开源 | MeshCentral |
 | :--- | :--- | :--- | :--- |
 | HTTP | NestJS + **Fastify** | Koa2 | Express |
-| 数据库 | **PostgreSQL** + TypeORM，主键 UUIDv7 | MySQL + Sequelize | 默认 NeDB，可换其他库 |
-| 实时 | 自有 WebSocket 信令；媒体 WebRTC | Socket.io 房间 | 自有 WebSocket，服务器中继字节 |
-| 桌面 | Electron + 现有注入（不引入 nut.js） | Electron + nut.js | 预编译 MeshAgent |
-| 前端 | React + Rsbuild + Sass Modules | Vue3 | Handlebars |
+| 数据库 | **PostgreSQL** + TypeORM | MySQL | 默认 NeDB |
+| 媒体 | WebRTC（P2P / TURN / SFU） | WebRTC | 常为服务器中继 |
+| 桌面 | Electron | Electron + nut.js | MeshAgent |
+| 前端 | React + Rsbuild | Vue3 | Handlebars |
 
-不把 `live_room`、Socket.io、Mesh JPEG 中继或 AMT 协议搬进 VistaRemote。Pro 作者自己也认为开源那套架构修不了权限和控制，所以只对齐产品能力，实现走现有 Spec。
+产品对齐能力，不照搬对方技术栈。
 
 ---
 
-## 4. 本轮不做的原因
+## 4. 对企业客户怎么说
 
-带外管理（AMT）、注册表、服务启停、登录窗注入会把产品变成另一类 RMM，并突破 [产品边界](https://github.com/VistaRemote/vibeCode/blob/main/spec/product-boundary-spec.md) 的已登录会话假设。**AMT 后置为 Enterprise / 私有化高级能力**，不抢前期研发。
-
-群控、缩略图屏幕墙见 [产品支柱 Spec](https://github.com/VistaRemote/vibeCode/blob/main/spec/product-pillars-spec.md)：群控优先；墙默认低成本缩略图，点选升级高质量会话；**不**默认承诺 128～500 路实时高清（企业采购后再验证槽位，公开市场常见宣传量级约 24 / 128 路）。虚拟屏为第二阶段。
+群控、监控墙、虚拟屏、带外等：**产品具备，Enterprise 开通；合同可约定交付节奏与加购**。不在客户文档中写内部工程分期。详见 [设备舰队与企业能力](/user/fleet-and-enterprise)。
