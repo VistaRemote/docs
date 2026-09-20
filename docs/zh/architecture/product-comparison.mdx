@@ -3,15 +3,15 @@
 | Metadata | Value |
 | :--- | :--- |
 | **文档** | 竞品能力对照（对内对外统一口径） |
-| **版本** | 1.0.0 |
+| **版本** | 1.1.0 |
 | **更新** | 2026-09-20 |
-| **关联** | [产品定位](./positioning) · Spec `spec/competitor-parity-spec.md` |
+| **关联** | [产品定位](./positioning) · Spec `spec/competitor-parity-spec.md` · `spec/product-pillars-spec.md` |
 
 ---
 
 ## 1. 三句话定位
 
-**VistaRemote** 是已登录桌面的 WebRTC 远程控制：信令在 NestJS，媒体走 P2P / TURN / mediasoup，数据可留在自有 PostgreSQL。
+**VistaRemote** 是已登录桌面的 WebRTC 远程控制，并规划 **边缘设备舰队**（群控、缩略图屏幕墙）：信令在 NestJS，媒体走 P2P / TURN / mediasoup，数据可留在自有 PostgreSQL。Fleet 相关能力须 **Enterprise 开通**；与 VistaCast「看业务视频 / 管 Edge 设备」可组合销售。
 
 **BilldDesk** 是 ToDesk 类远控。[开源仓](https://github.com/galaxy-s10/billd-desk) 作者声明尚未发布稳定版，权限与控制在现有架构下几乎不可修；Pro 是重写且源码不开放。下面「开源」列以克隆源码为准，不以 README 勾选为准。
 
@@ -33,10 +33,10 @@
 | 键鼠注入 | 已有（须被控允许；Win/mac/Linux X11） | 已有（nut.js 用户态，常要管理员） | 宣传驱动级 | 已有（Agent） |
 | 文本剪贴板 / 文件 / 终端 | 已有（单文件 ≤256 MiB） | 文件与剪贴板基本是桩 | 宣传有 | 已有（文件与终端是一等能力） |
 | 多显示器 | 已有（P2P 最多 2 路） | 开源采集只取第一块屏 | 宣传多屏 | 已有 |
-| 屏幕墙 / 旁观 | 已有壳 + 墙槽自动 SFU 订阅（≤4）；整墙 live E2E / displayId 仍开（`FR-WAD-108`） | 源码无 | 宣传有，阶梯收费 | 无 ToDesk 式屏幕墙；有设备列表 |
-| 批量群控 | 不做或后续 | 源码无 | 宣传有 | 可对多设备下命令，不是键鼠群控 |
+| 屏幕墙 / 旁观 | 已有壳 + 墙槽自动 SFU 订阅（≤4）；**目标**缩略图档（约 256×144 / ~5 FPS）+ 点选高质量控制（Enterprise，`FR-FLEET-SW-*`）；整墙 live E2E / displayId 仍开 | 源码无 | 宣传有，阶梯收费 | 无 ToDesk 式屏幕墙；有设备列表 |
+| 批量群控 | **路线图重点**（Enterprise，`FR-FLEET-GC-*`；批量命令优先于键鼠广播） | 源码无 | 宣传有 | 可对多设备下命令，不是键鼠群控 |
 | 本机隐私屏 | 已有（仅 Windows，未签收） | 源码无 | 宣传有 | 有同意与隐私条，不是遮罩桌面 |
-| 虚拟屏 / 扩展屏 | 不做或后续 | 源码无 | 宣传有 | 不做 |
+| 虚拟屏 / 扩展屏 | 第二阶段（`FR-FLEET-VD-*`） | 源码无 | 宣传有 | 不做 |
 | 远程开机 WOL | 已有（同 /24 魔术包，未签收） | 源码无 | 宣传有 | 已有（服务器或同网 Agent） |
 | 开机自启 | 已有（登录项，非服务保活） | README 标 BUG | 宣传有 | Agent 以服务运行 |
 | 会话结束锁屏 | 已有（未签收） | 源码无；锁屏会断开连接 | 宣传有 | 有电源动作 |
@@ -45,7 +45,7 @@
 | 我的设备列表 | 已有（labels 轻量分组，未签收） | 本机最近连接 | 宣传设备分组 | 设备组是核心模型 |
 | 会话内录制控制 | 已有（信令触发端侧录制，未签收） | 源码无 | 宣传有 | 可会话录像 |
 | 硬件编解码 / 零拷贝 | 不做或后续（性能路线仅内部 Spec） | 浏览器约束，不是硬编 | 宣传有 | Agent 原生编码 |
-| Intel AMT / 注册表 / 服务启停 | 不做 | 无 | 无 | 已有 |
+| Intel AMT / 注册表 / 服务启停 | AMT 为 Enterprise OOB **后置**；注册表/服务启停不做 | 无 | 无 | 已有 |
 | UAC / 登录窗 / Ctrl+Alt+Del | 不做（只做已登录会话） | 开源架构修不好权限 | 宣传有快捷操作 | 部分电源与控制台 |
 | 私有化部署 | 已有（Docker Compose 骨架） | 无完整 compose | 宣传有 | 已有（单进程 + 数据目录） |
 | 管理台 / 审计 | 已有（Admin，待签收） | 后台 API 有，管理前端未在本克隆 | 宣传有 | 已有（事件、录像、细粒度 ACL） |
@@ -68,4 +68,6 @@
 
 ## 4. 本轮不做的原因
 
-带外管理（AMT）、注册表、服务启停、登录窗注入会把产品变成另一类 RMM，并突破 [产品边界](https://github.com/VistaRemote/vibeCode/blob/main/spec/product-boundary-spec.md) 的已登录会话假设。群控、虚拟屏、驱动级键鼠留到后续单独 FR，不在这一波假装覆盖。
+带外管理（AMT）、注册表、服务启停、登录窗注入会把产品变成另一类 RMM，并突破 [产品边界](https://github.com/VistaRemote/vibeCode/blob/main/spec/product-boundary-spec.md) 的已登录会话假设。**AMT 后置为 Enterprise / 私有化高级能力**，不抢前期研发。
+
+群控、缩略图屏幕墙见 [产品支柱 Spec](https://github.com/VistaRemote/vibeCode/blob/main/spec/product-pillars-spec.md)：群控优先；墙默认低成本缩略图，点选升级高质量会话；**不**默认承诺 128～500 路实时高清（企业采购后再验证槽位，公开市场常见宣传量级约 24 / 128 路）。虚拟屏为第二阶段。
