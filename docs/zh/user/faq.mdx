@@ -51,7 +51,7 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 不要先改 DNS。ICE 候选由 Server 下发。管理台 **系统** 可核对权益标志（FR-WAD-52）。仍失败再查 UDP/防火墙与 TURN，见 [远程控制](/user/remote-control) 连接质量。
 
 **权限矩阵可以编辑吗？**  
-不能。权限页是 **只读** 对照（平台 RBAC / 组织角色）。**ADM-2**（可编辑角色绑定）尚未交付；不要按可改矩阵做验收。说明见 [管理控制台](/user/admin-console)。
+不能。权限页是 **只读** 对照（平台 RBAC / 组织角色）。角色与权限开通由企业实施 / 平台管理员按组织策略配置。说明见 [管理控制台](/user/admin-console)。
 
 **管理台 CSV 怎么导出？**  
 导出的是**当前筛选/已加载的列表**（默认客户端导出，除非该页另有说明；审计 CSV 走服务端筛选，含结果）。用户、设备、安全、任务、订单、组织、录制等页在已实现处有 CSV 按钮；组织详情抽屉内 **SupportGrant** 列表也可 **导出授权 CSV**（1.33.0）。这不是全库/数仓导出，也不是账单/支付导出。说明见 [管理控制台](/user/admin-console)。
@@ -71,11 +71,11 @@ SFU 需要 Pro/Enterprise，见 [套餐与付费](/user/plans-and-billing)。
 **录制回放 URL 过期怎么办？MinIO EntityTooSmall？**  
 录制页播放器经短时签名 **playback-url** 拉流（含 `expiresAt`）；过期可刷新。若 `failedReason` 含 **EntityTooSmall / part size**，列表会提示 Agent 应将非末片合并至 **≥5 MiB**（桌面端 ≥1.30；`memory://` 仍允许小分片）。见 [管理控制台](/user/admin-console)。
 
-**监控墙和完整 SFU 墙有什么区别？**  
-当前是 2×2 壳 + 槽位 **墙内旁观**（单路内嵌旁观，FR-WAD-72 MVP），**不是**完整跨会话 SFU 多路监控墙。后者规划为 **FR-WAD-108**（Spec 已定，实现仍开；依赖 SFU multi-producer + MD-4）——不要按已交付验收。见 [管理控制台](/user/admin-console)。
+**监控墙是什么？怎么开通？**  
+监控墙是 **Enterprise** 多屏观察能力：缩略图低成本观察多台设备，发现异常后点选进入高质量远控；更大槽位可按企业合同加购。说明见 [设备舰队与企业能力](/user/fleet-and-enterprise) 与 [管理控制台](/user/admin-console)。
 
-**旁观票据返回什么（1.36.0）？**  
-`POST /admin/rooms/:roomId/observe` 返回 shared **AdminObserveTicket** DTO（`signalingTicket`、`role: observe` 等）。SFU 字段（`routerId`、`transport`、`consumer`）当前为 **null 桩** — 尚未接 mediasoup 握手。
+**旁观 / 观察票据返回什么？**  
+管理台对房间发起观察时，服务端返回观察票据（含信令与 SFU 相关参数），用于墙内或旁观拉流。见 [管理控制台](/user/admin-console)。
 
 **监控墙布局会随改槽位自动保存吗？**  
 不会。URL **`s0`–`s3`** 优先；无种子时从 **GET** `/admin/monitor-wall/layout` 恢复；须点 **保存布局**（**PUT**，**admin.write**）才会持久化。见 [管理控制台](/user/admin-console)。
@@ -122,8 +122,8 @@ Web **用户端** `/membership` 页底有灰色脚注：历史订单由平台管
 **配对页头审计链接怎么用（1.44.0）？**  
 **配对** 页 **创建审计** / **加入审计** 分别打开 `/audit?action=pairing.create`、`pairing.join`。见 [管理控制台](/user/admin-console)。
 
-**监控墙提示条写什么（1.44.0）？**  
-布局持久化 ✅；多路 SFU 槽位订阅仍开；**FR-WAD-72 MVP**（2×2 + 墙内旁观）仍可用。见 [管理控制台](/user/admin-console)。
+**监控墙提示条写什么？**  
+说明布局可保存，以及墙内旁观 / 企业多屏观察的使用提示。产品能力与开通见 [设备舰队与企业能力](/user/fleet-and-enterprise)。
 
 **已登录还能打开 `/login` 吗（1.45.0）？**  
 会 **自动跳回控制台**（`/`），并显示「已登录」与回控制台链接。见 [管理控制台](/user/admin-console)。

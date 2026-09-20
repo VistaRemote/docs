@@ -51,7 +51,7 @@ No. Playback is a **local browser `<video>`** on the Recordings page (seek / spe
 Do not start by changing DNS. ICE candidates come from the Server. Admin **System** shows entitlement flags (FR-WAD-52). If it still fails, check UDP/firewall and TURN; see [Remote control](/user/remote-control) connection quality.
 
 **Can I edit the permission matrix?**  
-No. The Permissions page is a **read-only** map of platform RBAC / org roles. **ADM-2** (editable role bindings) is not shipped; do not accept an editable matrix. See [Admin console](/user/admin-console).
+No. The Permissions page is a **read-only** map of platform RBAC / org roles. Role and permission enablement is configured by enterprise rollout / platform admins per org policy. See [Admin console](/user/admin-console).
 
 **How do Admin CSV exports work?**  
 They export the **currently filtered/loaded list** (client-side unless the page says otherwise; audit CSV is server-filtered, including result). Users, devices, security, jobs, orders, orgs, and recordings have CSV buttons where implemented; the org drawer **SupportGrant** table also has **export grants CSV** (1.33.0). This is not a full warehouse dump, and not a billing/payment export. See [Admin console](/user/admin-console).
@@ -71,11 +71,11 @@ Admin **System** shows read-only `entitlementMode`, `entitlementBaseUrlConfigure
 **Recording playback URL expired? MinIO EntityTooSmall?**  
 The Recordings player fetches a short-lived signed **playback-url** (`expiresAt`; refresh on expiry). When `failedReason` matches **EntityTooSmall / part size**, the list shows a hint that the Agent should coalesce non-final parts to **≥5 MiB** (Desktop ≥1.30; `memory://` still allows small parts). See [Admin console](/user/admin-console).
 
-**Monitor wall vs full SFU wall?**  
-Today you get a 2×2 shell with slot **in-wall observe** (single-stream embed, FR-WAD-72 MVP) — **not** a full cross-session SFU multi-stream wall. That is **FR-WAD-108** (Spec drafted; implementation open; depends on SFU multi-producer + MD-4). Do not accept it as shipped. See [Admin console](/user/admin-console).
+**What is the monitor wall, and how do we enable it?**  
+The monitor wall is an **Enterprise** multi-screen observe capability: low-cost thumbnail observe across devices, then click into high-quality remote control when needed. Larger slot counts can be added under the enterprise contract. See [Device Fleet & Enterprise](/user/fleet-and-enterprise) and [Admin console](/user/admin-console).
 
-**What does the observe ticket return (1.36.0)?**  
-`POST /admin/rooms/:roomId/observe` returns the shared **AdminObserveTicket** DTO (`signalingTicket`, `role: observe`, …). SFU fields (`routerId`, `transport`, `consumer`) are **null stubs** — not mediasoup handshake yet.
+**What does the observe ticket return?**  
+When Admin starts observe on a room, the server returns an observe ticket (signaling and SFU-related parameters) for in-wall or observe pull. See [Admin console](/user/admin-console).
 
 **Does the monitor wall layout save automatically?**  
 No. URL **`s0`–`s3`** take priority; without seeds the page restores from **GET** `/admin/monitor-wall/layout`; click **Save layout** (**PUT**, **admin.write**) to persist. See [Admin console](/user/admin-console).
@@ -87,13 +87,13 @@ On **Jobs**, `recording.summarize` rows with id `summarize-{recordingId}` show *
 On **Efficiency reports**, click **Open recordings** — it carries active `userId` / `sessionId` / `deviceId` / `recordingId` substring filters to `/recordings` (rollup period is not passed; filters only).
 
 **Audit layout rows and monitor wall (1.37.0 / 1.38.0)?**  
-Filter audit by **monitor-wall layout** (`admin.monitor_wall.layout`). **1.38.0** — **Save layout** audit meta includes **`roomIds`** and the first **`roomId`**. Matching rows show **Monitor wall** — `/monitor-wall` or `/monitor-wall?s0=<roomId>` from meta / resource / target `roomId` / `room_id`. Slot 0 seed only; **not** SFU multi-stream shipped. See [Admin console](/user/admin-console).
+Filter audit by **monitor-wall layout** (`admin.monitor_wall.layout`). **1.38.0** — **Save layout** audit meta includes **`roomIds`** and the first **`roomId`**. Matching rows show **Monitor wall** — `/monitor-wall` or `/monitor-wall?s0=<roomId>` from meta / resource / target `roomId` / `room_id`. Slot 0 seed only; open observe from the wall when needed. See [Admin console](/user/admin-console).
 
 **How do user drawer related links work (1.38.0)?**  
 On **Users**, open the detail drawer and click **View sessions / recordings / orders / devices / audit** — they open `/sessions?userId=…`, `/recordings?userId=…`, `/orders?userId=…`, `/devices?ownerId=…`, and `/audit?actorId=…`. See [Admin console](/user/admin-console).
 
 **How do I jump to the monitor wall from an active device session (1.38.0)?**  
-On **Devices**, when a row has an active session, **Actions** shows **Monitor wall** → `/monitor-wall?s0=<sessionId>`. Slot 0 seed only — does **not** start SFU multi-stream or in-wall observe. See [Admin console](/user/admin-console).
+On **Devices**, when a row has an active session, **Actions** shows **Monitor wall** → `/monitor-wall?s0=<sessionId>`. This seeds slot 0; start in-wall observe from the wall when needed. See [Admin console](/user/admin-console).
 
 **How do I filter sessions by user ID (1.38.0)?**  
 On **Sessions**, filter by **user ID**; the filter syncs to **`?userId=`** in the URL (the user drawer **View sessions** button seeds this param). See [Admin console](/user/admin-console).
@@ -123,7 +123,7 @@ The Web **Client** `/membership` page shows a muted footnote that past orders ar
 On **Pairings**, **Create audit** / **Join audit** open `/audit?action=pairing.create` or `pairing.join`. See [Admin console](/user/admin-console).
 
 **What does the monitor-wall info alert say (1.44.0)?**  
-Layout persistence ✅; multi-stream SFU per slot still open; **FR-WAD-72 MVP** (2×2 + in-wall observe) remains. See [Admin console](/user/admin-console).
+It explains that layout can be saved, plus tips for in-wall observe / enterprise multi-screen observe. Product capabilities and enablement: [Device Fleet & Enterprise](/user/fleet-and-enterprise).
 
 **Already signed in on `/login` (1.45.0)?**  
 You are **redirected to the dashboard** (`/`) with an “already signed in” link. See [Admin console](/user/admin-console).
@@ -140,7 +140,7 @@ Yes. **Orders**: `id`, `userId`, `sku`, `provider`, `currency`, `status`; **User
 ## Deploy & go-live
 
 **What to verify before production payments?**  
-Walk [Production payment readiness · Checklist](/user/payment-production#checklist) (mock → sandbox → production). Entitlement payment adapters exist; live merchant enablement (credentials, notify DNS) is owner-ops — not shipped in the VistaRemote repo. Adapters ≠ production PSP live.
+Walk [Production payment readiness · Checklist](/user/payment-production#checklist) (mock → sandbox → production). Merchant credentials and notify DNS are configured in your environment / Entitlement; follow the checklist for go-live.
 
 **Where is the 15-step remote control acceptance?**  
 On a logged-in host Agent plus the Web controller, follow [Remote control · Manual acceptance checklist](/user/remote-control#manual-acceptance-checklist-one-pass). **Sign out and sign in** on the controller first so the ops JWT is fresh; use power/host dry-run env vars on dev machines.

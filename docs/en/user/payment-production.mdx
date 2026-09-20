@@ -1,6 +1,6 @@
 # Production payment readiness (ops)
 
-Use this page to walk **mock → sandbox → production**. LuminaryWorks Entitlement already ships payment **adapters**; that is not live merchant enablement. Lite checkout (commerce **complete** / **status**, plus the Entitlement ingress webhook) can cache local `User.plan`. **WeChat Pay / Alipay merchant onboarding, notify DNS, and production PSP secrets are owner-ops — not shipped with VistaRemote.** Product outbox delivery may still be in progress. Never commit merchant secrets.
+Use this page to walk **mock → sandbox → production**. LuminaryWorks Entitlement already ships payment **adapters**; that is not live merchant enablement. Lite checkout (commerce **complete** / **status**, plus the Entitlement ingress webhook) can cache local `User.plan`. **WeChat Pay / Alipay merchant onboarding, notify DNS, and production PSP secrets are owner-ops — configured in your environment / Entitlement.** Product outbox delivery may still be in progress. Never commit merchant secrets.
 
 Architecture: [Commercial billing](/architecture/commercial-billing). Admin modules: [Admin console](/user/admin-console). Spec: `spec/billing-commerce-spec.md`.
 
@@ -21,7 +21,7 @@ Sandbox path:
 | :--- | :--- | :--- |
 | **Mock (local)** | `ENTITLEMENT_MODE=off` | Local orders and plans. The order owner may call `POST /api/v1/billing/orders/:id/simulate-paid` (Controller JWT). Admin **Orders** **Simulate paid** calls `POST /api/v1/admin/orders/:id/simulate-paid` and applies only to `source=local_billing`. |
 | **Sandbox** | `ENTITLEMENT_MODE=enforce`, central Entitlement reachable | Web **Client** `/membership`: catalog `providerHint` `wechat` → `wechat_pay_v3`, `alipay` → `alipay_f2f`; may show QR / `codeUrl` / redirect. After pay the page **polls** `GET .../orders/:id` (~2s, ~2 min cap); return or **Complete payment** posts `.../complete`, then refreshes local entitlements. Sandbox secrets live on **Entitlement**, not this repo. **Not** production WeChat / Alipay merchant notify. |
-| **Production** | Same mode + production Entitlement / PSP (owner-ops) | VistaRemote lite webhook `POST /api/v1/commerce/webhooks/entitlement` can sync `User.plan`. **WeChat / Alipay platform notify lands on LuminaryWorks Entitlement**, not VistaRemote. Real merchant onboarding, certificates, and platform callbacks are **not shipped** with this repo. |
+| **Production** | Same mode + production Entitlement / PSP (owner-ops) | VistaRemote lite webhook `POST /api/v1/commerce/webhooks/entitlement` can sync `User.plan`. **WeChat / Alipay platform notify lands on LuminaryWorks Entitlement**, not VistaRemote. Real merchant onboarding, certificates, and platform callbacks are configured in your environment / Entitlement. |
 
 Lite ingress `order.fulfilled` (`POST /api/v1/commerce/webhooks/entitlement`) uses HMAC headers (**FR-BILL-06**) — **not** WeChat / Alipay platform notify verification:
 

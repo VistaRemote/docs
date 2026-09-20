@@ -1,6 +1,6 @@
 # 插件开发（PLUGIN-β 起步）
 
-VistaRemote 采用「核心 + 插件」架构。契约在 `@vistaremote/shared`（Manifest、权限、`apiVersion`）。本页覆盖 **脚手架 CLI**；签名、插件市场、动态安装到生产 Agent **尚未交付**。
+VistaRemote 采用「核心 + 插件」架构。契约在 `@vistaremote/shared`（Manifest、权限、`apiVersion`）。本页覆盖 **脚手架 CLI**；签名、插件市场、动态安装到生产 Agent 按企业插件发布流程开通。
 
 详见 Spec：[plugin-architecture-spec](https://github.com/VistaRemote/VistaRemote/blob/main/spec/plugin-architecture-spec.md)。
 
@@ -23,7 +23,7 @@ pnpm vt-cli pack ./demo --format zip
 pnpm vt-cli pack ./demo --format tgz
 ```
 
-生成目录含 `plugin.manifest.json`、各端 stub、Biome 配置。
+生成目录含 `plugin.manifest.json`、各端占位模块、Biome 配置。
 
 ## Manifest 最小字段
 
