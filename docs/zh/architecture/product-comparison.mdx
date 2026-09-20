@@ -1,0 +1,67 @@
+# 与 BilldDesk、MeshCentral 的对比
+
+| Metadata | Value |
+| :--- | :--- |
+| **文档** | 竞品能力对照（对内对外统一口径） |
+| **版本** | 1.0.0 |
+| **更新** | 2026-09-20 |
+| **关联** | [产品定位](./positioning) · Spec `spec/competitor-parity-spec.md` |
+
+---
+
+## 1. 三句话定位
+
+**VistaRemote** 是已登录桌面的 WebRTC 远程控制：信令在 NestJS，媒体走 P2P / TURN / mediasoup，数据可留在自有 PostgreSQL。
+
+**BilldDesk** 是 ToDesk 类远控。[开源仓](https://github.com/galaxy-s10/billd-desk) 作者声明尚未发布稳定版，权限与控制在现有架构下几乎不可修；Pro 是重写且源码不开放。下面「开源」列以克隆源码为准，不以 README 勾选为准。
+
+**MeshCentral** 是自托管整机管理：浏览器经服务器中继连到 MeshAgent，远程桌面默认不是 WebRTC。它还覆盖终端、文件、设备组 ACL、审计，以及 Intel AMT 等带外能力。
+
+选型背景仍见 [产品定位](./positioning)（传统监控 / 商业监控）。本页只对比远控与整机管理产品，不改那篇口径。
+
+---
+
+## 2. 能力矩阵
+
+格子只有三态：**已有**（代码在，多数仍待人工签收）、**本轮补**（`FR-PARITY-*` 已接线，未人工签收）、**不做或后续**。
+
+| 能力 | VistaRemote | BilldDesk 开源 | BilldDesk Pro（仅宣传） | MeshCentral |
+| :--- | :--- | :--- | :--- | :--- |
+| 一对一远程桌面 | 已有（WebRTC） | 已有（WebRTC，作者标未稳定） | 宣传有 | 已有（默认服务器中继，WebRTC 默认关） |
+| 临时配对码 | 已有 | 无（用稳定设备码） | 宣传有自定义设备码 | 无此产品概念（设备组 + Agent） |
+| 稳定设备码 + 密码 | 本轮补 | 已有（密码明文比对） | 宣传有 | 无；用账号 ACL |
+| 键鼠注入 | 已有（须被控允许；Win/mac/Linux X11） | 已有（nut.js 用户态，常要管理员） | 宣传驱动级 | 已有（Agent） |
+| 文本剪贴板 / 文件 / 终端 | 已有（文件单文件 ≤32 MiB） | 文件与剪贴板基本是桩 | 宣传有 | 已有（文件与终端是一等能力） |
+| 多显示器 | 已有（P2P 最多 2 路） | 开源采集只取第一块屏 | 宣传多屏 | 已有 |
+| 屏幕墙 / 旁观 | 已有壳；多路直播后续（`FR-WAD-108`） | 源码无 | 宣传有，阶梯收费 | 无 ToDesk 式屏幕墙；有设备列表 |
+| 批量群控 | 不做或后续 | 源码无 | 宣传有 | 可对多设备下命令，不是键鼠群控 |
+| 本机隐私屏 | 本轮补（仅 Windows） | 源码无 | 宣传有 | 有同意与隐私条，不是遮罩桌面 |
+| 虚拟屏 / 扩展屏 | 不做或后续 | 源码无 | 宣传有 | 不做 |
+| 远程开机 WOL | 本轮补（同 /24 魔术包） | 源码无 | 宣传有 | 已有（服务器或同网 Agent） |
+| 开机自启 | 本轮补（登录项，非服务保活） | README 标 BUG | 宣传有 | Agent 以服务运行 |
+| 会话结束锁屏 | 本轮补 | 源码无；锁屏会断开连接 | 宣传有 | 有电源动作 |
+| 硬件编解码 / 零拷贝 | 不做或后续（性能路线仅内部 Spec） | 浏览器约束，不是硬编 | 宣传有 | Agent 原生编码 |
+| Intel AMT / 注册表 / 服务启停 | 不做 | 无 | 无 | 已有 |
+| UAC / 登录窗 / Ctrl+Alt+Del | 不做（只做已登录会话） | 开源架构修不好权限 | 宣传有快捷操作 | 部分电源与控制台 |
+| 私有化部署 | 已有（Docker Compose 骨架） | 无完整 compose | 宣传有 | 已有（单进程 + 数据目录） |
+| 管理台 / 审计 | 已有（Admin，待签收） | 后台 API 有，管理前端未在本克隆 | 宣传有 | 已有（事件、录像、细粒度 ACL） |
+
+---
+
+## 3. 借鉴能力，不借鉴技术栈
+
+| | VistaRemote（保持） | BilldDesk 开源 | MeshCentral |
+| :--- | :--- | :--- | :--- |
+| HTTP | NestJS + **Fastify** | Koa2 | Express |
+| 数据库 | **PostgreSQL** + TypeORM，主键 UUIDv7 | MySQL + Sequelize | 默认 NeDB，可换其他库 |
+| 实时 | 自有 WebSocket 信令；媒体 WebRTC | Socket.io 房间 | 自有 WebSocket，服务器中继字节 |
+| 桌面 | Electron + 现有注入（不引入 nut.js） | Electron + nut.js | 预编译 MeshAgent |
+| 前端 | React + Rsbuild + Sass Modules | Vue3 | Handlebars |
+
+不把 `live_room`、Socket.io、Mesh JPEG 中继或 AMT 协议搬进 VistaRemote。Pro 作者自己也认为开源那套架构修不了权限和控制，所以只对齐产品能力，实现走现有 Spec。
+
+---
+
+## 4. 本轮不做的原因
+
+带外管理（AMT）、注册表、服务启停、登录窗注入会把产品变成另一类 RMM，并突破 [产品边界](https://github.com/VistaRemote/vibeCode/blob/main/spec/product-boundary-spec.md) 的已登录会话假设。群控、虚拟屏、驱动级键鼠留到后续单独 FR，不在这一波假装覆盖。
