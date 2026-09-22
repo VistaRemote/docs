@@ -5,7 +5,7 @@
   "description": "VistaRemote documentation site (Rspress)",
   "scripts": {
     "dev": "rspress dev",
-    "build": "rspress build",
+    "build": "rspress build && node scripts/publish-ai-reservation.mjs",
     "preview": "rspress preview",
     "test": "rstest",
     "test:watch": "rstest -w",

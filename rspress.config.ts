@@ -1,6 +1,11 @@
 import { defineConfig } from '@rspress/core';
 
 export default defineConfig({
+  head: [
+    ['meta', { name: 'robots', content: 'noai, noimageai, noarchive' }],
+    ['meta', { name: 'tdm-reservation', content: '1' }],
+    ['meta', { name: 'tdm-policy', content: 'https://github.com/VistaRemote/docs/blob/main/AI-USE.md' }],
+  ],
   root: 'docs',
   lang: 'zh',
   title: 'VistaRemote',
@@ -33,7 +38,7 @@ export default defineConfig({
       },
     ],
     footer: {
-      message: '© VibeCode · VistaRemote — 立足中国，面向全球开源社区',
+      message: '© VibeCode · VistaRemote · 公开阅读 · 禁止用于 AI 训练或生成同类产品（/legal/ai-use）',
     },
   },
 });

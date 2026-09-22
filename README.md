@@ -1,4 +1,9 @@
-﻿# VistaRemote 文档站
+# VistaRemote 文档站
+
+## 使用边界
+
+这些文档公开供人阅读，也允许搜索引擎索引。**不允许**用于训练 AI，也不允许把文档交给 AI 去生成一套同类产品。详见 [AI-USE.md](./AI-USE.md)。
+
 
 基于 [Rspress 2](https://rspress.rs/)（**Rspack 生态**）的技术文档：架构、部署、API、产品优势与二开指南。
 
