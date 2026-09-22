@@ -33,7 +33,11 @@ Lite ingress `order.fulfilled` (`POST /api/v1/commerce/webhooks/entitlement`) us
 | `x-lw-signature` | `v1=<base64url>` |
 | `x-lw-event-id` | Idempotent event id |
 
-Signature: `HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, \`${timestamp}.${nonce}.${rawBody}\`)` → base64url; verify on the **untouched raw body** (never re-serialize JSON). `ENTITLEMENT_WEBHOOK_SECRET` is this ingress HMAC secret and must equal Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`. Legacy `X-Entitlement-Signature` equality is a **hard-cut 401** with no fallback.
+Signature: `HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, \`${timestamp}.${nonce}.${rawBody}\`)` → base64url; verify on the **untouched raw body** (never re-serialize JSON). `ENTITLEMENT_WEBHOOK_SECRET` is this ingress HMAC secret and must equal Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`. Legacy `X-Entitlement-Signature` equality is a **hard-cut 401** with no fallback. Missing secret → **401** (honest reject, not silent mock).
+
+Fulfillment failures (local plan projection write) enter `commerce_webhook_fulfillments` retry; exhausted → dead letter. Admin: `GET/POST /api/v1/admin/commerce-webhook/*` (status / dead-letters / process-once / replay|ignore); audit `commerce.webhook.*` (**FR-BILL-07**).
+
+**Runbook:** WeChat / Alipay **merchant onboarding remains owner-ops** and is not delivered with this repo.
 
 ## Webhook user mapping (Logto `sub`)
 
@@ -63,6 +67,8 @@ This repo has **no** `COMMERCE_*` environment variables. The commerce BFF forwar
 | `ENTITLEMENT_BASE_URL` | Central Entitlement base URL |
 | `ENTITLEMENT_SERVICE_API_KEY` | M2M `X-Service-Key` |
 | `ENTITLEMENT_WEBHOOK_SECRET` | Lite ingress HMAC secret (= Entitlement `TARGETS.vistaremote.secret`); empty → webhook **always 401** |
+| `COMMERCE_WEBHOOK_POLL_MS` | Fulfillment retry poll interval (default 15000; `<=0` disables) |
+| `COMMERCE_WEBHOOK_MAX_ATTEMPTS` | Fulfillment retry cap (default 5 → dead letter) |
 | `ENTITLEMENT_CACHE_TTL_MS` | Entitlement cache TTL |
 | `ENTITLEMENT_OFFLINE_GRACE_MS` | Offline grace |
 | `ENTITLEMENT_DEPLOYMENT_ID` | Deployment id |
@@ -90,6 +96,7 @@ Closed trial can also grant via Admin **Users** → change plan, without checkou
 
 - [ ] **System entitlement flags (FR-WAD-52)**: Admin **System** → entitlement/payment config. `GET /api/v1/admin/system/entitlement` returns only `entitlementMode`, `entitlementBaseUrlConfigured`, and `webhookSecretConfigured`. It must **not** include `ENTITLEMENT_WEBHOOK_SECRET` or a raw base URL. Use **Copy entitlement status JSON** to verify.
 - [ ] **Reject a bad signature**: `POST /api/v1/commerce/webhooks/entitlement` with a wrong or missing `x-lw-signature` (or legacy `X-Entitlement-Signature` only) → **401**; local `User.plan` must not change. Unset secret → **401** as well.
+- [ ] **Fulfillment dead letters (FR-BILL-07)**: Admin `GET /api/v1/admin/commerce-webhook/dead-letters` lists failures; `process-once` / `replay` / `ignore` available. **WeChat / Alipay merchant onboarding remains owner-ops.**
 - [ ] **simulate-paid forbidden for commerce**: Admin **Simulate paid** is shown only on `local_billing` pending rows. `POST /api/v1/admin/orders/:id/simulate-paid` on `source=commerce` returns **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN` (UI: use Membership complete / webhook). Do not call `POST /api/v1/billing/orders/:id/simulate-paid` with an Admin JWT.
 - [ ] **Disable simulate-paid in production**: when `NODE_ENV=production` and `BILLING_ALLOW_SIMULATE_PAID` is not `true`, simulate-paid returns **400** `SIMULATE_PAID_DISABLED` (UI: simulate paid disabled in production).
 - [ ] **Webhook user mapping**: `subjectId` must be the Entitlement-side Logto `sub` with a matching local `users.logtoSub`; otherwise **400** `WEBHOOK_USER_NOT_FOUND`. Admin-created local users should use plan grant or Client Membership complete/status — **not** webhook auto-grant.

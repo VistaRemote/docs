@@ -33,7 +33,11 @@ Lite 入站 `order.fulfilled`（`POST /api/v1/commerce/webhooks/entitlement`）�
 | `x-lw-signature` | `v1=<base64url>` |
 | `x-lw-event-id` | 幂等事件 ID |
 
-签名：`HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, \`${timestamp}.${nonce}.${rawBody}\`)` → base64url；须对 **未改动的原始 body** 验签（勿重序列化 JSON）。`ENTITLEMENT_WEBHOOK_SECRET` 为本 ingress 的 HMAC secret，值须等于 Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`。旧头 `X-Entitlement-Signature` 常量相等 **硬切 401**，无 fallback。
+签名：`HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, \`${timestamp}.${nonce}.${rawBody}\`)` → base64url；须对 **未改动的原始 body** 验签（勿重序列化 JSON）。`ENTITLEMENT_WEBHOOK_SECRET` 为本 ingress 的 HMAC secret，值须等于 Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`。旧头 `X-Entitlement-Signature` 常量相等 **硬切 401**，无 fallback。密钥未配置时同样 **401**（诚实拒绝，非静默 mock）。
+
+履约失败（本地套餐投影写失败）会进入 `commerce_webhook_fulfillments` 重试队列；达上限 → 死信。Admin：`GET/POST /api/v1/admin/commerce-webhook/*`（status / dead-letters / process-once / replay|ignore）；审计 `commerce.webhook.*`（**FR-BILL-07**）。
+
+**Runbook**：微信 / 支付宝 **商户进件仍 owner-ops**，不随本仓交付。
 
 ## Webhook 用户映射（Logto `sub`）
 
@@ -63,6 +67,8 @@ Lite 入站 `order.fulfilled`（`POST /api/v1/commerce/webhooks/entitlement`）�
 | `ENTITLEMENT_BASE_URL` | 中央 Entitlement 基址 |
 | `ENTITLEMENT_SERVICE_API_KEY` | M2M `X-Service-Key` |
 | `ENTITLEMENT_WEBHOOK_SECRET` | Lite 入站 HMAC secret（= Entitlement `TARGETS.vistaremote.secret`）；空则 webhook **一律 401** |
+| `COMMERCE_WEBHOOK_POLL_MS` | 履约重试轮询间隔（默认 15000；`<=0` 关闭） |
+| `COMMERCE_WEBHOOK_MAX_ATTEMPTS` | 履约重试上限（默认 5 → 死信） |
 | `ENTITLEMENT_CACHE_TTL_MS` | 权益缓存 TTL |
 | `ENTITLEMENT_OFFLINE_GRACE_MS` | 离线宽限 |
 | `ENTITLEMENT_DEPLOYMENT_ID` | 部署标识 |
@@ -90,6 +96,7 @@ Web **用户端** `/membership`（当前 viewer Admin **没有** `/membership` �
 
 - [ ] **系统页权益标志（FR-WAD-52）**：管理台 **系统** → 权益/支付配置。`GET /api/v1/admin/system/entitlement` 只返回 `entitlementMode`、`entitlementBaseUrlConfigured`、`webhookSecretConfigured`。**禁止**出现 `ENTITLEMENT_WEBHOOK_SECRET` 或 Base URL 明文。可 **复制权益状态 JSON** 核对。
 - [ ] **错误签名拒绝**：对 `POST /api/v1/commerce/webhooks/entitlement` 发送错误或缺失的 `x-lw-signature`（或仅旧 `X-Entitlement-Signature`）→ **401**；本地 `User.plan` 不变。密钥未配置时同样 **401**。
+- [ ] **履约死信可查（FR-BILL-07）**：Admin `GET /api/v1/admin/commerce-webhook/dead-letters` 可见失败事件；可 `process-once` / `replay` / `ignore`。**微信/支付宝商户进件仍 owner-ops。**
 - [ ] **commerce 禁止 simulate-paid**：管理台「模拟支付」仅 `local_billing` pending 行可见。`POST /api/v1/admin/orders/:id/simulate-paid` 对 `source=commerce` 返回 **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN`（UI 提示走 Membership complete / webhook）。不要用 Admin JWT 打 `POST /api/v1/billing/orders/:id/simulate-paid`。
 - [ ] **生产关闭模拟支付**：`NODE_ENV=production` 且未设 `BILLING_ALLOW_SIMULATE_PAID=true` 时，simulate-paid 返回 **400** `SIMULATE_PAID_DISABLED`（UI：「生产环境已禁用模拟支付」）。
 - [ ] **Webhook 用户映射**：`subjectId` 须为 Entitlement 侧 Logto `sub`，且本地 `users.logtoSub` 已绑定；否则 **400** `WEBHOOK_USER_NOT_FOUND`。Admin 本地注册用户请用改套餐或 Client Membership complete/status，**不要**指望 webhook 自动开通。
