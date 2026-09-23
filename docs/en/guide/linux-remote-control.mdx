@@ -12,6 +12,19 @@ VistaRemote does **not** require turning Wayland off or forcing Xorg. A logged-i
 
 The Agent never silently drops pointer/keyboard events. Controllers see `CONTROL_NEEDS_PORTAL` in diagnostics when the portal is required.
 
+## Lab: `VR_WAYLAND_PORTAL=live` (W14-B)
+
+For development / lab (not production sign-off):
+
+| Value | Use |
+| :--- | :--- |
+| `mock` | In-process grant/deny without D-Bus (CI/unit tests) |
+| `live` | Force live: filesystem-probe `xdg-desktop-portal` + `libei`, then Agent RemoteDesktop |
+| `auto` | Default; same probe path on pure Wayland |
+| `off` | Always `CONTROL_NEEDS_PORTAL` on pure Wayland |
+
+Missing `xdg-desktop-portal` / `libei` yields an honest `CONTROL_NEEDS_PORTAL` (reasons: `portal-missing` / `libei-missing` / `portal-deps-missing`) — never a silent inject success. X11 / XWayland stay on XTest. Full lab steps: Meta-Repo [`plan/wayland-live-lab.md`](https://github.com/VistaRemote/vista-remote/blob/main/plan/wayland-live-lab.md).
+
 ## Ubuntu GNOME (Wayland) consent
 
 1. Start the Desktop Agent and connect from a controller.

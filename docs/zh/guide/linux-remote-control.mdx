@@ -12,6 +12,19 @@ VistaRemote **不要求**关闭 Wayland 或强制 Xorg。已登录图形会话�
 
 失败时 Agent **不会静默丢弃**键鼠；主控诊断会看到 `CONTROL_NEEDS_PORTAL`。
 
+## Lab：`VR_WAYLAND_PORTAL=live`（W14-B）
+
+开发/联调可显式指定门户后端（**非**生产签收）：
+
+| 值 | 用途 |
+| :--- | :--- |
+| `mock` | 无 D-Bus 的进程内模拟（CI/单测） |
+| `live` | 强制 live：先探测本机 `xdg-desktop-portal` + `libei`，再走 Agent RemoteDesktop |
+| `auto` | 默认；纯 Wayland 同 live 探测 |
+| `off` | 纯 Wayland 一律 `CONTROL_NEEDS_PORTAL` |
+
+缺 `xdg-desktop-portal` / `libei` 时 **诚实**返回 `CONTROL_NEEDS_PORTAL`（诊断 reason：`portal-missing` / `libei-missing` / `portal-deps-missing`），不会假装注入成功。X11 / XWayland 仍走 XTest。完整步骤见 Meta-Repo [`plan/wayland-live-lab.md`](https://github.com/VistaRemote/vista-remote/blob/main/plan/wayland-live-lab.md)。
+
 ## Ubuntu GNOME（Wayland）授权步骤
 
 1. 启动 Desktop Agent，主控连接后开始共享屏幕。
