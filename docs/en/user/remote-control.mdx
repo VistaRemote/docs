@@ -25,6 +25,17 @@ Web routes: `/pairing`, `/join/{token}`.
 
 The **Electron Viewer** is the same Web controller in a desktop shell (same session ops sidebar). The **mobile app** can view the screen and send mouse/keyboard; this release has no files/terminal ops panel on mobile.
 
+## Controlling more than one computer
+
+On **My devices**, select online computers and choose **Control selected**. That opens `/control`.
+
+| Mode | Who | Where keyboard and mouse go |
+| :--- | :--- | :--- |
+| **Focus** (default) | Accounts with a remote-session allowance | Only the computer you clicked |
+| **Sync** | Enterprise group-control entitlement | From the focused picture to every computer that has tapped Allow |
+
+Clipboard, files, and the terminal stay on the focused computer. One window keeps at most 8 high-quality pictures, and never more than the plan's concurrent-session limit. Leaving the page to add another computer does not drop the ones already connected. Each host still has to tap Allow. This is not the thumbnail monitor wall.
+
 ## Mapping from Mesh session tools
 
 This is Mesh **already-logged-in desktop** (KVM session / toolbar / same-device terminal and files), not inventory RMM. These tools are available **inside a VistaRemote session** after the host clicks Allow and the account has the matching permission.

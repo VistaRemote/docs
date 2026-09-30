@@ -20,7 +20,7 @@
     "@rspress/core": "^2.0.2",
     "@rstest/core": "^0.10.2",
     "@types/node": "^24.0.0",
-    "typescript": "^5.7.2"
+    "typescript": "6.0.3"
   },
   "engines": {
     "node": ">=24.0.0",
