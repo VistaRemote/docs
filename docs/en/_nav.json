@@ -1,21 +1,31 @@
 [
   {
-    "text": "guide",
+    "text": "User guide",
+    "link": "/user/remote-control",
+    "activeMatch": "/user/"
+  },
+  {
+    "text": "Guide",
     "link": "/guide/quick-start",
     "activeMatch": "/guide/"
   },
   {
-    "text": "architecture",
+    "text": "Architecture",
     "link": "/architecture/overview",
     "activeMatch": "/architecture/"
   },
   {
-    "text": "deploy",
+    "text": "Deploy",
     "link": "/deploy/docker",
     "activeMatch": "/deploy/"
   },
   {
-    "text": "whitepaper",
+    "text": "API",
+    "link": "/api/server-rest",
+    "activeMatch": "/api/"
+  },
+  {
+    "text": "Whitepaper",
     "link": "/whitepaper/"
   }
 ]

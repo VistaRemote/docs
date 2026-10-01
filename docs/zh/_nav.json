@@ -1,26 +1,31 @@
 [
   {
-    "text": "guide",
+    "text": "用户手册",
+    "link": "/user/remote-control",
+    "activeMatch": "/user/"
+  },
+  {
+    "text": "指南",
     "link": "/guide/quick-start",
     "activeMatch": "/guide/"
   },
   {
-    "text": "architecture",
+    "text": "架构",
     "link": "/architecture/overview",
     "activeMatch": "/architecture/"
   },
   {
-    "text": "deploy",
+    "text": "部署",
     "link": "/deploy/docker",
     "activeMatch": "/deploy/"
   },
   {
-    "text": "api",
+    "text": "API",
     "link": "/api/server-rest",
     "activeMatch": "/api/"
   },
   {
-    "text": "whitepaper",
+    "text": "白皮书",
     "link": "/whitepaper/"
   }
 ]

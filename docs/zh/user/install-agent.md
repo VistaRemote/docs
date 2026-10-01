@@ -20,7 +20,7 @@ VistaRemote **v1.0** 被控端为 Windows Agent。
 
 在安装目录（或 Portable 同级）创建 `.env`：
 
-```env
+```ini
 VISTAREMOTE_API_URL=https://api.example.com
 VISTAREMOTE_SIGNALING_URL=wss://api.example.com/signaling
 ```

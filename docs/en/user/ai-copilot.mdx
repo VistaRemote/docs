@@ -1,0 +1,42 @@
+# AI assist (Windows / macOS computer use)
+
+AI assist is off unless you turn it on. After that, you can type one task in Viewer and let your organization's AI click and type in windows that are already open on the **remote Windows or macOS** Agent, including the browser.
+
+The tool surface matches open-source **[Windows-MCP](https://github.com/CursorTouch/Windows-MCP)** and **MacOS-MCP**-style look → click/type computer use. VistaRemote does **not** embed those MCP processes; it maps the same allowed observe/act steps onto the existing WebRTC DataChannel remote-control path so AI and human control share one security boundary.
+
+This is not unattended takeover. It does not run scripts, edit the registry, or write files.
+
+## Why this is a core capability
+
+| | VistaRemote AI assist | Typical desktop MCP (Windows-MCP / MacOS-MCP) |
+| :--- | :--- | :--- |
+| Target | Remote Windows / macOS Agent | Local desktop |
+| Tools | Bounded observe, Click, Type, scroll | Same look → click/type idea |
+| Transport | Live remote session + private AI Worker | Local MCP host |
+| Consent | Separate "Allow AI" after human control consent | Host trust model |
+| Default | Off; alerts never auto-arm control | Host-defined |
+
+Use it to help a colleague open a settings page, fill a form in their browser, or walk through recovery — not to run scripts or edit the registry from Viewer.
+
+## Before you start
+
+1. The Agent is installed (Windows or macOS) and you are already in a session together.
+2. The host taps Allow. That only allows a person to use the keyboard and mouse.
+3. If this Agent has AI assist enabled, the host sees a second prompt. AI does not move the pointer until they tap Allow AI. The Viewer toolbar shows **AI assist** only after the server has the feature on.
+4. A small snapshot of the screen goes to your own AI service so it can choose the next click. This feature does not add a public model key.
+
+## How to use it
+
+1. Open **AI assist** from the Viewer toolbar. Human chat stays on its own button.
+2. Write the task, for example "click the browser address bar". An empty task does not start.
+3. The step list shows tool names such as Click or Type.
+4. Press **Stop**, or move the mouse or keyboard yourself. The AI pauses. Your own control works as before.
+
+One task stops after about 20 steps or 3 minutes.
+
+## Not in this version
+
+- Whether a click lands on a real Windows or macOS desktop still needs a person to look. This page does not call the feature production-signed.
+- It does not lock the screen, sign out, run PowerShell or a shell, or edit the registry.
+- An alert does not start a remote session or this assist by itself.
+- The same AI action is not broadcast to a group of computers.

@@ -33,7 +33,7 @@ Lite ingress `order.fulfilled` (`POST /api/v1/commerce/webhooks/entitlement`) us
 | `x-lw-signature` | `v1=<base64url>` |
 | `x-lw-event-id` | Idempotent event id |
 
-Signature: `HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, \`${timestamp}.${nonce}.${rawBody}\`)` → base64url; verify on the **untouched raw body** (never re-serialize JSON). `ENTITLEMENT_WEBHOOK_SECRET` is this ingress HMAC secret and must equal Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`. Legacy `X-Entitlement-Signature` equality is a **hard-cut 401** with no fallback. Missing secret → **401** (honest reject, not silent mock).
+Signature: `HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, timestamp.nonce.rawBody)` → base64url; verify on the **untouched raw body** (never re-serialize JSON). `ENTITLEMENT_WEBHOOK_SECRET` is this ingress HMAC secret and must equal Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`. Legacy `X-Entitlement-Signature` equality is a **hard-cut 401** with no fallback. Missing secret → **401** (honest reject, not silent mock).
 
 Fulfillment failures (local plan projection write) enter `commerce_webhook_fulfillments` retry; exhausted → dead letter. Admin: `GET/POST /api/v1/admin/commerce-webhook/*` (status / dead-letters / process-once / replay|ignore); audit `commerce.webhook.*` (**FR-BILL-07**).
 

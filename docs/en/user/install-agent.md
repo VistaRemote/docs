@@ -20,7 +20,7 @@ Public binary repo (source stays private):
 
 Create `.env` next to the executable:
 
-```env
+```ini
 VISTAREMOTE_API_URL=https://api.example.com
 VISTAREMOTE_SIGNALING_URL=wss://api.example.com/signaling
 ```

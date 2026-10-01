@@ -24,7 +24,9 @@ pnpm install
 pnpm dev
 ```
 
-浏览器打开终端提示的地址（默认 `http://localhost:5173`）。
+浏览器打开终端提示的地址（默认 `http://localhost:13401`，避免占用 Web Client 常用的 `:3000`）。
+
+生产文档域名：[https://docs.remote.vistacast.dev](https://docs.remote.vistacast.dev)（GitHub Pages + 自定义域名）。
 
 ## 构建
 
@@ -33,7 +35,7 @@ pnpm build
 pnpm preview
 ```
 
-静态产物在 `doc_build/`。
+静态产物在 `doc_build/`。推送到 `main` / `dev` 后由 `.github/workflows/docs.yml` 部署到 GitHub Pages。
 
 ## 推荐阅读
 

@@ -9,6 +9,8 @@
 3. Enter the Agent **pairing code** (6–8 digits). Codes are **one-shot** (`PAIRING_CONSUMED`); a class cannot share one code.
 4. Wait for video, then control with mouse/keyboard
 
+For multi-computer layout (Solo / Mosaic), Sync, and how to return after leaving the workspace, see [Multi-computer workspace](./multi-computer-workspace.md).
+
 Production signaling requires a short-lived **Signaling Ticket** (issued on join; Agents get `agentSignalingTicket` when creating a pairing session).
 
 Anonymous pairing join returns `401 UNAUTHORIZED`.

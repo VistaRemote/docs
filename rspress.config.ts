@@ -7,6 +7,8 @@ export default defineConfig({
     ['meta', { name: 'tdm-policy', content: 'https://github.com/VistaRemote/docs/blob/main/AI-USE.md' }],
   ],
   root: 'docs',
+  // Custom domain: https://docs.remote.vistacast.dev (GitHub Pages)
+  base: '/',
   lang: 'zh',
   title: 'VistaRemote',
   description: 'WebRTC 远程桌面 · 可私有化 AI · TypeScript 全栈',
@@ -14,6 +16,10 @@ export default defineConfig({
   logo: {
     light: '/logo.svg',
     dark: '/logo.svg',
+  },
+  server: {
+    // Avoid clash with web client / other local apps on :3000
+    port: 13401,
   },
   locales: [
     {

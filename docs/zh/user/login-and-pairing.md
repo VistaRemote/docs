@@ -9,6 +9,8 @@
 3. 输入 Agent 显示的 **6–8 位配对码**（码为一次性：`PAIRING_CONSUMED`，**不能**全班共用一个码）
 4. 等待画面出现后即可键鼠控制
 
+多机并行、专一/分屏与「返回远控」说明见：[多机远控工作区](./multi-computer-workspace.md)。
+
 生产环境信令必须携带短期 **Signaling Ticket**（join 接口自动签发；Agent 在创建配对会话时获得 `agentSignalingTicket`）。
 
 未登录调用配对 join 会返回 `401 UNAUTHORIZED`。

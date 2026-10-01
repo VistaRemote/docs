@@ -33,7 +33,7 @@ Lite 入站 `order.fulfilled`（`POST /api/v1/commerce/webhooks/entitlement`）�
 | `x-lw-signature` | `v1=<base64url>` |
 | `x-lw-event-id` | 幂等事件 ID |
 
-签名：`HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, \`${timestamp}.${nonce}.${rawBody}\`)` → base64url；须对 **未改动的原始 body** 验签（勿重序列化 JSON）。`ENTITLEMENT_WEBHOOK_SECRET` 为本 ingress 的 HMAC secret，值须等于 Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`。旧头 `X-Entitlement-Signature` 常量相等 **硬切 401**，无 fallback。密钥未配置时同样 **401**（诚实拒绝，非静默 mock）。
+签名：`HMAC-SHA256(ENTITLEMENT_WEBHOOK_SECRET, timestamp.nonce.rawBody)` → base64url；须对 **未改动的原始 body** 验签（勿重序列化 JSON）。`ENTITLEMENT_WEBHOOK_SECRET` 为本 ingress 的 HMAC secret，值须等于 Entitlement `ENTITLEMENT_ORDER_FULFILLED_TARGETS.vistaremote.secret`。旧头 `X-Entitlement-Signature` 常量相等 **硬切 401**，无 fallback。密钥未配置时同样 **401**（诚实拒绝，非静默 mock）。
 
 履约失败（本地套餐投影写失败）会进入 `commerce_webhook_fulfillments` 重试队列；达上限 → 死信。Admin：`GET/POST /api/v1/admin/commerce-webhook/*`（status / dead-letters / process-once / replay|ignore）；审计 `commerce.webhook.*`（**FR-BILL-07**）。
 
