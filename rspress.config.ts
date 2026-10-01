@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { defineConfig } from '@rspress/core';
 
 export default defineConfig({
@@ -7,6 +8,7 @@ export default defineConfig({
     ['meta', { name: 'tdm-policy', content: 'https://github.com/VistaRemote/docs/blob/main/AI-USE.md' }],
   ],
   root: 'docs',
+  globalStyles: path.join(__dirname, 'styles/index.css'),
   // Custom domain: https://docs.remote.vistacast.dev (GitHub Pages)
   base: '/',
   lang: 'zh',

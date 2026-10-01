@@ -1,16 +1,38 @@
 # Architecture Overview
 
-VistaRemote uses a **Flat Meta-Repo**: independent Git repos for `shared`, `server`, `ai`, `web`, `desktop`, `mobile`, `docs`, and `deploy`.
+VistaRemote uses a **Flat Meta-Repo**: independent Git repos for `shared`, `server`, `ai`, `web`, `desktop`, `mobile`, `docs`, and `deploy`. Contracts change in `shared` first.
+
+## Background
+
+Remote desktop is critical ops infrastructure. Common pain points in legacy stacks: high latency, monolithic C/C++ bases, and centralized cloud relays that put telemetry at risk.
+
+VistaRemote is **WebRTC-native** (P2P / SFU) for real-time control, with optional **self-hosted AI** — session summaries and Viewer **computer-use** assist in the spirit of **Windows-MCP / MacOS-MCP** (look → click/type; off by default; second consent).
+
+| Pillar | VistaRemote |
+| :--- | :--- |
+| **WebRTC-native** | Real-time control, not DVR-only monitoring |
+| **Open source & self-hosted** | PostgreSQL, object storage, optional Ollama |
+| **TypeScript end-to-end** | Lower customization cost; Spec-Driven |
+| **AI by design** | LLM only in `ai` workers |
+
+See [Positioning](/architecture/positioning) and [AI assist](/user/ai-copilot).
 
 ## Stack highlights
 
-- **WebRTC** for real-time remote desktop (P2P / SFU)
-- **NestJS + TypeORM + PostgreSQL 16** on the server
-- **Rspack/Rsbuild** for web and Electron renderer
-- **Dedicated `ai` workers** for LLM and analytics (BullMQ)
+- **WebRTC** remote desktop (P2P / SFU)
+- **NestJS + Fastify + TypeORM + PostgreSQL 16+**
+- **Rsbuild** for web / Electron renderer; React Native for mobile
+- **Dedicated `ai` workers** (BullMQ); optional computer-use assist
+- **Rust** only on capture/encode hot paths via napi-rs
 
-## Why not Monorepo?
+## Why not one Monorepo?
 
-Electron native addons and React Native Metro conflict with shared `node_modules` hoisting. Separate repos keep builds reliable.
+Electron native addons and React Native Metro conflict with aggressive hoisting. Separate repos keep builds reliable; shared contracts live in `@vistaremote/shared`.
 
-More: [Positioning](/architecture/positioning) · [WebRTC](/architecture/webrtc-topology).
+## Related
+
+- [Positioning](/architecture/positioning)
+- [Tech advantages](/architecture/tech-advantages)
+- [WebRTC topology](/architecture/webrtc-topology)
+- [AI platform](/architecture/ai-platform)
+- [AI assist (user)](/user/ai-copilot)

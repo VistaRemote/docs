@@ -1,0 +1,15 @@
+/* Home hero actions: prevent truncated CTA labels */
+.rp-home-hero__actions {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.rp-home-hero__action,
+.rp-home-hero__actions .rp-button {
+  white-space: normal;
+  height: auto !important;
+  min-height: 44px;
+  line-height: 1.35 !important;
+  padding: 10px 18px !important;
+  max-width: 100%;
+  text-align: center;
+}
