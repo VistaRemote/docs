@@ -26,18 +26,21 @@ pnpm dev
 
 浏览器打开终端提示的地址（默认 `http://localhost:13401`，避免占用 Web Client 常用的 `:3000`）。
 
-生产文档域名：[https://docs.remote.vistacast.dev](https://docs.remote.vistacast.dev)（**GitHub Pages** + 自定义域名）。
+生产文档域名：[https://docs.remote.vistacast.dev](https://docs.remote.vistacast.dev)
 
+因部分网络/浏览器直连 GitHub Pages 会出现 `ERR_CONNECTION_CLOSED`，**对外域名经 Cloudflare Pages 边缘分发**（构建产物与 GitHub Actions 同源）。可访问镜像：[https://vistaremote-docs.pages.dev](https://vistaremote-docs.pages.dev)
 
-> 说明：组织根地址 `https://vistaremote.github.io/` **没有**独立站点仓库，浏览器访问 404 是正常的。文档站是 **项目 Pages**（`VistaRemote/docs`），对外入口是自定义域名 `docs.remote.vistacast.dev`。DNS 的 CNAME 目标仍写 `vistaremote.github.io`（GitHub Pages 约定），不要改成 `vistaremote.github.io/docs`。
-
-DNS（Cloudflare，`vistacast.dev` zone）：
+Cloudflare DNS（`vistacast.dev`）请改为：
 
 ```text
-docs.remote  CNAME  vistaremote.github.io   # DNS only（关闭代理），供 GitHub Pages
+类型: CNAME
+名称: docs.remote
+目标: vistaremote-docs.pages.dev
+代理状态: 已代理（橙云）   ← 必须开，不要灰云指 github.io
 ```
 
-推送到 `main` / `dev` 后由 `.github/workflows/docs.yml` 部署到 GitHub Pages。不要用 Cloudflare Pages 托管文档站。
+不要再指向 `vistaremote.github.io`（浏览器会 CONNECTION_CLOSED）。GitHub Actions 仍构建；工作流同时部署到 Cloudflare Pages。
+
 
 ## 构建
 

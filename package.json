@@ -10,7 +10,8 @@
     "test": "rstest",
     "test:watch": "rstest -w",
     "lint": "biome check .",
-    "prepare": "node -e \"try{require('fs').accessSync('../tooling/scripts/setup-husky.mjs')}catch{process.exit(0)} require('child_process').execFileSync('node',['../tooling/scripts/setup-husky.mjs'],{stdio:'inherit'})\""
+    "prepare": "node -e \"try{require('fs').accessSync('../tooling/scripts/setup-husky.mjs')}catch{process.exit(0)} require('child_process').execFileSync('node',['../tooling/scripts/setup-husky.mjs'],{stdio:'inherit'})\"",
+    "pages:deploy": "pnpm build && wrangler pages deploy doc_build --project-name=vistaremote-docs --branch=main"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
