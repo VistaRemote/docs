@@ -26,7 +26,17 @@ pnpm dev
 
 浏览器打开终端提示的地址（默认 `http://localhost:13401`，避免占用 Web Client 常用的 `:3000`）。
 
-生产文档域名：[https://docs.remote.vistacast.dev](https://docs.remote.vistacast.dev)（GitHub Pages + 自定义域名）。
+生产文档域名目标：[https://docs.remote.vistacast.dev](https://docs.remote.vistacast.dev)。
+
+当前可访问镜像：[https://vistaremote-docs.pages.dev](https://vistaremote-docs.pages.dev)（Cloudflare Pages 项目 `vistaremote-docs`）。
+
+GitHub Pages 工作流（`.github/workflows/docs.yml`）已可构建部署；自定义域名需在 Cloudflare DNS 增加：
+
+```text
+docs.remote  CNAME  vistaremote-docs.pages.dev   # 推荐（与官网同账号，已挂域）
+# 或
+docs.remote  CNAME  vistaremote.github.io        # 纯 GitHub Pages（DNS only）
+```
 
 ## 构建
 
