@@ -28,6 +28,9 @@ pnpm dev
 
 生产文档域名：[https://docs.remote.vistacast.dev](https://docs.remote.vistacast.dev)（**GitHub Pages** + 自定义域名）。
 
+
+> 说明：组织根地址 `https://vistaremote.github.io/` **没有**独立站点仓库，浏览器访问 404 是正常的。文档站是 **项目 Pages**（`VistaRemote/docs`），对外入口是自定义域名 `docs.remote.vistacast.dev`。DNS 的 CNAME 目标仍写 `vistaremote.github.io`（GitHub Pages 约定），不要改成 `vistaremote.github.io/docs`。
+
 DNS（Cloudflare，`vistacast.dev` zone）：
 
 ```text
