@@ -2,7 +2,7 @@
 
 AI assist is off unless you turn it on. After that, you can type one task in Viewer and let your organization's AI click and type in windows that are already open on the **remote Windows or macOS** Agent, including the browser.
 
-The tool surface matches open-source **[Windows-MCP](https://github.com/CursorTouch/Windows-MCP)** and **MacOS-MCP**-style look → click/type computer use. VistaRemote does **not** embed those MCP processes; it maps the same allowed observe/act steps onto the existing WebRTC DataChannel remote-control path so AI and human control share one security boundary.
+The tool surface matches open-source **[Windows-MCP](https://github.com/CursorTouch/Windows-MCP)** and **MacOS-MCP**-style look → click/type computer use. VistaRemote does **not** bundle those programs. By default it maps the same allowed steps onto the existing WebRTC DataChannel so AI and human control share one path. An optional Agent setting can start `windows-mcp` or `macos-mcp` on local stdio and, if that process fails, falls back to the same input path.
 
 This is not unattended takeover. It does not run scripts, edit the registry, or write files.
 
@@ -33,6 +33,32 @@ Use it to help a colleague open a settings page, fill a form in their browser, o
 4. Press **Stop**, or move the mouse or keyboard yourself. The AI pauses. Your own control works as before.
 
 One task stops after about 20 steps or 3 minutes.
+
+## Local AI (Cursor / ChatGPT)
+
+A local MCP process can operate a session you have **already joined**, after the remote host has allowed AI. It cannot open a new remote session. If the server flag is off, the tools return `COPILOT_DISABLED`.
+
+Use the same command for ChatGPT desktop when it can launch a local stdio MCP. Do not put a real ticket in git. The example is `tooling/mcp/cursor-mcp.example.json`:
+
+```json
+{
+  "mcpServers": {
+    "vista-remote": {
+      "command": "node",
+      "args": [
+        "tooling/mcp/vista-remote-mcp.mjs"
+      ],
+      "env": {
+        "VR_API_URL": "http://127.0.0.1:3000",
+        "VR_SIGNALING_TICKET": "<signaling-ticket-for-an-existing-session>",
+        "VR_SESSION_ID": "<session-id>"
+      }
+    }
+  }
+}
+```
+
+Tools are `vr_snapshot`, `vr_click`, `vr_type`, `vr_scroll`, `vr_move`, `vr_shortcut`, and `vr_wait`. PowerShell, shell, and the ecosystem `remote_control` handoff tool are not in this list.
 
 ## Not in this version
 

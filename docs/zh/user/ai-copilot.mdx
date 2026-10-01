@@ -2,7 +2,7 @@
 
 AI 协助默认关闭。打开之后，你可以在 Viewer 里用一句话，让本组织的 AI 在**被控 Windows 或 macOS** 上已经打开的窗口里点击和输入，包括浏览器。
 
-能力对标开源社区的 **[Windows-MCP](https://github.com/CursorTouch/Windows-MCP)** 与 **MacOS-MCP** 一类「看屏幕 → 点击 / 输入」computer-use 工具面：VistaRemote 并不内嵌这些 MCP 进程，而是把同等允许的观察与动作接到已有 WebRTC DataChannel 远控通道上，让 AI 与人工远控共用同一条安全链路。
+能力对标开源社区的 **[Windows-MCP](https://github.com/CursorTouch/Windows-MCP)** 与 **MacOS-MCP** 一类「看屏幕 → 点击 / 输入」computer-use 工具面。VistaRemote **不把**这些程序打进安装包。默认仍把允许的动作接到已有 WebRTC DataChannel，让 AI 与人工远控走同一条链路。只有被控端另外打开平台 MCP 时，才会在本机 stdio 拉起 `windows-mcp` 或 `macos-mcp`；拉起失败就回到原来的键鼠注入。
 
 这不是无人值守接管，也不包含脚本、注册表或文件代写。
 
@@ -33,6 +33,32 @@ AI 协助默认关闭。打开之后，你可以在 Viewer 里用一句话，让
 4. 点 **停止**，或直接动鼠标、键盘，AI 会暂停。之后你的键鼠和以前一样。
 
 单次任务大约不超过 20 步或 3 分钟。
+
+## 本机 AI（Cursor / ChatGPT）
+
+本机 MCP 只能操作你**已经加入**、且对方已允许 AI 的会话，不能新开远控。服务端开关没开时，工具返回 `COPILOT_DISABLED`。
+
+ChatGPT 桌面版如果能启动同一个本地 stdio MCP，用同一条命令。不要把真实票据写进仓库。示例文件是 `tooling/mcp/cursor-mcp.example.json`：
+
+```json
+{
+  "mcpServers": {
+    "vista-remote": {
+      "command": "node",
+      "args": [
+        "tooling/mcp/vista-remote-mcp.mjs"
+      ],
+      "env": {
+        "VR_API_URL": "http://127.0.0.1:3000",
+        "VR_SIGNALING_TICKET": "<signaling-ticket-for-an-existing-session>",
+        "VR_SESSION_ID": "<session-id>"
+      }
+    }
+  }
+}
+```
+
+工具是 `vr_snapshot`、`vr_click`、`vr_type`、`vr_scroll`、`vr_move`、`vr_shortcut`、`vr_wait`。这里没有 PowerShell、Shell，也没有生态里那个只做确认链接的 `remote_control`。
 
 ## 还没做到的
 

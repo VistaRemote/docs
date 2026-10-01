@@ -2,11 +2,11 @@ name: Docs
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, master, dev]
     paths:
       - '**'
   pull_request:
-    branches: [main, dev]
+    branches: [main, master, dev]
   workflow_dispatch:
 
 permissions:
@@ -45,16 +45,8 @@ jobs:
         with:
           path: doc_build
 
-      - name: Deploy to Cloudflare Pages
-        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy doc_build --project-name=vistaremote-docs --branch=main
-
   deploy:
-    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev')
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -64,4 +56,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        continue-on-error: true
