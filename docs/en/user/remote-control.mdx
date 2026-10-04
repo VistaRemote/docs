@@ -4,11 +4,13 @@ For **operators** using VistaRemote for remote assistance—not developers.
 
 VistaRemote takes the **logged-in desktop session** tools operators use in MeshCentral / MeshAgent—screen, keyboard and mouse, clipboard, files, terminal, chat, processes, read-only services, power, host info, notify, lock, open URL, screenshot—and ships them here. Video uses **WebRTC**, not Mesh JPEG desktop or server byte relay.
 
-VistaRemote is **not** full MeshCentral RMM. It does not include Intel AMT / IP-KVM, remote printing, registry, service start/stop, Wake-on-LAN magic packets, UAC/logon desktop, file clipboard, USB, audio mix, wallpaper toggle, remote script run, locking the host user’s input, or an Agent JS console.
+One session covers the screen, keyboard and mouse, clipboard, files, terminal, and host actions. Group control, the monitor wall, virtual displays, and Intel AMT are in [Device fleet and enterprise](/user/fleet-and-enterprise). The product does not rewrite the registry, start and stop services, inject the logon window, or monitor silently.
 
 ## AI assist (off by default)
 
 Optional. See [AI assist](./ai-copilot.mdx). When it is off, keyboard, mouse, chat, and the terminal behave as they do today. An alert does not start a remote session. The host must allow AI separately from remote control before any click or typing happens. Local Cursor or ChatGPT can use MCP on that already-allowed session only; it does not open a new one.
+
+Linux desktops and servers without a graphical client are covered in [Linux hosts](./linux-agent.mdx).
 
 ## Roles
 
@@ -27,7 +29,9 @@ Optional. See [AI assist](./ai-copilot.mdx). When it is off, keyboard, mouse, ch
 
 Web routes: `/pairing`, `/join/{token}`.
 
-The **Electron Viewer** is the same Web controller in a desktop shell (same session ops sidebar). The **mobile app** can view the screen and send mouse/keyboard; this release has no files/terminal ops panel on mobile.
+The **Electron Viewer** is the same Web controller in a desktop shell (same session ops sidebar).
+
+The **phone** is for watching the remote computer. The phone itself is not the machine being controlled. Precise keyboard and mouse, files, and the terminal stay on the computer controller. A phone screen is a poor place to operate a desktop, so that work is not being added to the phone app.
 
 ## Controlling more than one computer
 

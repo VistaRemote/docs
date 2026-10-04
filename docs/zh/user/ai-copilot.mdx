@@ -1,18 +1,21 @@
-# AI 协助（Windows / macOS 电脑操控）
+# AI 协助与本机 MCP（Windows / macOS）
 
-AI 协助默认关闭。打开之后，你可以在 Viewer 里用一句话，让本组织的 AI 在**被控 Windows 或 macOS** 上已经打开的窗口里点击和输入，包括浏览器。
+AI 协助默认关闭。打开之后有两条路，都只能动**已经同意**的远程会话：
 
-能力对标开源社区的 **[Windows-MCP](https://github.com/CursorTouch/Windows-MCP)** 与 **MacOS-MCP** 一类「看屏幕 → 点击 / 输入」computer-use 工具面。VistaRemote **不把**这些程序打进安装包。默认仍把允许的动作接到已有 WebRTC DataChannel，让 AI 与人工远控走同一条链路。只有被控端另外打开平台 MCP 时，才会在本机 stdio 拉起 `windows-mcp` 或 `macos-mcp`；拉起失败就回到原来的键鼠注入。
+1. **Viewer**：在工具栏「AI 协助」里写一句话，由本组织 AI Worker 点按远端已打开的窗口（含浏览器）。
+2. **本机 MCP（Cursor / ChatGPT）**：在本机用 `vr_*` 工具操作同一场已允许的会话。**不能**新开远控。
+
+能力对标开源社区的 **[Windows-MCP](https://github.com/CursorTouch/Windows-MCP)** 与 **MacOS-MCP** 一类「看屏幕 → 点击 / 输入」。VistaRemote **不把**这些程序打进安装包。默认仍把允许的动作接到已有 WebRTC DataChannel。只有被控端另外打开 `VR_COPILOT_BACKEND=platform-mcp` 时，才会在本机 stdio 拉起 `windows-mcp` 或 `macos-mcp`；拉起失败就回到原来的键鼠注入。
 
 这不是无人值守接管，也不包含脚本、注册表或文件代写。
 
 ## 为什么这是核心能力
 
-| 维度 | VistaRemote AI 协助 | 典型桌面 MCP（Windows-MCP / MacOS-MCP） |
+| 维度 | VistaRemote AI 协助 / 本机 MCP | 典型桌面 MCP（Windows-MCP / MacOS-MCP） |
 | :--- | :--- | :--- |
 | 目标系统 | 远端 Windows / macOS Agent | 本机桌面 |
 | 工具面 | 截屏观察、Click、Type、滚动等有界动作 | 同类 look → click/type |
-| 传输 | 已建立的远控会话 + 组织内 AI Worker | 本机 MCP 宿主 |
+| 传输 | 已建立的远控会话（Viewer 或本机 MCP） | 本机 MCP 宿主 |
 | 同意 | 人工远控允许之外，还需二次「允许 AI」 | 本机信任模型 |
 | 默认 | 关；告警不会自动开控 | 由宿主决定 |
 
@@ -22,10 +25,10 @@ AI 协助默认关闭。打开之后，你可以在 Viewer 里用一句话，让
 
 1. 被控电脑已经装好 Agent（Windows 或 macOS），并且你们已经连上同一台会话。
 2. 被控端先点「允许」，这只表示允许人工键鼠。
-3. 若这台 Agent 打开了 AI 协助，被控端还会看到另一次确认。点「允许 AI」之后，主控工具栏才会出现 **AI 协助**。没点的话，AI 不会动键鼠。
-4. 画面缩图会送到你们自己的 AI 服务，用来决定下一步点哪里。默认不会为了这个功能去接公网模型。
+3. 若这台 Agent 打开了 AI 协助（`VR_COPILOT=on`），被控端还会看到另一次确认。点「允许 AI」之后，主控工具栏才会出现 **AI 协助**，本机 MCP 的 `vr_*` 才能生效。没点的话，AI 不会动键鼠。
+4. Viewer 路径下，画面缩图会送到你们自己的 AI 服务。默认不会为了这个功能去接公网模型。
 
-## 怎么用
+## Viewer 怎么用
 
 1. 在 Viewer 工具栏打开 **AI 协助**（人类聊天还是原来的入口）。
 2. 写下要做的事，例如「点一下浏览器地址栏」。空着不能开始。
@@ -36,7 +39,7 @@ AI 协助默认关闭。打开之后，你可以在 Viewer 里用一句话，让
 
 ## 本机 AI（Cursor / ChatGPT）
 
-本机 MCP 只能操作你**已经加入**、且对方已允许 AI 的会话，不能新开远控。服务端开关没开时，工具返回 `COPILOT_DISABLED`。
+本机 MCP 只能操作你**已经加入**、且对方已允许 AI 的会话，不能新开远控。服务端开关没开时，工具返回 `COPILOT_DISABLED`。未允许 AI 时返回 `COPILOT_NOT_ARMED`，不会注入键鼠。
 
 ChatGPT 桌面版如果能启动同一个本地 stdio MCP，用同一条命令。不要把真实票据写进仓库。示例文件是 `tooling/mcp/cursor-mcp.example.json`：
 

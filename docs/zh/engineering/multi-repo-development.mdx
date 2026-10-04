@@ -38,13 +38,13 @@ git push          # VistaRemote/mobile
 
 **deploy** 负责把已发布的各服务版本写进部署清单，不是把所有代码打成一个包。
 
-## CI/CD 与版本
+## CI/CD
 
-- **shared 先发**：打 tag `v0.2.0` 发布 npm 包，自动通知各消费者开 bump PR
-- **各仓 tag**：如 `server-v0.2.0`、`web-v0.2.0` 触发镜像 / 静态资源发布
+- **shared 先发**：按 shared 的 tag 前缀发布 npm 包，自动通知各消费者开依赖升级 PR
+- **各仓再发**：按各自前缀打 tag，触发镜像或静态资源发布
 - **本地联调**：仍用 `file:../shared`；CI 使用 `setup-shared` 兄弟目录布局
 
-详见 [CI/CD 与版本发布](/engineering/cicd-release) 与 [spec/cicd-release-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/cicd-release-spec.md)。
+详见 [发布流程](/engineering/cicd-release) 与 [spec/cicd-release-spec](https://github.com/VistaRemote/vista-remote/blob/main/spec/cicd-release-spec.md)。
 
 ## Biome：每个仓库都要配置
 

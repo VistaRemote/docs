@@ -4,8 +4,8 @@
 
 1. 打开 Web Client（`https://app.example.com` 或本地 `http://localhost:5173`）或安装 Android APK
 2. 进入 **VistaRemote 品牌登录页**（`/login`）完成登录 / 注册（须登录后才能配对与远控）
-   - **推荐（统一身份）**：主按钮「登录 / 注册」→ LuminaryWorks Logto（OIDC）；本页为产品品牌 Headless 入口，不使用 Logto 托管页作为主 UI
-   - **本地 / 私有化 C / 开发离线**：展开「本地账号」使用邮箱 + 密码
+   - **推荐（统一身份）**：主按钮「登录 / 注册」走 LuminaryWorks 统一账号。第一次注册验证邮箱；之后用邮箱和密码登录。需要时可以绑定验证器（含微软 Authenticator，应用免费）。
+   - **本地 / 私有化离线**：展开「本地账号」使用邮箱 + 密码
 3. 输入 Agent 显示的 **6–8 位配对码**（码为一次性：`PAIRING_CONSUMED`，**不能**全班共用一个码）
 4. 等待画面出现后即可键鼠控制
 
@@ -17,17 +17,9 @@
 
 ## 试用与套餐
 
-- 新用户默认 **7 天试用**（`standard_7d`，每用户每产品一次；含部分 Pro 能力）
-- 试用结束后免费档保留 **1:1 P2P**；SFU 等需升级
-- 付费首版由 **Admin 手工改套餐**（真实支付见 v1.1）
-
-## 开发者 / 运维（本地 E2E）
-
-用户向文档不展开逐步验收。克隆 **VistaRemote Meta 仓库**后，本地 **1:1 P2P** 配对、画面、键鼠与运维通道（剪贴板 / 文件 / 终端）的 **15 步人工验收** 见：
-
-- Meta 仓库 [`plan/mvp-e2e-runbook.md`](https://github.com/VistaRemote/vibeCode/blob/main/plan/mvp-e2e-runbook.md)（同仓相对路径：`plan/mvp-e2e-runbook.md`）
-
-公网 v1.0 出门清单见 Meta `plan/v1-golive-checklist.md`；运维通道 FR 见 Meta `spec/remote-session-ops-spec.md`。不含 SFU 多路验收。
+- 新用户享有 **7 天试用**（含 SFU 与部分 Pro 能力）
+- 试用结束后，免费档保留 **1:1 P2P**；SFU、录制与 AI 按套餐开通
+- 用户支付完成后权益生效；管理员也可在管理台调整套餐
 
 ## 故障排查
 

@@ -1,40 +1,57 @@
-# 二开与定制指南
+# 二开与定制：为什么选择 VistaRemote
 
-VistaRemote 面向 **私有化、二开、低成本迭代** 设计，而非千万级并发直播。
+选 VistaRemote 做二次开发，是因为 **改得动、招得到人、数据留在自己的机房**。它面向企业内网和行业定制，而不是千万级观众的直播。
 
-## 为什么好改、改得快？
+## 选择它做二开的理由
 
-| 因素 | 说明 |
+| 理由 | 对你的团队意味着什么 |
 | :--- | :--- |
-| **全栈 TypeScript** | `shared` 契约贯通 server / web / desktop / mobile / ai；国内 TS 人才储备大 |
-| **Python 仅重 ML** | `ai/python-worker` 做 OCR/VL 等重算，主业务仍是 TS |
-| **Spec 驱动** | 先改 `spec/*.md` 与 FR，再改代码，AI 协作者可跟 Spec 实现 |
-| **Meta-Repo** | 只拉需要的子仓；无 Monorepo 构建黑洞，Rsbuild 冷启动快 |
-| **PostgreSQL + Docker** | 运维熟悉，单机可跑全栈 |
+| **一种主语言** | 信令、Web 主控、管理台、Electron Agent、手机主控、AI 任务都是 **TypeScript**。招 Node / React 工程师就能改产品，不必同时养 C++ 远控团队 |
+| **契约只有一处** | 跨端类型在 `shared`。改协议先改契约，Web、桌面、手机不会各写一套字段 |
+| **Spec 驱动** | 行为写在 Spec 里再写代码。人和 AI 协作者对着同一份说明改，评审时也能对照 |
+| **仓库分开、构建不互相拖死** | Electron、React Native、NestJS 各自独立。只拉要改的子仓，Rsbuild 冷启动快 |
+| **运维你已经会** | **PostgreSQL + Docker**。单机可以拉起信令、数据库、录制和 AI |
+| **重计算不污染主业务** | OCR、视觉等重活在 `ai` 的 Python worker。主路径仍是 TypeScript |
+| **插件，而不是只能分叉全仓** | 行业规则、额外管理页、对接 IM，可以按插件清单扩展，不必把上游远控逻辑改散 |
 
-语言层面：**TypeScript 与 Python 语法简单、生态成熟**，小团队可在数周内完成企业定制（SSO、审批流、定制 Admin、行业 OCR 规则等）。
+语言本身简单、生态成熟。小团队可以在数周内做完企业常见定制，例如：
 
-## 推荐二开路径
+- 企业 **SSO / OIDC** 登录
+- 远程协助前的 **审批流**
+- 按行业改的 **管理台** 字段和报表
+- 内网 **OCR / 视觉** 规则（数据不出域）
+- 会话事件推到企业微信、钉钉或自有工单
+
+## 和闭源远控、老 C++ 项目比
+
+| | VistaRemote | 闭源商业远控 | 传统 C/C++ 开源远控 |
+| :--- | :--- | :--- | :--- |
+| 改界面和管理台 | 改 React 页面 | 通常不能改 | 往往要动原生 UI |
+| 改协议 | 改 `shared` 后各端一起编过 | 不能改 | 多语言绑定容易漂移 |
+| 招人 | 国内 TypeScript 人才多 | 只能等厂商排期 | C++ 桌面 + 自有协议，周期长 |
+| 数据位置 | 自建 PostgreSQL、MinIO、Ollama | 常在厂商云 | 看你怎么部署 |
+| AI | 独立服务，可完全内网 | 多绑定厂商模型 | 通常没有 |
+
+## 推荐改动顺序
 
 ```text
-1. 读 spec/product-positioning-spec.md + 相关模块 Spec
-2. 改 shared（若动协议）
-3. 改 server API / Admin
-4. 改 web client 或 desktop Agent
-5. 文档站 docs/ 同步用户可见说明
+1. 读产品定位和相关模块 Spec
+2. 若动协议，先改 shared
+3. 改 server API 或管理台
+4. 改 Web 主控或 Desktop Agent
+5. 用户能看见的行为，同步文档
 ```
 
-## 性能定制入口
+## 性能要从哪里改
 
 | 需求 | 文档 |
 | :--- | :--- |
-| Desktop 采集/编码/守护 | [Desktop 性能架构](/architecture/desktop-performance) |
-| Web 播放卡顿 | [WebRTC 开发调优](/architecture/webrtc-development) |
-| Mobile 触控延迟 | `spec/mobile-spec.md` FR-MOB-PERF |
+| 桌面采集、编码、守护进程 | [Desktop 性能架构](/architecture/desktop-performance) |
+| 浏览器播放卡顿 | [WebRTC 开发与调优](/architecture/webrtc-development) |
+| 手机触控延迟 | [架构总览](/architecture/overview) 与 mobile 模块 Spec |
 
-## 不适合的场景
+## 适合谁
 
-- 全球亿级观众同屏直播  
-- 必须用闭源黑盒且拒绝自建  
+适合：**企业内网、会话规模在万级以内、要掌握数据、要改代码** 的客户。
 
-适合：**企业内网、万级以下会话、要控数据与要改代码** 的客户。
+不适合：全球亿级观众同屏直播，或明确要求闭源黑盒、拒绝自建的采购。

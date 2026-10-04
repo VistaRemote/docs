@@ -1,68 +1,76 @@
 # 与 BilldDesk、MeshCentral 的对比
 
-| Metadata | Value |
-| :--- | :--- |
-| **文档** | 竞品能力对照（用户 / 客户口径） |
-| **版本** | 1.2.0 |
-| **更新** | 2026-09-20 |
-| **关联** | [产品定位](./positioning) · [设备舰队与企业能力](/user/fleet-and-enterprise) |
+VistaRemote 把 **低延迟 WebRTC 远控**、**设备舰队** 和 **可改的 TypeScript 全栈** 放在同一套可私有化产品里。下面对照 BilldDesk 与 MeshCentral，说明选型时 VistaRemote 强在哪里。
 
----
+相关：[产品定位](./positioning) · [设备舰队与企业能力](/user/fleet-and-enterprise) · [二开与定制](/guide/customization)
 
-## 1. 三句话定位
+## 为什么选 VistaRemote
 
-**VistaRemote** 是已登录桌面的 WebRTC 远程控制，并具备 **设备舰队** 能力（群控、批量命令、多屏监控墙、虚拟显示器等）。信令在 NestJS，媒体走 P2P / TURN / mediasoup，数据可留在自有 PostgreSQL。舰队相关能力属 **Enterprise** 产品范围，购买企业服务后开通。与 VistaCast「看业务视频 / 管 Edge 设备」可组合销售。
+| 你在意的事 | VistaRemote | 另外两家常见情况 |
+| :--- | :--- | :--- |
+| **看屏和操作要快** | 一对一 **P2P + TURN**；多人观摩自动 **SFU**，被控端只上行一路。键鼠走 DataChannel，和画面分开 | BilldDesk 也用 WebRTC，但开源能力停在基础远控。MeshCentral 远程桌面默认经 **服务器中继**，不是 WebRTC |
+| **管一批电脑** | **群控键鼠、批量命令、多屏监控墙、虚拟显示器** 都在产品里，购买 Enterprise 后开通 | BilldDesk 开源没有舰队能力。MeshCentral 是设备列表和批量命令，没有监控墙和虚拟显示器 |
+| **数据留在自己机房** | 信令、PostgreSQL、录制、TURN、SFU、AI 都可以自建。AI 可用内网 Ollama | 商业远控常把画面和账号放在厂商云。MeshCentral 能自托管，默认库是 NeDB，媒体路径仍偏服务器中继 |
+| **要改代码、要招人** | 全栈 **TypeScript**，契约在 `shared`，NestJS + React + Electron + React Native。国内团队能直接二开 SSO、管理台和行业规则 | BilldDesk Pro 源码不开放。MeshCentral 是另一套 Agent 与 Handlebars 管理端，二开面和国内 TS 人才储备不对齐 |
+| **临时协助和长期设备** | 临时 **配对码**，也有稳定设备码。会话、文件、终端、审计在同一产品 | MeshCentral 靠账号 ACL，没有临时配对码。BilldDesk 开源没有临时配对码 |
 
-**BilldDesk** 是 ToDesk 类远控。[开源仓](https://github.com/galaxy-s10/billd-desk) 作者声明尚未发布稳定版；Pro 源码不开放。下表「开源」列以克隆源码为准。
+和 **VistaCast** 可以一起卖：Cast 看业务视频，Remote 管边缘电脑和办公桌面。
 
-**MeshCentral** 是自托管整机管理：浏览器经服务器中继连到 MeshAgent，远程桌面默认不是 WebRTC；并覆盖终端、文件、设备组 ACL、审计与 Intel AMT 等。
+## 三家各是什么
 
-选型见 [产品定位](./positioning)；舰队能力见 [设备舰队与企业能力](/user/fleet-and-enterprise)。
+**VistaRemote** 控制的是已经登录的桌面。信令在 NestJS，媒体走 P2P / TURN / mediasoup，业务数据在 PostgreSQL。舰队能力（群控、监控墙、虚拟屏、带外）属于 **Enterprise**，购买企业服务后开通。
 
----
+**BilldDesk** 是 ToDesk 一类的远控。[开源仓库](https://github.com/galaxy-s10/billd-desk) 提供基础远控；Pro 能力以厂商宣传为准，源码不开放。
 
-## 2. 能力矩阵
+**MeshCentral** 是自托管的整机管理：浏览器经服务器连到 MeshAgent，覆盖终端、文件、设备组、审计和 Intel AMT。远程桌面默认不是 WebRTC。
+
+## 能力对照
 
 | 标记 | 含义 |
 | :--- | :--- |
-| **有** | 产品能力范围内 |
-| **Enterprise** | 须购买企业服务开通 |
-| **合同** | 按采购范围交付 / 加购验收 |
+| **有** | 产品具备 |
+| **Enterprise** | 购买企业服务后开通 |
+| **合同** | 按采购范围交付 |
 
 | 能力 | VistaRemote | BilldDesk 开源 | BilldDesk Pro（宣传） | MeshCentral |
 | :--- | :--- | :--- | :--- | :--- |
-| 一对一远程桌面 | 有（WebRTC） | 有 | 宣传有 | 有（默认服务器中继） |
-| 临时配对码 | 有 | 无 | 宣传有 | 无 |
+| 一对一远程桌面 | **有（WebRTC P2P / TURN）** | 有 | 宣传有 | 有（默认服务器中继） |
+| 临时配对码 | **有** | 无 | 宣传有 | 无 |
 | 稳定设备码 + 密码 | 有 | 有 | 宣传有 | 账号 ACL |
-| 键鼠 / 剪贴板 / 文件 / 终端 | 有 | 弱 | 宣传有 | 有 |
-| 多显示器 | 有 | 弱 | 宣传有 | 有 |
-| **多屏监控墙** | **有（Enterprise）**：缩略图观察 + 点选高质量控制；更大槽位可合同加购 | 无 | 宣传有 | 设备列表 |
+| 键鼠 / 剪贴板 / 文件 / 终端 | **有** | 弱 | 宣传有 | 有 |
+| 多显示器 | **有** | 弱 | 宣传有 | 有 |
+| **多屏监控墙** | **有（Enterprise）**：缩略图观察，点选后高质量控制 | 无 | 宣传有 | 设备列表 |
 | **群控键鼠 / 批量命令** | **有（Enterprise）** | 无 | 宣传有 | 可批量命令 |
 | **虚拟显示器** | **有（Enterprise）** | 无 | 宣传有 | 不做 |
 | 本机隐私屏 | 有（Windows） | 无 | 宣传有 | 同意条 |
-| 远程开机 WOL | 有（同网段） | 无 | 宣传有 | 有 |
-| 开机自启 / 结束锁屏 / Host 快捷操作 | 有 | 弱 | 宣传有 | 有 |
-| 我的设备 / 录制控制 | 有 | 弱 | 宣传有 | 有 |
-| **Intel AMT / 带外** | **有（Enterprise 私有化合同）** | 无 | 无 | 有 |
+| 远程开机（WOL） | 有（同网段） | 无 | 宣传有 | 有 |
+| 开机自启 / 结束锁屏 / 主机快捷操作 | 有 | 弱 | 宣传有 | 有 |
+| 我的设备 / 录制 | **有** | 弱 | 宣传有 | 有 |
+| **Intel AMT / 带外** | **有（Enterprise 私有化）** | 无 | 无 | 有 |
+| 可私有化 AI（摘要、洞察） | **有** | 无 | 无 | 无 |
+| 全栈 TypeScript、可二开 | **有** | 部分开源 | 源码不开放 | 另一套技术栈 |
 | 注册表 / 服务启停 / 登录窗注入 | 不做 | 无 | 部分宣传 | 部分有 |
-| 私有化部署 / 管理台审计 | 有 | 弱 | 宣传有 | 有 |
+| 私有化部署 / 管理台审计 | **有** | 弱 | 宣传有 | 有 |
 
----
+VistaRemote 不做注册表改写、服务启停和登录窗注入。这些属于整机 RMM 的另一类风险，不放进远程协助产品。
 
-## 3. 技术栈差异（给技术选型）
+## 技术栈
 
 | | VistaRemote | BilldDesk 开源 | MeshCentral |
 | :--- | :--- | :--- | :--- |
 | HTTP | NestJS + **Fastify** | Koa2 | Express |
 | 数据库 | **PostgreSQL** + TypeORM | MySQL | 默认 NeDB |
-| 媒体 | WebRTC（P2P / TURN / SFU） | WebRTC | 常为服务器中继 |
-| 桌面 | Electron | Electron + nut.js | MeshAgent |
-| 前端 | React + Rsbuild | Vue3 | Handlebars |
+| 媒体 | **WebRTC**（P2P / TURN / SFU） | WebRTC | 常为服务器中继 |
+| 桌面 | Electron，采集与编码用 Rust | Electron + nut.js | MeshAgent |
+| 前端 | React + Rsbuild | Vue 3 | Handlebars |
+| AI | 独立服务，可内网 Ollama | 无 | 无 |
 
-产品对齐能力，不照搬对方技术栈。
+## 怎么跟客户说
 
----
+需要低延迟远控、一批设备的群控和监控墙、数据留在自己的 PostgreSQL，并且团队要用 TypeScript 改管理台或对接 SSO：选 **VistaRemote**。
 
-## 4. 对企业客户怎么说
+只想要一个不能改源码的商业远控客户端：BilldDesk Pro 是另一类产品。
 
-群控、监控墙、虚拟屏、带外等：**产品具备，Enterprise 开通；合同可约定交付节奏与加购**。不在客户文档中写内部工程分期。详见 [设备舰队与企业能力](/user/fleet-and-enterprise)。
+已经标准化在 MeshAgent 上、并且主要要 Intel AMT 和传统 RMM：MeshCentral 覆盖面不同；VistaRemote 的带外能力在 Enterprise 私有化里提供，媒体路径仍然是 WebRTC。
+
+群控、监控墙、虚拟屏和带外购买 **Enterprise** 后开通，合同写明槽位和现场范围。详见 [设备舰队与企业能力](/user/fleet-and-enterprise)。

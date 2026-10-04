@@ -1,22 +1,24 @@
-# CI/CD and versioning
+# Releases
 
 VistaRemote uses **per-repository builds and releases**: each sub-repo has its own SemVer tags and GitHub Actions workflows. When `@vistaremote/shared` is published, downstream repos are notified to bump their dependency.
 
 > Full normative spec: Meta-Repo [spec/cicd-release-spec.md](https://github.com/VistaRemote/vista-remote/blob/main/spec/cicd-release-spec.md)
 
-## Version and tag conventions
+## Tag conventions
 
-| Repo | Tag format | Example | Artifact |
-| :--- | :--- | :--- | :--- |
-| **shared** | `vMAJOR.MINOR.PATCH` | `v0.2.0` | npm `@vistaremote/shared` (GitHub Packages) |
-| **server** | `server-v*` | `server-v0.2.0` | Docker `ghcr.io/vistaremote/server` |
-| **ai** | `ai-v*` | `ai-v0.2.0` | Docker `ghcr.io/vistaremote/ai` |
-| **web** | `web-v*` | `web-v0.2.0` | Static artifacts (client + admin) |
-| **desktop** | `desktop-v*` | `desktop-v0.2.0` | Build artifact (installers P1) |
-| **docs** | `docs-v*` | `docs-v0.2.0` | GitHub Pages |
-| **deploy** | `deploy-v*` | `deploy-v0.2.0` | Compose validation / release notes |
-| **mobile** | `mobile-v*` | `mobile-v0.2.0` | Build verification (stores P1) |
-| **downloads** (public) | `v*` | `v1.0.0` | Windows Agent + Android APK (anonymous download) |
+Each repository uses its own prefix plus a semantic version. The **tag** is the release. Keep `package.json` aligned with that tag.
+
+| Repo | Tag prefix | Artifact |
+| :--- | :--- | :--- |
+| **shared** | `v` | npm `@vistaremote/shared` (GitHub Packages) |
+| **server** | `server-v` | Docker `ghcr.io/vistaremote/server` |
+| **ai** | `ai-v` | Docker `ghcr.io/vistaremote/ai` |
+| **web** | `web-v` | Static artifacts (client + admin) |
+| **desktop** | `desktop-v` | Windows / macOS installers |
+| **docs** | `docs-v` | GitHub Pages |
+| **deploy** | `deploy-v` | Compose validation / release notes |
+| **mobile** | `mobile-v` | Android package |
+| **downloads** (public) | `v` | Windows Agent + Android APK (anonymous download) |
 
 **Tags are the source of truth** for releases; keep `package.json#version` aligned when possible.
 
@@ -36,43 +38,35 @@ Requires `gh auth login` and matching `desktop` / `mobile` package versions. Pre
 Website defaults:
 
 - `NEXT_PUBLIC_RELEASE_BASE=https://github.com/VistaRemote/downloads/releases/latest/download`
-- `NEXT_PUBLIC_RELEASE_VERSION=1.0.0` (must match asset filenames)
+- `NEXT_PUBLIC_RELEASE_VERSION` matches the release id in the asset filenames
 
 ## Recommended release order
 
-```text
-1. Merge shared to main
-2. Tag v0.2.0 → release.yml publishes npm package
-3. repository_dispatch → consumer sync-shared.yml opens PRs
-4. Merge bump PRs, tag server-v0.2.0 / web-v0.2.0 / …
-5. Update deploy compose image tags → deploy-v0.2.0
-```
+1. Merge `shared` to `main`.
+2. Tag `shared` with the `v` prefix and push it. `release.yml` publishes the npm package.
+3. `repository_dispatch` makes each consumer `sync-shared.yml` open a dependency PR.
+4. After those PRs merge, tag `server`, `web`, and the other repos with their own prefixes.
+5. Point Compose image tags at the new releases, then tag `deploy`.
 
 ### Publish shared
 
-```bash
-cd shared
-git tag v0.2.0
-git push origin v0.2.0
-```
+In the `shared` repo, align `package.json` with the tag you are about to push, then push that tag to `origin`.
 
-Workflow `shared/.github/workflows/release.yml`: lint → test → build → publish → notify consumers.
+Workflow `shared/.github/workflows/release.yml`: lint → test → build → publish → notify `server` / `web` / `ai` / `desktop` / `mobile`.
 
 ### Consumer auto-bump
 
 `sync-shared.yml` on each consumer:
 
-- Sets `@vistaremote/shared` to `^0.2.0`
-- Runs install, lint, test, build
-- Opens PR: `chore(deps): bump @vistaremote/shared to 0.2.0`
+- Moves `@vistaremote/shared` to the version just published
+- Runs install, lint, test, and build
+- Opens a dependency bump PR
 
-### Release services
+Review and merge it.
 
-```bash
-cd server
-git tag server-v0.2.0
-git push origin server-v0.2.0
-```
+### Release a service
+
+In that repo (for example `server`), push a tag that uses the repo prefix. Its `release.yml` publishes the image or static assets.
 
 ## Local vs CI vs production
 

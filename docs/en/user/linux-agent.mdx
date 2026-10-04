@@ -1,0 +1,27 @@
+# Linux hosts
+
+Windows and macOS controllers can operate Linux. A machine with a desktop installs the Desktop Agent. A server that does not install a graphical client runs the headless ops process. Files, chat, and the terminal use the same session channels as Windows and macOS.
+
+The AppImage and a live Ubuntu screen session are **not signed off on a real machine yet**. On pure Wayland, keyboard and mouse may still return `CONTROL_NEEDS_PORTAL`. That result is shown, not hidden.
+
+## Linux with a desktop
+
+1. Install `VistaRemote-Agent-*-linux.AppImage`. Packing that file on macOS needs Docker. Without Docker the pack command fails and does not leave an empty file.
+2. Open the Agent and note the pairing code.
+3. Connect from a Windows or macOS Viewer with that code.
+4. X11, or XWayland with `DISPLAY`, can show the screen and take keyboard and mouse. The host still has to allow control.
+5. Files, chat, and the terminal in the toolbar work the same way as on Windows and macOS. Files stay inside the host user's home directory.
+
+## A server without a desktop
+
+Do not install Electron. Run the headless process with Node.js 24 as a normal user, not as root.
+
+Consent is the environment variable `VR_HEADLESS_OPS=on`. Without it, the process can register and print a pairing code in the log, and it refuses files, chat, and the shell.
+
+The example unit is `desktop/headless/vistaremote-headless.service`. `User=` should be a normal account.
+
+After you connect, the controller does not sit on a black screen. The stage says this is a server. Files, chat, and the terminal open. Keyboard, mouse, and AI assist are not shown.
+
+## What stays the same
+
+Windows and macOS screen, keyboard, mouse, files, and chat are unchanged. AI assist stays off unless you turn it on.

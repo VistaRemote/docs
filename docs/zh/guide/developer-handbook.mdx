@@ -8,7 +8,7 @@
 | :--- | :--- |
 | 克隆与一键环境 | [快速开始](/guide/quick-start) |
 | Spec 索引 | Meta-Repo `spec/README.md` |
-| **能写什么** | [实现状态](/engineering/implementation-status) |
+| **平台组成** | [平台组成](/engineering/implementation-status) |
 | **怎么改需求** | [Spec 驱动开发](/guide/spec-driven-development) |
 
 根目录 [DEVELOPMENT.md](https://github.com/VistaRemote/vista-remote/blob/main/DEVELOPMENT.md) 为命令速查入口。
@@ -25,12 +25,12 @@
 ## 3. 新增功能（标准流程）
 
 ```text
-1. 查 implementation-status → 确认依赖已 Ready
+1. 读对应模块 Spec 与 [平台组成](/engineering/implementation-status)
 2. 在对应 spec/*.md 写 FR-xxx + 验收标准
 3. 改 shared（若跨端）
 4. 实现 server / 客户端
 5. 单测 + 手测
-6. 更新 implementation-status + 用户文档（若可见）
+6. 用户能看见的行为，更新文档
 ```
 
 分步说明：[功能开发指南](/guide/feature-development)。

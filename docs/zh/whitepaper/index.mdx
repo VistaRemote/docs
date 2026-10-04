@@ -4,9 +4,6 @@
 | :--- | :--- |
 | **项目名称** | VistaRemote |
 | **组织** | VibeCode |
-| **文档版本** | 0.3.0 |
-| **发布日期** | 2026-05-24 |
-| **状态** | 公开草案（Draft） |
 
 ---
 
@@ -48,11 +45,11 @@ WebRTC 已在浏览器与原生端成熟：标准 codecs、DTLS-SRTP、ICE/NAT �
 | 维度 | 定位 |
 | :--- | :--- |
 | **目标用户** | 开发者、中小企业 IT、技术支持团队、VibeCode 社区 |
-| **部署模式** | 私有化 / 自建为主，可选公有云托管（路线图） |
+| **部署模式** | 私有化 / 自建，也可托管部署 |
 | **差异化** | WebRTC 实时远程 + 可私有化 AI + 开源；TS 全栈降低二开与招聘成本；PostgreSQL（LuminaryWorks 生态） |
 | **非目标** | 替代重型 VDI、游戏级帧同步、无授权监控 |
 
-### 2.2 核心优势（对外口径）
+### 2.3 核心优势
 
 1. **WebRTC 架构**：相较传统基于专有协议或纯录屏的「监控」，提供低延迟 **实时远程控制** 与观摩（P2P / SFU）。  
 2. **AI 可自控**：独立 `ai` 服务；企业可自建 **Ollama**，录制与洞察数据不出域。  
@@ -61,11 +58,11 @@ WebRTC 已在浏览器与原生端成熟：标准 codecs、DTLS-SRTP、ICE/NAT �
 
 展开论述见 [产品定位](/architecture/positioning)。
 
-### 2.3 数据存储：PostgreSQL
+### 2.4 数据存储：PostgreSQL
 
 全项目采用 **PostgreSQL 16+** 作为唯一关系型 OLTP，通过 TypeORM + `pg` 访问。与 **LuminaryWorks** 生态（identity、auth-core）一致，便于跨项目联调与共享 DBA 规范。本地开发见 `deploy/compose/docker-compose.dev.yml`（宿主机 **:5436**）。
 
-### 2.4 Vibe Code 与 Spec-Driven
+### 2.5 Vibe Code 与 Spec-Driven
 
 **Vibe Code** 强调人类意图与 AI 协作者在同一套结构化上下文下工作。VistaRemote 将 **Spec 文档**（`spec/system-overview.md` 与各模块 Spec）作为：
 
@@ -205,23 +202,20 @@ Server **不转发媒体**，仅负责信令、鉴权、ICE 配置与 SFU 资源
 | Pro | ✓ | ✓ | 会话摘要 |
 | Enterprise | ✓ | ✓ + 策略触发 | 异常检测、效率周报、安全规则 |
 
-AI 推理集中在 **`ai` 子项目**（Node/TS），避免拖累信令；**默认私有化**：自托管 **Ollama/vLLM + Qdrant**，重 ML 由 **`python-worker`** 承担，**不默认** 使用 OpenAI 等公网 API。路径：**端侧监控 → 行为入库 → LLM/RAG 报告 → 流程优化与 AI 替代（路线图）**。详见 `spec/ai-platform-spec.md`。
+AI 推理集中在 **`ai` 子项目**（Node/TS），避免拖累信令；**默认私有化**：自托管 **Ollama/vLLM + Qdrant**，重 ML 由 **`python-worker`** 承担，**不默认** 使用 OpenAI 等公网 API。路径：**端侧监控 → 行为入库 → LLM/RAG 报告 → 流程优化与 AI 替代**。详见 [AI 平台](/architecture/ai-platform)。
 
 ---
 
-## 8. 路线图
+## 8. 产品能力
 
-| 阶段 | 时间（示意） | 交付 | 成功标准 |
-| :--- | :--- | :--- | :--- |
-| **M0 契约** | T0 | `shared` 类型与 Spec 基线 | 各端可引用 `@vistaremote/shared` |
-| **M1 最小闭环** | T0+8w | Agent + Web + Server P2P | 局域网 1:1 可控 |
-| **M2 穿透与移动** | T0+12w | TURN + RN 主控 | 跨 NAT、手机控桌面 |
-| **M3 观摩** | T0+16w | SFU 一对多 | 3+ 观众稳定观看 |
-| **M4 Pro** | T0+18w | 录制/回放 + AI 摘要 | Pro 套餐 |
-| **M5 Enterprise** | T0+22w | 策略录制、多屏、安全与效率报告 | Enterprise |
-| **M6 部署** | T0+24w | PostgreSQL + MinIO + ai + deploy | 私有化一键 |
-
-（具体排期由核心团队按资源调整。）
+| 能力 | 说明 |
+| :--- | :--- |
+| **一对一远控** | Agent + Web / 桌面 / 手机主控，P2P 低延迟 |
+| **跨网穿透** | STUN / TURN |
+| **多人观摩** | SFU，被控端单路上行 |
+| **Pro** | 录制回放与会话摘要 |
+| **Enterprise** | 策略录制、多屏监控墙、设备舰队、安全与效率报告 |
+| **私有化** | PostgreSQL、MinIO、AI 与 Docker 部署 |
 
 ---
 
@@ -232,7 +226,7 @@ VistaRemote 隶属 **VibeCode**，面向全球开发者：
 - **许可证**：根目录 **VistaRemote Open Source License** — **个人非盈利免费**；**任何商业使用须付费商业许可**。微调工具链 **闭源** 独立交付（`spec/ai-finetune-spec.md`）。
 - **试用**：默认 **7 天**（`standard_7d`）可体验 **SFU** 与 **AI 降云**；试用结束后须 **Pro / Enterprise**（见 `spec/commercial-tier-spec.md`）。
 - **贡献**：Meta-Repo `CONTRIBUTING.md` + `spec/git-collaboration-spec.md`。
-- **沟通**：GitHub Issues / Discussions（待建）。
+- **沟通**：GitHub Issues / Discussions。
 
 欢迎围绕 **WebRTC 最佳实践、Spec 完善、国际化文档** 提交 PR。
 
@@ -243,7 +237,7 @@ VistaRemote 隶属 **VibeCode**，面向全球开发者：
 | 风险 | 对策 |
 | :--- | :--- |
 | NAT 穿透失败 | 强制可配置 TURN；文档化防火墙端口 |
-| 弱网画质差 | Simulcast/SVC 与动态降分辨率（路线图） |
+| 弱网画质差 | Simulcast/SVC 与动态降分辨率 |
 | 多端类型不一致 | shared SSOT + 跨库提交顺序 |
 | Electron/RN 构建冲突 | Meta-Repo 隔离，禁止 Monorepo hoist |
 | 安全误用 | 授权 UI、审计日志、明确「禁止静默监控」政策 |
@@ -272,16 +266,6 @@ VistaRemote 隶属 **VibeCode**，面向全球开发者：
 - [WebRTC 拓扑](/architecture/webrtc-topology)
 - [快速开始](/guide/quick-start)
 - [Git 协作](/engineering/git-workflow)
-
----
-
-## 13. 文档修订记录
-
-| 版本 | 日期 | 说明 |
-| :--- | :--- | :--- |
-| 0.1.0 | 2026-05-24 | 首版白皮书草案 |
-| 0.2.0 | 2026-05-24 | 套餐、ai 仓库、企业安全与录制 |
-| 0.3.0 | 2026-06-28 | OLTP 改为 PostgreSQL（LuminaryWorks 生态对齐） |
 
 ---
 
