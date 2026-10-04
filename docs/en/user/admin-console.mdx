@@ -1,136 +1,85 @@
-# Admin Console (Users)
+# Admin console
 
-For **enterprise IT / administrators** managing users, devices, sessions, and compliance data.
-
-As of **1.11.0**, the modules below use live server data, not demo data. **1.13.0** adds **CSV export** on orders, organizations, and recordings (users, devices, security events, and jobs already had it); **online / offline** device filter; audit **result** filter (`ok` / `denied` / `error`); security-event **deviceId** filter; and dashboard **org count** plus **pending orders**. **1.14.0** adds sessions / permissions-matrix **CSV**; user **org ID** filter; efficiency-report **userId / sessionId** filters; jobs **id** filter; and audit **resource type** filter. **1.15.0** adds user / security **userId** filters; device **owner / org** filters with overview deep-link for online devices; order **provider** filter; org-detail **members CSV**; System **copy ICE probe result**; recording **recordingId / deviceId** filters. **1.18.0** routes devices / recordings / organizations / sessions / jobs / orders list filters through **server query params**; overview **failed recordings** deep-links; efficiency reports add **deviceId** filter. **1.19.0** seeds most lists from **URL query params** (including plan expiry, org seats, audit result, session mode); overview deep-links expired users / over-seat orgs / denied audits / SFU sessions; System can **copy TURN URL**; efficiency reports add **recordingId** filter. **1.20.0** completes URL seeds for recordings / orders / sessions / organizations / jobs / security / reports; adds permission-matrix search; overview adds offline devices / available seats / expired recordings / paid orders deep-links. **1.21.0** seeds audit **fromTs / toTs** from the URL; System can copy **ICE summary / pairing-policy JSON**; permission search accepts `q` / `perm` URL seeds; org members filter by role; overview links to **efficiency reports**. **1.25.0** (Scope C): Agent **MediaRecorder** upload playback; **Permissions** can assign platform-operator roles and orgs can change member `orgRole` (matrix stays read-only); orders distinguish local_billing / commerce; security events deep-link to session/device; sessions support **observe**; runtime has a **2×2 monitor-wall** shell (enterprise monitor wall available). **1.27.0**: org drawer manages **SupportGrant** (temporary IT-assist grants: create / list / revoke; permission matrix stays read-only); recording playback uses a **short-lived signed playback-url** (`expiresAt`, refresh on expiry; proxied via in-memory `/media`); Client **Membership** checkout picks WeChat / Alipay **catalog `providerHint`** (`wechat` / `alipay`, not Entitlement adapter ids). **1.28.0**: Enterprise device rows can toggle **allowOrgSupport** (POL-02 path A); Consumer devices show **—**; after Membership commerce **complete** / paid-status poll, local **User.plan** syncs so the Admin Users list shows Pro/Enterprise without waiting on a production PSP webhook. **1.29.0**: editable Security **alert rules lite** (FR-WAD-107): banner min severity + muted event types; not a full correlation engine; monitor-wall slot **in-wall observe** embeds single-stream observe (enterprise monitor wall available); lite Entitlement webhook `POST /api/v1/commerce/webhooks/entitlement` (`x-lw-signature: v1=<base64url>`; HMAC `timestamp.nonce.rawBody`) syncs **User.plan** (not production WeChat/Alipay PSP). **1.30.0**: read-only entitlement/payment flags on the System page (`entitlementMode`, `baseUrlConfigured`, `webhookSecretConfigured`; no secrets); org **SupportGrant** revoke confirmation can check **Revoke and disconnect related sessions** (`?kickSessions=true`, off by default); Agent recording coalesces non-final multipart PUTs to **≥5 MiB** for S3/MinIO (`memory://` still allows small parts). **1.31.0**: security-events list **applies saved mute rules by default** (`applyMute=true`); Switch **Apply mute rules** (`applyMute=false` shows all types); overview deep-links to **/security**, **/system** (entitlement flags), and **/monitor-wall**. **1.32.0**: security events **`applyMute` URL seed** (`?applyMute=true|false`, synced with the Switch); audit action presets add **observe / SupportGrant / operator and member roles**. **1.33.0**: org drawer **SupportGrant** **CSV export**; System **copy entitlement status JSON** (flags only: `entitlementMode`, `entitlementBaseUrlConfigured`, `webhookSecretConfigured`); Recordings show **EntityTooSmall / part-size** hints when `failed` (banner + tooltips; **≥5 MiB** coalesce — Agent since 1.30). **1.35.0**: monitor-wall **layout persistence** — URL `s0`–`s3` take priority; without seeds **GET** `/admin/monitor-wall/layout` restores bindings; **Save layout** **PUT** to the same path (requires **admin.write**); enterprise monitor wall — see Device Fleet guide. **1.36.0**: `POST /admin/rooms/:roomId/observe` returns shared **AdminObserveTicket** (`signalingTicket`, `role: observe`, …); SFU observe parameters are issued by the server; monitor-wall deep links from overview / sessions / security; audit **layout** preset. **1.37.0**: **Jobs** list filters (`id` / `name` / `state` / `failedReason`) **sync to the URL** (overview **failed jobs** → `/jobs?state=failed`); `recording.summarize` rows (`summarize-{recordingId}`) link **Recording** → `/recordings?recordingId=…`; **Efficiency reports** **Open recordings** carries active substring filters to `/recordings`; audit **`admin.monitor_wall.layout`** rows jump **Monitor wall** (`s0=roomId` when meta has one). **1.38.0**: user detail drawer **related links** (Sessions / Recordings / Orders / Devices / Audit with `userId` / `ownerId` / `actorId` filters); **Monitor wall** in Devices **Actions** when the device has an active session (`/monitor-wall?s0=<sessionId>` — slot seed only); Sessions list **`?userId=`** filter synced to the URL; layout-save audit meta includes **`roomIds`** (and first `roomId`) so audit layout rows can jump with **`?s0=`**. **1.39.0** — read-only **Pairings** list at **`/pairings`** (**FR-WAD-109**): **GET** `/api/v1/admin/pairings` (**admin.read**); filters **`deviceId` / `userId` / `numericCode`** sync to the URL; row **Device** / **User** deep-links to `/devices?deviceId=` and `/users?userId=` (device owner when known). **1.40.0** — on **System**, the pairing-policy section **Open pairings** → `/pairings`; Pairings row **Session** → `/sessions?sessionId=…` when **sessionId** is present. **1.41.0** — Pairings **consumed** filter (`?consumed=yes|no`, server + URL-synced); **Overview** **Pairings** NavCard → `/pairings`; **Devices** **Actions** **Pairings** → `/pairings?deviceId=`. **1.42.0** — user detail drawer **Open pairings** → `/pairings?userId=`; **Membership** page **Open orders** → `/orders?userId=` (URL `?userId=` or the current commerce order **userId**). **1.43.0** — **Orders** row **Membership** → `/membership?userId=…` (completes **Membership**↔**Orders**); audit action presets add **`pairing.create`** / **`pairing.join`** (server audit since 1.12.0). **1.44.0** — **Forbidden** (**403**) adds **Back to dashboard** (→ `/`); signed-in users get **Sign in with another account**; **Pairings** header **Create audit** / **Join audit** → `/audit?action=pairing.create|join`; monitor-wall tips cover layout save and enterprise multi-screen observe. Ops FAQ: [FAQ](/user/faq) (mute rules, SupportGrant, entitlement flags, recording parts, monitor wall, user drawer links, jobs/reports jumps, audit layout → monitor wall, pairings list, consumed filter, session deep-links, Users→Pairings, Membership↔Orders, pairing audit presets, Forbidden dashboard, Pairings→Audit header). Roles: [Authorization](/architecture/authorization).
-
-**1.52.0 current viewer Admin (routed modules only)**
-
-Current `apps/admin` routes: **Overview, Users, Devices, Orders, Sessions, Recordings, Permissions, Audit, System**. Modules that may exist in historical Admin / API but are **not mounted in the current viewer UI**: Membership, Pairings, Organizations, Jobs, efficiency reports, monitor wall, security events.
+For **enterprise IT and administrators**. Manage users, devices, sessions, recordings, orders, and compliance data in one console.
 
 ## Access
 
-- URL is typically `https://<your-domain>/admin` (provided by your operator)
-- Sign in with a **platform admin** or **org admin** account
+- The URL is provided by whoever deploys the product, usually `https://<your-domain>/admin`
+- Sign in as a **platform admin** or an **organization admin**
 
 ## Modules
 
-| Module | Purpose |
+| Module | What it does |
 | :--- | :--- |
-| **Overview** | Live count cards, including **org count** and **pending orders**, plus users, sessions, recordings, devices / online devices, and similar. **/system** is mounted (entitlement flags). Historical deep-links to **/security**, **/monitor-wall**, and **Pairings** NavCard → `/pairings` (**1.41.0**) may be unavailable in the current viewer build (see 1.52 note above) |
-| **Users** | View / filter (including **user ID** and **org ID**) / create / disable accounts; assign org and plan; detail drawer **related links** (Sessions / Recordings / Pairings / Orders / Devices / Audit, **1.38.0**; **1.42.0** adds **Pairings**); export **CSV** |
-| **Devices** | Agent **online** status (heartbeat within about 120 seconds), **online / offline**, **owner / org**, and **label** filters, label edit, revoke device; **Pairings** in **Actions** → `/pairings?deviceId=` (**1.41.0**); **Monitor wall** in **Actions** when the device has an active session (`s0` seed, **1.38.0**); export **CSV** (overview **Online devices** deep-links to the online filter) |
-| **Pairings** | Read-only recent pairing codes from PostgreSQL (**FR-WAD-109**, **1.39.0**); filter by **device ID**, **owner user ID**, **numeric code**, and **consumed** (`yes` = `consumedAt` set, `no` = unused — URL-synced, **1.41.0**); row **Device** / **User** / **Session** links to `/devices?deviceId=`, `/users?userId=`, `/sessions?sessionId=` (**1.40.0** session deep-link); page header **Create audit** / **Join audit** → `/audit?action=pairing.create|join` (**1.44.0**); pairing **policy** (length / TTL) on **System**, with **Open pairings** → `/pairings` in the policy section |
-| **Sessions** | Active remote rooms (p2p / SFU); admins can **force disconnect** / **observe** (single stream; **1.36.0** observe ticket = shared **AdminObserveTicket**); filter by **user ID** (**`?userId=`** URL-synced, **1.38.0**); export **CSV** |
-| **Recordings** | **Filter** by user, **recording ID**, **device ID**, status, session, and trigger; export **CSV**; **EntityTooSmall / part-size** hints on `failed` rows (banner + tooltips; **≥5 MiB** coalesce); built-in player fetches a **playback-url** short-lived signed stream (`expiresAt`, refresh on expiry; in-memory `/media`); **seek** and **playback speed** |
-| **Audit** | **Filter** by actor, action presets (including **observe / SupportGrant / operator and member roles**, **`pairing.create` / `pairing.join`** (**1.43.0**), and **monitor-wall layout**), time, resource / **resource type**, and **result** (`ok` / `denied` / `error`); **`admin.monitor_wall.layout`** rows link **Monitor wall** (meta **`roomIds`** / `roomId` → `?s0=`, slot seed only, **1.38.0**); export **CSV** |
-| **Security events** | Exfiltration risk, bulk delete, behavior inference, and similar; filter by type, **deviceId**, **userId**, and **orgId**; editable **alert rules lite** (banner min severity + muted types; not a correlation engine); list **applies saved mute rules by default** (Switch **Apply mute rules**; `applyMute=false` or URL `?applyMute=false` shows all types); high-severity banner; jump to a related recording timestamp / **session / device**; export **CSV** |
-| **Organizations** | Orgs, seats/members, and policy (keywords, domains, and similar); change member **orgRole**; drawer **SupportGrant** (IT-assist) create / list / revoke / **export CSV** (optional **Revoke and disconnect related sessions**, `?kickSessions=true`); list **CSV**; detail **members CSV** |
-| **Orders** | Filter plan orders by user, SKU, **provider**, **source**, and status. The list can show local billing and commerce mirror rows. **Simulate paid** appears only on `source=local_billing` pending rows and calls `POST /api/v1/admin/orders/:id/simulate-paid`. Commerce rows have no button; the API returns **400** `COMMERCE_SIMULATE_PAID_FORBIDDEN` (use Client Membership complete / webhook). Production without `BILLING_ALLOW_SIMULATE_PAID` returns **400** `SIMULATE_PAID_DISABLED`. Do **not** use an Admin JWT against `/billing/.../simulate-paid`. Page copy: WeChat / Alipay production notify is on Entitlement, not this page. Historical row **Membership** → `/membership?userId=…` has **no Admin Membership route** in the current viewer |
-| **Membership** | **Checkout is Web Client `/membership`** (current viewer Admin has **no such route**): trial countdown, legal, SKU, catalog `providerHint` (`wechat` / `alipay`), QR / `codeUrl` / redirect; after pay, **status polling** + **complete** refreshes entitlements. On-page sandbox copy is **not** production PSP. Historical Admin Membership (`?userId=`, Open orders) is unrouted |
-| **System** | **FR-WAD-52** entitlement/payment config flags (read-only): `entitlementMode`, `entitlementBaseUrlConfigured`, `webhookSecretConfigured`; **Copy entitlement status JSON**. Never exposes secrets or Base URL plaintext. Enforce readiness ≠ live WeChat/Alipay merchant |
-| **Jobs** | Background jobs (for example recording summaries): list; filter by **id / name / state / failedReason** (URL-synced; overview **failed jobs** → `?state=failed`); **`recording.summarize`** rows link to **Recordings**; retry failed jobs; export **CSV** |
-| **Efficiency reports** | Weekly / monthly recording-minute totals; filter by **userId / sessionId / deviceId / recordingId** before rollup (from recording metadata, not an LLM efficiency model); **Open recordings** deep-link with active filters; export **CSV** |
-| **Permissions** | Platform / org permission matrices are **read-only**; export reference **CSV**; assign **platform operator** roles (not checkbox Permission edits) |
-| **Monitor wall** | **Enterprise multi-screen wall**: thumbnail observe, click-up to HD control; layout can be saved. See [Device Fleet & Enterprise](/user/fleet-and-enterprise) and [Monitor wall layout](#monitor-wall-layout) |
+| **Overview** | Counts for organizations, users, online devices, sessions, unpaid orders, failed recordings, and failed jobs, with links into the matching lists |
+| **Users** | View, filter, create, and disable accounts; assign organization and plan; open that person’s sessions, recordings, pairings, orders, devices, and audit; export CSV |
+| **Devices** | Online / offline (a heartbeat within about 120 seconds counts as online), owner, organization, and label filters; edit labels and revoke devices; open the monitor wall when a session is active; export CSV |
+| **Pairings** | Recent pairing codes, filtered by device, user, code, and whether the code was used, with links to the device, user, or session |
+| **Sessions** | P2P / SFU rooms; force-disconnect or observe; filter by user; export CSV |
+| **Recordings** | Filter by user, device, status, session, and trigger; play back in the browser (seek and speed); export CSV |
+| **Audit** | Filter by actor, action, time, resource, and result (ok / denied / error); monitor-wall layout changes link back to the wall; export CSV |
+| **Security events** | Exfiltration, bulk delete, and similar risks; filter by type, device, user, and organization; mute event types; jump to the related session, device, or recording |
+| **Organizations** | Organizations, seats, and member roles; temporary IT assist grants (create, list, revoke, and optionally disconnect related sessions); export members and grants as CSV |
+| **Orders** | Plan orders by user, SKU, payment provider, and status, with a link to that user’s membership |
+| **Membership** | People pay with WeChat, Alipay, or another enabled provider on the Web client; the plan is written onto the user and shows up in the admin user list |
+| **System** | See whether entitlements and payments are configured (no secrets), copy ICE / TURN and pairing policy, and open the pairings list |
+| **Jobs** | Background work such as recording summaries; filter by status and retry failures; a summary job links to its recording |
+| **Efficiency reports** | Recording minutes by week or month, with filters that open the recordings list |
+| **Permissions** | Read the platform and organization permission matrix; assign platform operators and organization member roles; export CSV |
+| **Monitor wall** | Thumbnail observation across many screens, then click through to high-quality control; layouts can be saved. Enterprise — see [Device fleet and enterprise](/user/fleet-and-enterprise) |
+
+List filters are stored in the URL, so overview cards and shared links open the same view.
 
 ## Common tasks
 
-### Grant Pro to a user
+### Give someone a plan
 
-1. Closed trial preferred: Admin **Users** → change plan (writes local `User.plan` immediately).
-2. Sandbox checkout: the user opens Web **Client** `/membership`, picks `providerHint` (WeChat / Alipay), then waits for polling or clicks **Complete payment**. That is not live merchant notify.
-3. Local pending orders only: Admin **Orders** **Simulate paid** (`POST /api/v1/admin/orders/:id/simulate-paid`). The order owner may also call `/api/v1/billing/orders/:id/simulate-paid` with a Controller JWT. Commerce orders return `COMMERCE_SIMULATE_PAID_FORBIDDEN`.
-4. Entitlements apply after the user refreshes the client or signs in again.
+1. Change the plan on **Users**.
+2. Or have the person open membership on the Web client and pay with WeChat or Alipay. After payment, the user list shows the new plan.
+3. After a refresh or a new sign-in, remote control, recording, and AI entitlements apply.
 
 ### Disable a user
 
-1. Users → select user → disable.
-2. The user cannot start new sessions. For an active session, open **Sessions** and **force disconnect**.
+1. Disable the account in the user list.
+2. That person cannot start a new remote session. Disconnect any session already in progress from **Sessions**.
 
-### Monitor wall layout
+### Monitor wall
 
-**Product capability (Enterprise):** multi-device thumbnail observe; click into high-quality remote control when needed. Larger slot counts can be purchased and accepted under enterprise contracts. See [Device Fleet & Enterprise](/user/fleet-and-enterprise).
+1. Open the monitor wall and place active sessions in slots.
+2. **Save layout** (write permission required). The next visit restores it. The URL can also pre-fill slots.
+3. Thumbnails are for watching the floor. Click a tile to enter the control session.
 
-**Ops quick steps:**
+Larger walls are enabled under the enterprise contract. See [Device fleet and enterprise](/user/fleet-and-enterprise).
 
-1. Open **/monitor-wall** and bind active sessions to slots.  
-2. **Save layout** (requires **admin.write**) to persist bindings.  
-3. URL seeds such as `s0`–`s3` can prefill slots.  
-4. Click a live slot to open a control session (enterprise wall / remote entitlements required).  
+### Look up a pairing code
 
-(Version history and API notes below remain for implementers.)
+Open **Pairings** and filter by device, user, or code. Code length and lifetime are set under pairing policy on **System**. The Agent on the host still creates the code.
 
-**Layout persistence (1.35.0)** — persists slot-to-session bindings.
+### Follow one person across records
 
-1. Open **/monitor-wall**. URL query **`s0`–`s3`** (aliases `slot0`–`slot3` accepted) with session IDs **take priority** and are **not** overwritten by a saved layout.
-2. With **no** URL seeds, the page **GET**s `/admin/monitor-wall/layout` to restore the last saved slot bindings.
-3. After changing slots, click **Save layout** to **PUT** the same path (requires **admin.write**; read-only admins see the button disabled). Saving the layout **does not** auto-start in-wall observe or SFU connections.
-4. Per-slot **in-wall observe** provides thumbnail observe; click a live slot for high-quality control when needed. Enterprise multi-screen wall scale: [Device Fleet & Enterprise](/user/fleet-and-enterprise).
-5. **1.36.0** — `POST /admin/rooms/:roomId/observe` returns shared **AdminObserveTicket** (`signalingTicket`, `role: observe`, `expiresAt`, …). SFU observe parameters are issued by the server.
-6. **1.37.0** / **1.38.0** — Filter audit by action preset **monitor-wall layout** (`admin.monitor_wall.layout`). **1.38.0** — **Save layout** writes audit meta with **`roomIds`** (bound session ids) and the first **`roomId`**. Matching rows show **Monitor wall** in **Related** → `/monitor-wall`, or `/monitor-wall?s0=<roomId>` from meta / resource / target `roomId` / `room_id`. Slot 0 seed only; start observe from the wall when needed.
-7. **1.44.0** — Page tips cover layout save and in-wall / enterprise multi-screen observe.
+Open a user and jump to their sessions, recordings, pairings, orders, devices, and audit. If a device has a live session, open it on the monitor wall.
 
-### Jobs, reports, and recordings (1.37.0)
+## Enterprise scope
 
-1. **Jobs** — List filters (`id`, `name`, `state`, `failedReason`) **sync to the URL** when you search (shareable links; overview **failed jobs** opens `/jobs?state=failed`).
-2. **Recording summarize jobs** — Rows with type `recording.summarize` and id `summarize-{recordingId}` show **Recording** in **Actions**, linking to `/recordings?recordingId=…` (other job types have no recording jump).
-3. **Efficiency reports** — **Open recordings** opens `/recordings` with the same active substring filters (`userId`, `sessionId`, `deviceId`, `recordingId`); empty filters open the full list.
-
-### Pairings list (1.39.0 / 1.40.0 / 1.41.0)
-
-**FR-WAD-109** — read-only ops view of recent pairing codes; **not** a code generator or SFU / monitor-wall feature.
-
-1. Open **/pairings** under **Operations** (nav between **Devices** and **Orders**), from **Overview** → **Pairings** NavCard (**1.41.0**), from **Devices** → **Actions** → **Pairings** (`?deviceId=` pre-filled, **1.41.0**), or from **System** → pairing-policy section **Open pairings** (**1.40.0**).
-2. The page calls **GET** `/api/v1/admin/pairings` (requires **admin.read**). Default returns up to **100** recent rows; optional query **`limit`** is clamped **1–500**.
-3. Server filters: **`deviceId`** and **`numericCode`** (substring, case-insensitive); **`userId`** filters by the device **owner** resolved from the devices table; **`consumed`** (**1.41.0**) — **`yes`** = `consumedAt` set (code already used), **`no`** = `consumedAt` null (unused); unknown values are ignored.
-4. Search fields sync to **`?deviceId=`**, **`?userId=`**, **`?numericCode=`**, and **`?consumed=yes|no`** in the URL (shareable links). The **Consumed** select offers **Consumed** / **Unused** / **All**.
-5. Columns include numeric code, **deviceId**, **userId** (owner), **sessionId**, **expiresAt**, **consumedAt**. In **Actions**, **Device** → `/devices?deviceId=…`; **User** → `/users?userId=…` when an owner is known; **Session** → `/sessions?sessionId=…` (**1.40.0**, when the row has **sessionId**; Sessions filter syncs to **`?sessionId=`** in the URL).
-6. To change code length or TTL, use **System** pairing policy; hosts still generate codes on the Agent.
-7. **1.44.0** — Page header **Create audit** / **Join audit** open `/audit?action=pairing.create` or `pairing.join` (same presets as the Audit action filter since **1.43.0**).
-
-### User drawer and cross-module links (1.38.0 / 1.42.0)
-
-1. **Users** — In the detail drawer, **View sessions / recordings / pairings / orders / devices / audit** deep-link to `/sessions?userId=…`, `/recordings?userId=…`, `/pairings?userId=…` (**1.42.0**; Pairings list filters by device **owner** substring), `/orders?userId=…`, `/devices?ownerId=…`, and `/audit?actorId=…` (devices list filters by `ownerId`; the drawer device tab still uses owner / org logic).
-2. **Devices** — When a row has an **active session** (correlated with in-memory rooms), **Actions** shows **Monitor wall** → `/monitor-wall?s0=<sessionId>` (slot 0 seed; **not** SFU multi-stream shipped).
-3. **Sessions** — Filter by **user ID**; filters sync to **`?userId=`** in the URL (the user drawer **View sessions** button seeds this param). Client-side filter matches row `userId` (rows without `userId` do not match).
-
-### Membership and orders (1.42.0 / 1.43.0 / 1.52.0)
-
-1. **Checkout** — Web **Client** `/membership` (current viewer Admin has **no Membership route**): `providerHint`, QR/redirect, status polling after pay, and **Complete payment** (`complete`). Sandbox copy is not production PSP.
-2. **Orders** — Admin **Orders** lists local rows; **Simulate paid** is `local_billing` pending only. Read commerce together with Client Membership. Historical Admin Membership↔Orders deep-links are **unrouted** in the current viewer.
-3. **Grant** — If a trial user is stuck on Free, prefer **Users** → change plan; do not simulate-pay commerce orders.
-
-## Enterprise enablement & contract scope
-
-These capabilities are under Enterprise Fleet / contract scope (see [Device Fleet & Enterprise](/user/fleet-and-enterprise)) and are delivered per enablement and contract:
-
-- An **editable permission matrix** (the Permissions page is a read-only reference; role enablement is configured during rollout)
-- Larger-slot / multi-screen **monitor wall** scale (default in-wall observe; add-ons in the Fleet guide)
-- A **correlation engine** or alert **DSL** (alert rules lite is banner threshold + mute types)
-- Production **WeChat Pay / Alipay** secrets (never commit them; configure via Entitlement / environment)
-
-Engineering readiness: [Implementation status](/engineering/implementation-status).
+Group control, larger monitor walls, configurable alert policy, and production WeChat / Alipay merchants are enabled with Enterprise and the contract. See [Device fleet and enterprise](/user/fleet-and-enterprise).
 
 ## Security
 
-- Prefer VPN or a private network for the admin URL; MFA is planned (P1).
-- Audit sensitive actions (disable user, plan changes, force disconnect, device revoke); filter and export CSV as needed.
+The admin console runs on your server and signs in with the shared account. It does not have to sit on a private network.
 
-## Ops FAQ
+- **Registration**: the first sign-up verifies the email address. Later sign-ins use email and password, without a code every time.
+- **Optional one-time codes**: a person can bind an authenticator on the account. Microsoft Authenticator works. It reads a standard one-time code, and the app is free — no paid Microsoft plan is required. Other authenticator apps work too. Sign-in still works if they skip this.
+- **When an organization requires it**: that organization can require members to complete the step.
+- Review disable-user, plan changes, force-disconnect, and device revoke in **Audit**, and export when you need a copy.
 
-Mute rules, SupportGrant, entitlement flags, recording EntityTooSmall, monitor wall, user drawer links, jobs/reports recording jumps, audit layout → monitor wall, pairings list, consumed filter, Overview/Devices entry points, session deep-links, Users→Pairings, Membership↔Orders, pairing audit presets, Forbidden dashboard, and Pairings→Audit header: [FAQ](/user/faq) § Admin & remote ops.
+Roles: [Authorization](/architecture/authorization). Operations Q&A: [FAQ](/user/faq). Developers: [Admin getting started](/guide/admin-getting-started).
 
-Developers: [Admin getting started](/guide/admin-getting-started).
+## Payments
 
-## Payments and Entitlement (mock → sandbox)
-
-| Mode | Behavior |
+| Path | What happens |
 | :--- | :--- |
-| `ENTITLEMENT_MODE=off` (default) | Local plan/orders; no central Entitlement |
-| `ENTITLEMENT_MODE=enforce` | Entitlement is authoritative for commercial checkout |
-| Mock / dev | Owner `POST /api/v1/billing/orders/:id/simulate-paid`; Admin `POST /api/v1/admin/orders/:id/simulate-paid` (`local_billing` only) |
-| Sandbox WeChat / Alipay | Client `/membership`: `providerHint` `wechat`→`wechat_pay_v3`, `alipay`→`alipay_f2f`; poll status + `complete`; secrets only in Entitlement |
-| Lite Entitlement webhook | `POST /api/v1/commerce/webhooks/entitlement`; `x-lw-timestamp` / `x-lw-nonce` / `x-lw-signature: v1=<base64url>` / `x-lw-event-id`; HMAC `timestamp.nonce.rawBody`; syncs **User.plan** (not production WeChat/Alipay PSP) |
+| Admin changes the plan | Set the plan on **Users** |
+| The person pays | Membership on the Web client (WeChat, Alipay, or another enabled provider) writes the plan after payment |
+| Entitlement status | **System** shows whether the entitlement service is connected, without revealing secrets |
 
-Production checklist (entitlement **API** flags, bad-signature 401, commerce simulate-paid forbidden, env **names**): [Production payment readiness](/user/payment-production). Real merchant onboarding is configured in your environment / Entitlement.
+Production checks: [Production payment readiness](/user/payment-production).

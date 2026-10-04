@@ -1,0 +1,27 @@
+# Linux 被控
+
+Windows 和 macOS 主控可以操作 Linux。有桌面时装 Desktop Agent；服务器通常不装图形客户端，改用无界面运维进程。文件、聊天和终端与 Windows / macOS 是同一套会话通道。
+
+本页描述的安装包和真机看屏 **还没有在 Ubuntu 上签收**。纯 Wayland 的键鼠仍可能是 `CONTROL_NEEDS_PORTAL`，这不是失败被藏起来。
+
+## 有桌面的 Linux
+
+1. 在 Linux 上安装 `VistaRemote-Agent-*-linux.AppImage`。在 macOS 上打包需要 Docker；没有 Docker 时打包会失败，不会留下空包。
+2. 打开 Agent，记下配对码。
+3. 在 Windows 或 macOS 的 Viewer 里用这个码连接。
+4. X11 或带 `DISPLAY` 的 XWayland 可以看屏和键鼠。对方仍要点「允许」。
+5. 工具栏里的文件、聊天、终端与 Windows / macOS 相同。文件留在被控用户的主目录里。
+
+## 没有桌面的服务器
+
+不要安装 Electron。在服务器上用 Node.js 24 运行无界面进程，并以普通用户启动，不要用 root。
+
+同意写在环境里：`VR_HEADLESS_OPS=on`。没有这一项时，进程可以注册并在日志里打印配对码，但不接受文件、聊天或终端。
+
+systemd 示例在仓库 `desktop/headless/vistaremote-headless.service`。`User=` 应是普通用户。
+
+连上之后，主控不会出现黑屏等待。画面区域说明这是服务器。文件、聊天和终端可以打开。键鼠和 AI 协助入口不会出现。
+
+## 和现有远控的关系
+
+Windows / macOS 的看屏、键鼠、文件和聊天不因这项能力改变。AI 协助仍默认关闭。

@@ -4,8 +4,8 @@
 
 ## Step 0 — 门禁
 
-1. 打开 `spec/implementation-status.md`，确认 WebRTC / client 为 🟡 或 ✅。
-2. 阅读 `spec/webrtc-architecture-spec.md` 与 `spec/web-client-spec.md`。
+1. 阅读 `spec/webrtc-architecture-spec.md` 与 `spec/web-client-spec.md`。
+2. 对照 [平台组成](/engineering/implementation-status)，确认改动落在 Web 主控与信令。
 
 ## Step 1 — 更新 Spec
 
@@ -40,9 +40,8 @@ pnpm build && pnpm test
 
 ## Step 6 — 收尾
 
-1. `implementation-status.md` 更新该行
-2. 若用户可见：补充 [远程控制（用户）](/user/remote-control) 相关段落
-3. PR 使用模板，列出 FR 与 touched repos
+1. 若用户可见：补充 [远程控制（用户）](/user/remote-control) 相关段落
+2. PR 使用模板，列出 FR 与 touched repos
 
 ## 反模式
 

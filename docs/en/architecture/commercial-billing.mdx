@@ -22,9 +22,9 @@ Same as [Trial and paid features](./commercial-trial): **SFU** and **cloud AI** 
 
 ## Payment providers
 
-Central Entitlement ships WeChat / Alipay / PayPal / Stripe / etc. **adapters** (sandbox-tested); **live merchant enablement** (credentials, notify DNS, `enabled=true`) is owner-ops — not shipped with VistaRemote. Bank cards later.
+WeChat, Alipay, PayPal, Stripe, and bank card are supported. After the person pays on the Web membership page, the plan is written onto the user and shows up in the admin user list. Merchant secrets stay in Entitlement, not in the client. The UI shows channel names such as WeChat and Alipay.
 
-Dev: owner `POST /api/v1/billing/orders/:id/simulate-paid`. With `ENTITLEMENT_MODE=enforce`, WeChat/Alipay go through Entitlement sandbox (`wechat`→`wechat_pay_v3`, `alipay`→`alipay_f2f`); no production secrets in git. Admin orders are `local_billing` only. **1.27.0**: Client Membership checkout uses catalog **`providerHint`** (`wechat` / `alipay`); the BFF maps to Entitlement adapters — do not surface adapter ids in the UI. **1.28.0**: after commerce payment, the client polls **complete** and syncs local **User.plan** so the Admin Users list reflects the tier immediately without production webhook delay. **1.29.0**: lite `POST /api/v1/commerce/webhooks/entitlement` (`x-lw-signature: v1=<base64url>`; HMAC `timestamp.nonce.rawBody`; legacy `X-Entitlement-Signature` hard-cut 401) also syncs **User.plan**; not production WeChat/Alipay PSP. **1.30.0**: `GET /api/v1/admin/system/entitlement` returns read-only `entitlementMode` / `baseUrlConfigured` / `webhookSecretConfigured` (no secret values). **Current viewer Admin System UI is pending** (API ready). **1.52.0**: Client `/membership` restores poll / QR / `providerHint`; Admin Orders simulate-paid is `local_billing` only. Production checklist: [Production payment readiness](/user/payment-production). WeChat/Alipay merchant onboarding is owner-ops, not shipped.
+**System** in the admin console shows whether the entitlement service is connected, without revealing secrets. Production checks: [Production payment readiness](/user/payment-production).
 
 ## Admin modules
 

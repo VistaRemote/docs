@@ -1,39 +1,57 @@
-# Customization & Secondary Development
+# Customization: why VistaRemote
 
-VistaRemote targets **self-hosted, fork-friendly, low-cost iteration** — not billion-viewer live streaming.
+Teams pick VistaRemote for secondary development because **they can change it, they can hire for it, and the data stays on their network**. It is built for private deployments and industry-specific work, not for million-viewer live streams.
 
-## Why it's easy and fast
+## Why customize this product
 
-| Factor | Notes |
+| Reason | What it means for your team |
 | :--- | :--- |
-| **TypeScript everywhere** | `shared` contracts across server / web / desktop / mobile / ai |
-| **Python for heavy ML only** | `ai/python-worker`; core product stays TS |
-| **Spec-driven** | Change Spec + FR first, then code |
-| **Meta-Repo** | Clone only what you need; no monorepo build black hole; fast Rsbuild |
-| **PostgreSQL + Docker** | Familiar ops, single-machine full stack |
+| **One main language** | Signaling, the Web controller, admin, the Electron Agent, the phone app, and AI jobs are **TypeScript**. Hire Node and React engineers instead of a separate C++ remote-desktop team |
+| **One contract** | Cross-platform types live in `shared`. Change the protocol there first so Web, desktop, and mobile do not invent their own fields |
+| **Spec-driven** | Behavior is written in a Spec before code. People and AI collaborators change the same description, and review can check it |
+| **Repos stay separate** | Electron, React Native, and NestJS do not share one install. Clone the repo you are changing. Rsbuild starts quickly |
+| **Ops you already know** | **PostgreSQL + Docker**. One machine can run signaling, the database, recordings, and AI |
+| **Heavy compute stays aside** | OCR and vision run in the Python worker under `ai`. The main path stays TypeScript |
+| **Plugins, not only a full fork** | Industry rules, extra admin pages, and chat notifications can extend the product from a plugin manifest |
 
-**TypeScript and Python are approachable languages** — small teams can ship enterprise customizations (SSO, workflows, Admin, OCR rules) in weeks.
+The languages are ordinary and the ecosystems are large. A small team can ship common enterprise changes in weeks:
 
-## Suggested workflow
+- Corporate **SSO / OIDC**
+- An **approval** step before a remote session
+- Industry-specific **admin** fields and reports
+- On-prem **OCR / vision** rules (data stays inside)
+- Session events into WeCom, DingTalk, or your own tickets
+
+## Compared with a closed client or a legacy C++ project
+
+| | VistaRemote | Closed commercial remote desktop | Legacy C/C++ open source |
+| :--- | :--- | :--- | :--- |
+| Change the UI and admin | Edit React pages | Usually not possible | Often a native UI |
+| Change the protocol | Edit `shared`, then build every client | Not possible | Bindings drift across languages |
+| Hiring | Large TypeScript talent pool | Wait on the vendor | C++ desktop plus a private protocol |
+| Where data lives | Your PostgreSQL, MinIO, and Ollama | Often the vendor cloud | However you deploy it |
+| AI | A separate service, fully on your network | Often the vendor’s model | Usually none |
+
+## Suggested order
 
 ```text
-1. Read spec/product-positioning-spec.md
-2. Update shared if protocols change
-3. server / web / desktop
-4. Sync docs for user-visible changes
+1. Read positioning and the module Spec you are changing
+2. If the protocol changes, edit shared first
+3. Change the server API or admin
+4. Change the Web controller or Desktop Agent
+5. Update docs for anything a user can see
 ```
 
-## Performance customization
+## Where to tune performance
 
-| Topic | Doc |
+| Need | Doc |
 | :--- | :--- |
-| Desktop capture/encode/guard | [Desktop performance](/architecture/desktop-performance) |
-| Web playback | [WebRTC development](/architecture/webrtc-development) |
-| Mobile touch | `spec/mobile-spec.md` FR-MOB-PERF |
+| Desktop capture, encode, and the guard process | [Desktop performance](/architecture/desktop-performance) |
+| Choppy browser playback | [WebRTC development](/architecture/webrtc-development) |
+| Touch latency on mobile | [Architecture overview](/architecture/overview) and the mobile Spec |
 
-## Not a fit for
+## Who it fits
 
-- Billion-scale live CDN audiences  
-- Closed-box-only vendors with no self-hosting  
+It fits **private networks, up to tens of thousands of sessions, teams who must own the data, and teams who will change the code**.
 
-**Best for**: intranet assist, sub-10k sessions, data sovereignty, code-level control.
+It does not fit a global live-streaming audience, or a purchase that requires a closed box and refuses self-hosting.

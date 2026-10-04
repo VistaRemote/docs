@@ -1,6 +1,6 @@
 # Production payment readiness (ops)
 
-Use this page to walk **mock → sandbox → production**. LuminaryWorks Entitlement already ships payment **adapters**; that is not live merchant enablement. Lite checkout (commerce **complete** / **status**, plus the Entitlement ingress webhook) can cache local `User.plan`. **WeChat Pay / Alipay merchant onboarding, notify DNS, and production PSP secrets are owner-ops — configured in your environment / Entitlement.** Product outbox delivery may still be in progress. Never commit merchant secrets.
+For operators walking **local simulation → sandbox → production**. Payment channels connect through LuminaryWorks Entitlement. WeChat Pay and Alipay merchant ids, callback DNS, and production secrets are configured by the operator. Do not commit them. After checkout, the plan is written onto the user.
 
 Architecture: [Commercial billing](/architecture/commercial-billing). Admin modules: [Admin console](/user/admin-console). Spec: `spec/billing-commerce-spec.md`.
 
@@ -81,9 +81,9 @@ This repo has **no** `COMMERCE_*` environment variables. The commerce BFF forwar
 
 WeChat / Alipay **merchant ids, APIv3 keys, certificates, and Alipay app secrets** belong on Entitlement / the PSP — **not** VistaRemote server env vars. `ENTITLEMENT_TRIAL_PURGE_*` is trial recording purge, not a payment callback.
 
-## Client Membership (sandbox, not PSP live)
+## Client membership
 
-Web **Client** `/membership` (the current viewer Admin has **no** `/membership` route):
+Web **Client** `/membership`:
 
 1. Accept policies → pick a Pro/Ultra SKU → choose **WeChat Pay** or **Alipay** (catalog `providerHint`, not Entitlement adapter ids).
 2. **Checkout** → `POST /api/v1/commerce/orders` then `.../pay`. A QR, payment link, or redirect may appear.

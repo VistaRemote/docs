@@ -6,10 +6,10 @@ Normative：`spec/desktop-performance-spec.md` · 仓库内 `desktop/ARCHITECTUR
 
 1. **视频帧不走 IPC** — `MediaStream` 直进 WebRTC。  
 2. **GPU 优先** — 构建启用 NVENC、Intel QSV。  
-3. **Electron 只做控制台** — 采集/编码/录制逐步下沉 **本地 Agent 服务**。  
-4. **先交付再深化** — 优先可商用能力；深度性能路线在 Meta-Repo `spec/` 维护，**本文不写未发布排期**。
+3. **Electron 做控制台** — 采集、编码、录制在 **本地 Agent 服务**。  
+4. **性能在原生层** — 截屏、编码与录制放在本地 Agent 服务，深度说明见 `spec/desktop-performance-spec.md`。
 
-## 当前工程方向（可对外表述）
+## 做法
 
 | 方向 | 说明 |
 | :--- | :--- |

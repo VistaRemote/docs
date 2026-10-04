@@ -45,7 +45,7 @@ IT support uses the **client** app with `orgRole=it_support`. Platform operators
 | SSE `/api/v1/events/stream` | Controller or Admin JWT; `userId` must match `sub` |
 | Agent | Device token (not for controller signaling) |
 
-Policy helpers live in `shared/src/auth/`; WSS/SSE handshake enforcement is **P3** (FR-MSG-10/11).
+Policy helpers live in `shared/src/auth/`. WSS / SSE handshakes use the credentials in the table above.
 
 ## Code layout
 

@@ -1,42 +1,31 @@
-# 实现状态（开发向）
+# 平台组成
 
-与 Meta-Repo `spec/implementation-status.md` 同步摘要。**合并改变就绪度的 PR 时请更新源文件。**
+VistaRemote 由一组职责清晰的组件组成。信令与业务在服务端，画面与键鼠走 WebRTC，类型契约统一在 `shared`，AI 推理独立部署。
 
-## 总结
+## 组件
 
-| 维度 | 状态 |
+| 组件 | 职责 |
 | :--- | :--- |
-| Spec + SDD 流程 | ✅ 可规范开发 |
-| shared 契约 | ✅ |
-| 本地 dev-up / 多环境 | ✅ |
-| Server 持久化 / 真实支付 | 🟡 P1 |
-| 端到端配对 + JWT | 🟡 MVP-A/B |
+| `shared` | 信令、认证、计费、遥测与 AI 任务的类型契约 |
+| `server` | NestJS 信令、会话、权益与管理 API |
+| Web 主控 | 浏览器远控、播放与套餐能力 |
+| 管理台 | 用户、设备、订单、会话、录制与审计 |
+| `desktop` | Windows / macOS Agent 与桌面主控 |
+| `mobile` | 手机主控 |
+| `ai` | 会话摘要、行为洞察与私有化模型 |
+| `deploy` | Docker Compose 与 mediasoup |
+| 文档 | 中英产品与开发文档 |
 
-**结论**：可在既有模块边界内并行开发；全量生产闭环见下方 MVP 阶段。
+## 数据与实时
 
-## 仓库
+- **PostgreSQL** 保存用户、设备、会话、订单与审计。
+- **WebSocket** 交换 SDP / ICE；**SSE** 推送业务通知。
+- **一对一** 走 P2P；**一对多观摩** 走 SFU，被控端只上行一路。
+- 录制对象放在 **MinIO / S3**。
 
-| 仓库 | 状态 | 说明 |
-| :--- | :--- | :--- |
-| shared | ✅ | 信令、auth、billing、telemetry、ai jobs |
-| server | 🟡 | WSS/SSE、SFU 调度、权益；内存 store |
-| web/client | 🟡 | 信令客户端、播放、FeatureGate |
-| web/admin | 🟡 | 用户/订单/权限骨架 |
-| desktop | 🟡 | Electron、edge-ai、env |
-| mobile | 🟡 | RN 骨架、peer-session |
-| ai | 🟡 | Worker、LLM stub、python-worker |
-| deploy | ✅ | compose、mediasoup profile |
-| docs | ✅ | 中英 Rspress |
+## 延伸阅读
 
-## 建议 MVP 顺序
-
-1. **MVP-A** — PostgreSQL User/Session + JWT
-2. **MVP-B** — Client 配对 + 1:1 视频
-3. **MVP-C** — BullMQ + AI 摘要
-4. **MVP-D** — 录制 MinIO
-
-完整矩阵与领域 FR 对照见 [spec/implementation-status.md](https://github.com/VistaRemote/vista-remote/blob/main/spec/implementation-status.md)。
-
-## 基础架构清单
-
-F-01～F-10（init、shared、env、docker、信令、权益、文档站）已就绪 — 见 `spec/architecture-foundation-spec.md`。
+- [架构总览](/architecture/overview)
+- [产品定位](/architecture/positioning)
+- [二开与定制](/guide/customization)
+- [开发者手册](/guide/developer-handbook)

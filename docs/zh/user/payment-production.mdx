@@ -1,6 +1,6 @@
 # 生产支付就绪（运维）
 
-面向部署方核对 **mock → sandbox → production**。LuminaryWorks Entitlement 已实现支付 **adapter**；这不等于 live 商户已启用。Lite 收银（commerce **complete** / **status**、Entitlement 入站 webhook）可以把本地 `User.plan` 写到缓存；**微信 / 支付宝商户进件、notify DNS 与生产 PSP 密钥是 owner-ops，不随 VistaRemote 交付**。产品侧 outbox 履约投递可能仍在推进。不要把商户密钥写入 git。
+面向部署方，按 **本地模拟 → 沙箱 → 生产** 核对。支付渠道接在 LuminaryWorks Entitlement 上。微信 / 支付宝的商户号、回调域名和生产密钥由部署方配置，不要写入 git。收银完成后，套餐会写到用户资料。
 
 架构说明见 [商业化与计费](/architecture/commercial-billing)；管理台模块见 [管理控制台](/user/admin-console)。Spec：`spec/billing-commerce-spec.md`。
 
@@ -81,9 +81,9 @@ Lite 入站 `order.fulfilled`（`POST /api/v1/commerce/webhooks/entitlement`）�
 
 微信 / 支付宝 **商户号、APIv3 密钥、证书、支付宝应用密钥** 属于 Entitlement / PSP，**不是** VistaRemote server 变量。`ENTITLEMENT_TRIAL_PURGE_*` 是试用录制清理，与支付回调无关。
 
-## 用户端 Membership（sandbox，非 PSP live）
+## 用户端会员页
 
-Web **用户端** `/membership`（当前 viewer Admin **没有** `/membership` 路由）：
+Web **用户端** `/membership`：
 
 1. 接受条款 → 选 Pro/Ultra SKU → 选 **微信支付** 或 **支付宝**（catalog `providerHint`，不是 Entitlement adapter id）。
 2. **去支付** → `POST /api/v1/commerce/orders` 再 `.../pay`。可能出现二维码、支付链接或跳转。

@@ -4,8 +4,8 @@ Example: add in-session **quality preset switching** on Web Client (assume Spec 
 
 ## Step 0 — Gates
 
-1. Open `spec/implementation-status.md`; confirm WebRTC / client is 🟡 or ✅.
-2. Read `spec/webrtc-architecture-spec.md` and `spec/web-client-spec.md`.
+1. Read `spec/webrtc-architecture-spec.md` and `spec/web-client-spec.md`.
+2. Use [Platform](/engineering/implementation-status) to confirm the change lands in the Web controller and signaling.
 
 ## Step 1 — Update Spec
 
@@ -39,9 +39,8 @@ Signaling broadcast / auth: `server/src/signaling/`; plan limits via `Entitlemen
 
 ## Step 6 — Wrap-up
 
-1. Update `implementation-status.md`
-2. If user-visible: update [Remote control (users)](/user/remote-control)
-3. PR template with FR list and repos touched
+1. If user-visible: update [Remote control (users)](/user/remote-control)
+2. PR template with FR list and repos touched
 
 ## Anti-patterns
 

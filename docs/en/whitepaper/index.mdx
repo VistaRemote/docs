@@ -2,29 +2,164 @@
 
 | | |
 | :--- | :--- |
-| **Version** | 0.3.0 (Draft) |
+| **Project** | VistaRemote |
 | **Organization** | VibeCode |
 
 ## Summary
 
-VistaRemote is a **cross-platform remote desktop** system built on **WebRTC** (P2P first, SFU for broadcast). It targets teams who need **self-hosted** deployments with optional **private AI** (recordings, summaries, enterprise security insights).
+VistaRemote is a **cross-platform remote desktop** in the VibeCode ecosystem. **WebRTC** is the transport: **one-to-one** sessions prefer a **direct P2P** path, and **one-to-many viewing** switches to an **SFU** so the host uploads once. Control input uses an **SCTP DataChannel**, separate from audio and video.
 
-## Plans
+The engineering model is a **flat meta-repo**: TypeScript across the stack, with Electron and React Native isolated from each other. The relational database is **PostgreSQL 16**. Product behavior is written as Specs before code, so people and AI collaborators change the same contract.
+
+Compared with traditional desktop monitoring, VistaRemote is **live remote control**, not only a recording after the fact. You can **host it yourself**, and AI analysis can stay on your network. See [Positioning](/architecture/positioning).
+
+## 1. The problem
+
+Remote desktop is basic infrastructure for IT support, customer help, remote work, and training. Older products share a few limits:
+
+- **Latency** from TCP or proprietary protocols, especially across firewalls.
+- **Lock-in** to a vendor relay, with cost and data-sovereignty consequences.
+- **Old stacks**, often a C/C++ monolith that is expensive to extend to the web and to phones.
+- **Privacy**: picture and input pass through a third-party cloud.
+
+WebRTC is mature in browsers and native apps. Codecs, DTLS-SRTP, ICE, and DataChannel make **“control a desktop from a browser”** a normal product. VistaRemote treats WebRTC as a first-class path and uses TypeScript for signaling, clients, and contracts.
+
+## 2. What it is
+
+> **High-performance, self-hosted, auditable remote desktop as a normal part of a modern web stack.**
+
+| | |
+| :--- | :--- |
+| **Who it is for** | Developers, SMB IT, support teams, and the VibeCode community |
+| **How it is deployed** | Private / self-hosted, or hosted for you |
+| **What is different** | Live WebRTC remote control, private AI, and an open TypeScript stack on PostgreSQL |
+| **What it is not** | A heavy VDI, game-grade frame sync, or silent monitoring without consent |
+
+1. **WebRTC** for low-latency control and viewing (P2P / SFU), rather than a proprietary screen recorder.
+2. **AI you control**: a separate `ai` service. Run **Ollama** yourself so recordings and insight stay inside.
+3. **Auditable code** versus closed desktop-monitoring suites. Data sovereignty stays with the organization.
+4. **TypeScript** so hiring, customization, and Docker deployment stay inexpensive.
+
+## 3. Typical uses
+
+| Scene | Who | Topology | Value |
+| :--- | :--- | :--- | :--- |
+| **Support** | Engineer on the web + customer Agent | P2P | Low-latency view and control |
+| **Mobile rounds** | Admin on the phone + a PC in the room | P2P + TURN | Control a desktop from anywhere |
+| **Training** | One host Agent + many viewers | SFU | One upload, many viewers |
+| **Private network** | Every component on-prem | P2P first | Media stays off the public internet (TURN only as fallback) |
+
+## 4. Architecture
+
+The server does **not** forward media. It does signaling, authorization, ICE configuration, and SFU scheduling.
+
+| Path | Technology |
+| :--- | :--- |
+| Video / audio | RTP over DTLS-SRTP |
+| Control | SCTP DataChannel |
+| Signaling | WebSocket + JSON |
+
+| Viewers | Strategy | Why |
+| :--- | :--- | :--- |
+| 1:1 | **P2P** | Lowest latency, no SFU bandwidth |
+| 1:N | **SFU** | The host does not upload N copies |
+
+Details: [WebRTC topology](/architecture/webrtc-topology) · [Development](/architecture/webrtc-development) · [Messaging](/architecture/messaging-transport) · [Overview](/architecture/overview).
+
+| Repo | Role |
+| :--- | :--- |
+| `shared` | Types and protocol |
+| `server` | NestJS signaling and APIs |
+| `desktop` | Electron Agent |
+| `web` | Browser controller |
+| `mobile` | React Native controller |
+| `docs` | This site |
+| `deploy` | Docker / Kubernetes templates |
+
+## 5. Security
+
+| Principle | How |
+| :--- | :--- |
+| Least privilege | The host explicitly allows the session; capture and input stop when it ends |
+| Transport | WSS for signaling; DTLS-SRTP for media |
+| Self-host | Signaling, TURN, and SFU can run in the customer’s domain |
+| Audit | Connect, disconnect, and identity logs on the server |
+| Secrets | Environment variables and short-lived TURN credentials, not hardcoded clients |
+
+## 6. Stack
+
+| Layer | Choice |
+| :--- | :--- |
+| Contracts | TypeScript + Zod (`shared`) |
+| Server | NestJS + TypeORM + PostgreSQL 16 |
+| AI | Separate `ai` repo; Ollama + Qdrant; Python only for heavy ML |
+| Objects | MinIO / S3 for recordings |
+| Plans | Free · Pro (recording + summary) · Enterprise (security + efficiency) |
+| UI | React, Ant Design, Sass modules; Rsbuild |
+| Desktop | Electron |
+| Mobile | React Native |
+| Realtime | WebRTC (P2P / SFU) and coturn-compatible TURN |
+
+## 7. Plans and AI
 
 | Plan | Remote | Recording | AI |
-| :--- | :---: | :---: | :---: |
+| :--- | :---: | :---: | :--- |
 | Free | ✓ | — | — |
 | Pro | ✓ | ✓ | Session summary |
-| Enterprise | ✓ | ✓ + policy triggers | Anomaly & efficiency reports |
+| Enterprise | ✓ | ✓ + policy | Anomaly detection, efficiency reports, security rules |
 
-## Stack
+Inference stays in **`ai`** so it does not load the signaling process. The default is private: **Ollama / vLLM + Qdrant**. The path is on-device signals, stored behavior, LLM / RAG reports, then process improvement. See [AI platform](/architecture/ai-platform).
 
-- NestJS + TypeORM + **PostgreSQL 16**
-- Rsbuild / Rspress / Electron / React Native
-- BullMQ + **`ai`** (Node/TS, LangChain) + self-hosted **Ollama** + **Qdrant**; Python microservice for heavy ML only
+## 8. What the product includes
 
----
+| Capability | What you get |
+| :--- | :--- |
+| **1:1 remote control** | Agent plus Web, desktop, and phone controllers, low-latency P2P |
+| **NAT traversal** | STUN / TURN |
+| **Many viewers** | SFU, one upload from the host |
+| **Pro** | Recording playback and session summaries |
+| **Enterprise** | Policy recording, monitor wall, device fleet, security and efficiency reports |
+| **Private deploy** | PostgreSQL, MinIO, AI, and Docker |
 
-For the full whitepaper (Chinese), switch to **简体中文** or read the complete sections in the zh locale site tree.
+## 9. License and community
 
-Related: [Architecture](/architecture/overview) · [Positioning](/architecture/positioning)
+VistaRemote is part of **VibeCode**.
+
+- **License**: personal non-commercial use is free; **any commercial use needs a commercial license**. The fine-tune toolchain is delivered separately.
+- **Trial**: **7 days** includes **SFU** and **AI cloud fallback**; after that, Pro or Enterprise.
+- **Contributing**: `CONTRIBUTING.md` and the Git collaboration Spec.
+- **Discussion**: GitHub Issues / Discussions.
+
+## 10. Risks and responses
+
+| Risk | Response |
+| :--- | :--- |
+| NAT failure | Configurable TURN; documented firewall ports |
+| Poor quality on a weak network | Simulcast / SVC and dynamic resolution |
+| Clients drift apart | `shared` as the only contract, changed first |
+| Electron and React Native build conflicts | Separate repos |
+| Misuse | Consent UI, audit logs, no silent monitoring |
+| AI privacy | Plan entitlements, PII handling, optional private LLM (Ollama) |
+| AI load on signaling | Separate `ai` service and an async queue |
+
+## 11. Terms
+
+| Term | Meaning |
+| :--- | :--- |
+| **Agent** | Electron app on the computer being controlled |
+| **Controller** | The side that takes control (Web, mobile, or desktop) |
+| **Signaling** | SDP / ICE exchange; not the media |
+| **SFU** | Selective Forwarding Unit |
+| **Spec** | The written behavior before code |
+| **Meta-repo** | The repo that aggregates the child repositories |
+
+## 12. Further reading
+
+- [Architecture overview](/architecture/overview)
+- [Positioning](/architecture/positioning)
+- [WebRTC topology](/architecture/webrtc-topology)
+- [Quick start](/guide/quick-start)
+- [Compared with BilldDesk and MeshCentral](/architecture/product-comparison)
+- [Customization](/guide/customization)
+
+*© VibeCode · VistaRemote.*

@@ -1,42 +1,31 @@
-# Implementation Status (developers)
+# Platform
 
-Summary synced with Meta-Repo `spec/implementation-status.md`. **Update the source file when merging PRs that change readiness.**
+VistaRemote is a set of components with clear jobs. Signaling and business APIs live on the server, picture and input travel over WebRTC, types live in `shared`, and AI inference runs on its own service.
 
-## Summary
+## Components
 
-| Area | Status |
+| Component | Role |
 | :--- | :--- |
-| Spec + SDD workflow | ✅ |
-| shared contracts | ✅ |
-| Local dev-up / env profiles | ✅ |
-| Server persistence / real payments | 🟡 P1 |
-| E2E pairing + JWT | 🟡 MVP-A/B |
+| `shared` | Contracts for signaling, auth, billing, telemetry, and AI jobs |
+| `server` | NestJS signaling, sessions, entitlements, and admin APIs |
+| Web controller | Browser remote control, playback, and plan features |
+| Admin console | Users, devices, orders, sessions, recordings, and audit |
+| `desktop` | Windows / macOS Agent and desktop controller |
+| `mobile` | Phone controller |
+| `ai` | Session summaries, behavior insight, and private models |
+| `deploy` | Docker Compose and mediasoup |
+| Docs | Chinese and English product and developer docs |
 
-**Takeaway**: parallel feature work inside existing boundaries is supported; full production loop follows MVP phases below.
+## Data and realtime
 
-## Repositories
+- **PostgreSQL** stores users, devices, sessions, orders, and audit.
+- **WebSocket** carries SDP / ICE; **SSE** carries product notifications.
+- **One-to-one** uses P2P; **one-to-many viewing** uses an SFU so the host uploads once.
+- Recordings go to **MinIO / S3**.
 
-| Repo | Status | Notes |
-| :--- | :--- | :--- |
-| shared | ✅ | Signaling, auth, billing, telemetry, ai jobs |
-| server | 🟡 | WSS/SSE, SFU routing, entitlements; in-memory stores |
-| web/client | 🟡 | Signaling client, playback, FeatureGate |
-| web/admin | 🟡 | Users/orders/permissions skeleton |
-| desktop | 🟡 | Electron, edge-ai, env |
-| mobile | 🟡 | RN skeleton, peer-session |
-| ai | 🟡 | Worker, LLM stub, python-worker |
-| deploy | ✅ | compose, mediasoup profile |
-| docs | ✅ | zh/en Rspress |
+## Read next
 
-## Suggested MVP sequence
-
-1. **MVP-A** — PostgreSQL User/Session + JWT
-2. **MVP-B** — Client pairing + 1:1 video
-3. **MVP-C** — BullMQ + AI summarize
-4. **MVP-D** — Recording to MinIO
-
-Full matrix: [spec/implementation-status.md](https://github.com/VistaRemote/vista-remote/blob/main/spec/implementation-status.md).
-
-## Foundation checklist
-
-F-01–F-10 (init, shared, env, docker, signaling, entitlements, docs site) are ready — see `spec/architecture-foundation-spec.md`.
+- [Architecture overview](/architecture/overview)
+- [Positioning](/architecture/positioning)
+- [Customization](/guide/customization)
+- [Developer handbook](/guide/developer-handbook)

@@ -1,68 +1,76 @@
 # Compared with BilldDesk and MeshCentral
 
-| Metadata | Value |
-| :--- | :--- |
-| **Doc** | Competitor capability matrix (customer-facing) |
-| **Version** | 1.2.0 |
-| **Updated** | 2026-09-20 |
-| **See also** | [Positioning](./positioning) · [Device Fleet & Enterprise](/user/fleet-and-enterprise) |
+VistaRemote puts **low-latency WebRTC remote control**, a **device fleet**, and a **TypeScript stack you can change** in one product you can run yourself. This page shows where that is stronger than BilldDesk and MeshCentral.
 
----
+See also: [Positioning](./positioning) · [Device fleet and enterprise](/user/fleet-and-enterprise) · [Customization](/guide/customization)
 
-## 1. Three one-liners
+## Why VistaRemote
 
-**VistaRemote** is WebRTC remote control of an already logged-in desktop, plus a **device fleet**: group control, batch commands, multi-screen monitor wall, virtual display, and more. Signaling is NestJS; media is P2P / TURN / mediasoup; state can stay in your PostgreSQL. Fleet capabilities are **Enterprise** scope and enabled after purchase. With VistaCast: Cast watches business video; Remote manages Edge boxes.
+| What you care about | VistaRemote | The other two, typically |
+| :--- | :--- | :--- |
+| **Fast picture and input** | One-to-one is **P2P + TURN**. Many viewers switch to an **SFU** so the host uploads once. Keyboard and mouse use a DataChannel, separate from video | BilldDesk also uses WebRTC, but the open-source product stops at basic remote control. MeshCentral’s desktop is a **server relay** by default, not WebRTC |
+| **Many computers** | **Group input, batch commands, a multi-screen monitor wall, and virtual displays** are in the product and turn on with Enterprise | Open-source BilldDesk has no fleet. MeshCentral has a device list and batch commands, not a monitor wall or virtual displays |
+| **Data on your network** | Signaling, PostgreSQL, recordings, TURN, SFU, and AI can all be self-hosted. AI can use Ollama on your LAN | Commercial remote-desktop products often keep video and accounts in the vendor cloud. MeshCentral can be self-hosted; its default database is NeDB, and media still tends to relay through the server |
+| **You need to modify it and hire for it** | Full-stack **TypeScript**, contracts in `shared`, NestJS + React + Electron + React Native. A local team can add SSO, admin screens, and industry rules | BilldDesk Pro source is not public. MeshCentral is a different Agent and a Handlebars admin UI, which does not match a TypeScript team |
+| **One-off help and long-lived devices** | Ephemeral **pairing codes** and stable device codes. Sessions, files, terminal, and audit are the same product | MeshCentral uses account ACL and has no pairing code. Open-source BilldDesk has no pairing code |
 
-**BilldDesk** is a ToDesk-style remote desktop. The [open-source repo](https://github.com/galaxy-s10/billd-desk) is not a stable release; Pro source is not public. The “open source” column follows the cloned source.
+**VistaCast** sells next to it: Cast watches business video; Remote manages edge PCs and office desktops.
 
-**MeshCentral** is self-hosted machine management with a server relay to MeshAgent (remote desktop is not WebRTC by default), plus terminal, files, device ACL, audit, and Intel AMT.
+## What each product is
 
-See [Positioning](./positioning) and [Device Fleet & Enterprise](/user/fleet-and-enterprise).
+**VistaRemote** controls a desktop that is already signed in. Signaling is NestJS, media is P2P / TURN / mediasoup, and business data is in PostgreSQL. Fleet features (group control, monitor wall, virtual display, out-of-band) are **Enterprise** and turn on after you buy enterprise service.
 
----
+**BilldDesk** is a ToDesk-style remote desktop. The [open-source repo](https://github.com/galaxy-s10/billd-desk) covers basic remote control. Pro capabilities are vendor marketing; the Pro source is not public.
 
-## 2. Capability matrix
+**MeshCentral** is self-hosted machine management. The browser reaches MeshAgent through the server, with terminal, files, device groups, audit, and Intel AMT. Remote desktop is not WebRTC by default.
+
+## Capability matrix
 
 | Marker | Meaning |
 | :--- | :--- |
-| **Have** | In product scope |
-| **Enterprise** | Requires enterprise service |
-| **Contract** | Delivered / add-on under purchase |
+| **Have** | In the product |
+| **Enterprise** | Turns on with enterprise service |
+| **Contract** | Delivered under the purchase |
 
 | Capability | VistaRemote | BilldDesk open source | BilldDesk Pro (marketing) | MeshCentral |
 | :--- | :--- | :--- | :--- | :--- |
-| 1:1 remote desktop | Have (WebRTC) | Have | Claimed | Have (server relay) |
-| Ephemeral pairing code | Have | No | Claimed | No |
+| 1:1 remote desktop | **Have (WebRTC P2P / TURN)** | Have | Claimed | Have (server relay by default) |
+| Ephemeral pairing code | **Have** | No | Claimed | No |
 | Stable device code + password | Have | Have | Claimed | Account ACL |
-| Keyboard / clipboard / files / terminal | Have | Weak | Claimed | Have |
-| Multiple displays | Have | Weak | Claimed | Have |
-| **Multi-screen monitor wall** | **Have (Enterprise)**: thumbnail observe + click-up HD control; larger slots as contract add-on | No | Claimed | Device list |
-| **Group keyboard & batch commands** | **Have (Enterprise)** | No | Claimed | Batch commands |
+| Keyboard / clipboard / files / terminal | **Have** | Weak | Claimed | Have |
+| Multiple displays | **Have** | Weak | Claimed | Have |
+| **Multi-screen monitor wall** | **Have (Enterprise)**: thumbnails, then click through to high-quality control | No | Claimed | Device list |
+| **Group input / batch commands** | **Have (Enterprise)** | No | Claimed | Batch commands |
 | **Virtual display** | **Have (Enterprise)** | No | Claimed | No |
 | Local privacy screen | Have (Windows) | No | Claimed | Consent bar |
 | Wake-on-LAN | Have (same LAN) | No | Claimed | Have |
 | Start at login / lock on end / host actions | Have | Weak | Claimed | Have |
-| My devices / recording control | Have | Weak | Claimed | Have |
-| **Intel AMT / OOB** | **Have (Enterprise private-deploy contract)** | No | No | Have |
-| Registry / service start-stop / login-window inject | No | No | Partial claims | Partial |
-| Self-host / admin audit | Have | Weak | Claimed | Have |
+| My devices / recording | **Have** | Weak | Claimed | Have |
+| **Intel AMT / out-of-band** | **Have (Enterprise, private deploy)** | No | No | Have |
+| Private AI (summaries, insight) | **Have** | No | No | No |
+| Full-stack TypeScript you can change | **Have** | Partial open source | Source not public | A different stack |
+| Registry / service control / logon inject | Not in product | No | Partial claims | Partial |
+| Self-host / admin audit | **Have** | Weak | Claimed | Have |
 
----
+VistaRemote does not rewrite the registry, start and stop services, or inject the logon window. Those are a different risk class from remote assistance.
 
-## 3. Stack differences (for technical buyers)
+## Stack
 
 | | VistaRemote | BilldDesk open source | MeshCentral |
 | :--- | :--- | :--- | :--- |
 | HTTP | NestJS + **Fastify** | Koa2 | Express |
 | Database | **PostgreSQL** + TypeORM | MySQL | NeDB by default |
-| Media | WebRTC (P2P / TURN / SFU) | WebRTC | Often server relay |
-| Desktop | Electron | Electron + nut.js | MeshAgent |
+| Media | **WebRTC** (P2P / TURN / SFU) | WebRTC | Often a server relay |
+| Desktop | Electron; capture and encode in Rust | Electron + nut.js | MeshAgent |
 | UI | React + Rsbuild | Vue 3 | Handlebars |
+| AI | Separate service; Ollama on your network | None | None |
 
-We align on product capabilities, not on copying another stack.
+## How to choose
 
----
+Choose **VistaRemote** when you want low-latency remote control, group control and a monitor wall, data in your own PostgreSQL, and a TypeScript team that will change the admin console or connect SSO.
 
-## 4. How to talk to enterprise buyers
+A closed commercial remote-desktop client is a different product (BilldDesk Pro).
 
-Group control, monitor wall, virtual display, and OOB are **in product scope**, enabled with **Enterprise**, and delivered on a **contract schedule** when needed. Customer docs do not use internal engineering stage language. Details: [Device Fleet & Enterprise](/user/fleet-and-enterprise).
+A site already standardized on MeshAgent, mainly for Intel AMT and classic RMM, is MeshCentral’s center of gravity. VistaRemote still offers out-of-band management on an Enterprise private deployment, and the media path stays WebRTC.
+
+Group control, the monitor wall, virtual displays, and out-of-band management turn on with **Enterprise**. The contract states slot count and site scope. See [Device fleet and enterprise](/user/fleet-and-enterprise).

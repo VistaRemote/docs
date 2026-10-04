@@ -2,156 +2,156 @@
 
 ## Pairing & connection
 
-**Invalid pairing code?**  
+**Invalid pairing code?**
 It may have expired (~5 minutes by default), been mistyped, or already consumed (`PAIRING_CONSUMED` — a class cannot share one code); regenerate on the host.
 
-**Video works but no control?**  
-Confirm the host Agent clicked **Allow**, and pairing was not **View only**. The control channel may also be missing. Mouse/keyboard inject exists on Windows and macOS. Refresh the session or check Agent version with IT.
+**Video works but no control?**
+Confirm the host Agent clicked **Allow**, and pairing was not **View only**. Refresh the session. If control is still missing, ask IT to confirm that computer is running the current Agent installer. Windows and macOS both accept keyboard and mouse.
 
-**Stuck on connecting?**  
+**Stuck on connecting?**
 Check network/firewall UDP and whether TURN is configured.
 
-**Is VistaRemote MeshCentral?**  
+**Is VistaRemote MeshCentral?**
 No. VistaRemote is WebRTC remote control plus an enterprise **device fleet** (group control, monitor wall, virtual display, and more — see [Device Fleet & Enterprise](/user/fleet-and-enterprise)). Out-of-band AMT is an enterprise private-deploy contract capability. Registry, remote print, and login-window injection are out of scope. Comparison: [Product comparison](/architecture/product-comparison).
 
-**Do you have group control / monitor wall / virtual display?**  
+**Do you have group control / monitor wall / virtual display?**
 Yes — **Enterprise** product capabilities. Enable after purchasing enterprise service; larger wall slots and site customizations follow the contract. See [Device Fleet & Enterprise](/user/fleet-and-enterprise).
 
 ## Plans
 
-**Cannot multi-view after trial?**  
+**Cannot multi-view after trial?**
 SFU requires Pro/Enterprise — see [Plans & billing](/user/plans-and-billing).
 
-**Is device fleet sold separately?**  
+**Is device fleet sold separately?**
 Group control, monitor wall, virtual display, and OOB ship under **Enterprise** (plus contract add-ons). Endpoint management can be priced per device / seat — see [Plans & billing](/user/plans-and-billing) and your sales proposal.
 
-**Can I use the open-source build commercially?**  
+**Can I use the open-source build commercially?**
 Free for personal non-commercial use; **all commercial use requires a paid license** — see [Licensing](/guide/licensing).
 
 ## Privacy & AI
 
-**Is data sent to OpenAI by default?**  
+**Is data sent to OpenAI by default?**
 Default private deployment uses **Ollama + self-hosted vector DB**; cloud inference only when enabled and entitled.
 
-**What does Desktop AI do?**  
+**What does Desktop AI do?**
 Local rules/light inference for behavior hints; heavy jobs go to the `ai` worker queue.
 
 ## Admin & remote ops
 
-**How do I force-disconnect a session?**  
+**How do I force-disconnect a session?**
 Open the [Admin console](/user/admin-console) → **Sessions** and **force disconnect** the active room. The server closes the signaling WebSocket first, then clears the in-memory room. The host can also disconnect from the always-on-top connection bar; see [Remote control](/user/remote-control). Disabling a user does not kick an in-progress session — still disconnect it under Sessions.
 
-**When is a device “online”? What are labels?**  
+**When is a device “online”? What are labels?**
 **Online** means the device’s last heartbeat was within about **120 seconds**; after that it is offline. Online is not “currently sharing the screen.” On **Devices** you can edit **labels** and filter by them. Revoking a device makes the next heartbeat fail; that is separate from the online check. See [Admin console](/user/admin-console).
 
-**How does recording playback work? Is it a MinIO player?**  
+**How does recording playback work? Is it a MinIO player?**
 No. Playback is a **local browser `<video>`** on the Recordings page (seek / speed), not a MinIO product player. Desktop **MediaRecorder** multipart upload and MinIO storage ship with the dev **`recording`** profile — see [Docker deployment](/deploy/docker).
 
-**ICE stuck — should I change DNS?**  
+**ICE stuck — should I change DNS?**
 Do not start by changing DNS. ICE candidates come from the Server. Admin **System** shows entitlement flags (FR-WAD-52). If it still fails, check UDP/firewall and TURN; see [Remote control](/user/remote-control) connection quality.
 
-**Can I edit the permission matrix?**  
+**Can I edit the permission matrix?**
 No. The Permissions page is a **read-only** map of platform RBAC / org roles. Role and permission enablement is configured by enterprise rollout / platform admins per org policy. See [Admin console](/user/admin-console).
 
-**How do Admin CSV exports work?**  
-They export the **currently filtered/loaded list** (client-side unless the page says otherwise; audit CSV is server-filtered, including result). Users, devices, security, jobs, orders, orgs, and recordings have CSV buttons where implemented; the org drawer **SupportGrant** table also has **export grants CSV** (1.33.0). This is not a full warehouse dump, and not a billing/payment export. See [Admin console](/user/admin-console).
+**How do Admin CSV exports work?**
+They export the **currently filtered/loaded list** (client-side unless the page says otherwise; audit CSV is server-filtered, including result). Users, devices, security, jobs, orders, orgs, and recordings have CSV export; the org drawer **SupportGrant** table also has **export grants CSV** . This is not a full warehouse dump, and not a billing/payment export. See [Admin console](/user/admin-console).
 
-**Can I open overview cards and list filters from a URL?**  
+**Can I open overview cards and list filters from a URL?**
 Yes. Overview metric cards and most list filters support **URL query seeds** (for example `/devices?online=offline`, `/users?planExpiry=expired`, `/audit?result=denied`, `/recordings?status=failed`). Permission matrix search is a read-only filter, not editable roles. See [Admin console](/user/admin-console).
 
-**How do security mute rules work?**  
+**How do security mute rules work?**
 On [Admin console](/user/admin-console) → **Security events**, configure muted types (alert rules lite). The list applies saved rules by default (Switch **Apply mute rules**); turn it off or open `?applyMute=false` to see all types. The high-severity banner count still excludes muted types.
 
-**Where is SupportGrant managed? Does revoke kick sessions?**  
+**Where is SupportGrant managed? Does revoke kick sessions?**
 In the organization drawer: create / list / revoke **SupportGrant** temporary IT-assist grants, and **export grants CSV** (current filter/loaded rows). The revoke confirmation can check **Revoke and disconnect related sessions** (`?kickSessions=true`, off by default). The permission matrix stays read-only. See [Admin console](/user/admin-console).
 
-**What are the System page entitlement flags?**  
+**What are the System page entitlement flags?**
 Admin **System** shows read-only `entitlementMode`, `entitlementBaseUrlConfigured`, and `webhookSecretConfigured` (`GET /api/v1/admin/system/entitlement`, FR-WAD-52) — **no secrets**. Copy entitlement status JSON to verify; it is not a plan-grant UI. See [Admin console](/user/admin-console). Production webhook / simulate-paid checks: [Production payment readiness](/user/payment-production).
 
-**Recording playback URL expired? MinIO EntityTooSmall?**  
+**Recording playback URL expired? MinIO EntityTooSmall?**
 The Recordings player fetches a short-lived signed **playback-url** (`expiresAt`; refresh on expiry). When `failedReason` matches **EntityTooSmall / part size**, the list shows a hint that the Agent should coalesce non-final parts to **≥5 MiB** (Desktop ≥1.30; `memory://` still allows small parts). See [Admin console](/user/admin-console).
 
-**What is the monitor wall, and how do we enable it?**  
+**What is the monitor wall, and how do we enable it?**
 The monitor wall is an **Enterprise** multi-screen observe capability: low-cost thumbnail observe across devices, then click into high-quality remote control when needed. Larger slot counts can be added under the enterprise contract. See [Device Fleet & Enterprise](/user/fleet-and-enterprise) and [Admin console](/user/admin-console).
 
-**What does the observe ticket return?**  
+**What does the observe ticket return?**
 When Admin starts observe on a room, the server returns an observe ticket (signaling and SFU-related parameters) for in-wall or observe pull. See [Admin console](/user/admin-console).
 
-**Does the monitor wall layout save automatically?**  
+**Does the monitor wall layout save automatically?**
 No. URL **`s0`–`s3`** take priority; without seeds the page restores from **GET** `/admin/monitor-wall/layout`; click **Save layout** (**PUT**, **admin.write**) to persist. See [Admin console](/user/admin-console).
 
-**How do I open a recording from a summarize job (1.37.0)?**  
+**How do I open a recording from a summarize job ?**
 On **Jobs**, `recording.summarize` rows with id `summarize-{recordingId}` show **Recording** in **Actions** → `/recordings?recordingId=…`. Job filters (`id`, `name`, `state`, `failedReason`) sync to the URL; overview **failed jobs** opens `/jobs?state=failed`.
 
-**How do efficiency reports open the recordings list (1.37.0)?**  
+**How do efficiency reports open the recordings list ?**
 On **Efficiency reports**, click **Open recordings** — it carries active `userId` / `sessionId` / `deviceId` / `recordingId` substring filters to `/recordings` (rollup period is not passed; filters only).
 
-**Audit layout rows and monitor wall (1.37.0 / 1.38.0)?**  
-Filter audit by **monitor-wall layout** (`admin.monitor_wall.layout`). **1.38.0** — **Save layout** audit meta includes **`roomIds`** and the first **`roomId`**. Matching rows show **Monitor wall** — `/monitor-wall` or `/monitor-wall?s0=<roomId>` from meta / resource / target `roomId` / `room_id`. Slot 0 seed only; open observe from the wall when needed. See [Admin console](/user/admin-console).
+**Audit layout rows and monitor wall ?**
+Filter audit by **monitor-wall layout** (`admin.monitor_wall.layout`). **Save layout** audit meta includes **`roomIds`** and the first **`roomId`**. Matching rows show **Monitor wall** — `/monitor-wall` or `/monitor-wall?s0=<roomId>` from meta / resource / target `roomId` / `room_id`. Slot 0 seed only; open observe from the wall when needed. See [Admin console](/user/admin-console).
 
-**How do user drawer related links work (1.38.0)?**  
+**How do user drawer related links work ?**
 On **Users**, open the detail drawer and click **View sessions / recordings / orders / devices / audit** — they open `/sessions?userId=…`, `/recordings?userId=…`, `/orders?userId=…`, `/devices?ownerId=…`, and `/audit?actorId=…`. See [Admin console](/user/admin-console).
 
-**How do I jump to the monitor wall from an active device session (1.38.0)?**  
+**How do I jump to the monitor wall from an active device session ?**
 On **Devices**, when a row has an active session, **Actions** shows **Monitor wall** → `/monitor-wall?s0=<sessionId>`. This seeds slot 0; start in-wall observe from the wall when needed. See [Admin console](/user/admin-console).
 
-**How do I filter sessions by user ID (1.38.0)?**  
+**How do I filter sessions by user ID ?**
 On **Sessions**, filter by **user ID**; the filter syncs to **`?userId=`** in the URL (the user drawer **View sessions** button seeds this param). See [Admin console](/user/admin-console).
 
-**Where do I see recent pairing codes (1.39.0)?**  
+**Where do I see recent pairing codes ?**
 Open [Admin console](/user/admin-console) → **Operations** → **Pairings** (`/pairings`). The page loads **GET** `/api/v1/admin/pairings` (requires **admin.read**) and lists recent codes from PostgreSQL (default **100** rows; optional **`limit`** 1–500). Filter by device ID, owner user ID, or numeric code — filters sync to **`?deviceId=`**, **`?userId=`**, **`?numericCode=`**. Row **Device** / **User** links open `/devices?deviceId=` and `/users?userId=` (device owner). Read-only — change length/TTL under **System** pairing policy; hosts generate codes on the Agent. See [Admin console](/user/admin-console).
 
-**System pairing policy and Pairings row jumps (1.40.0)?**  
+**System pairing policy and Pairings row jumps ?**
 **System** → pairing-policy section **Open pairings** → `/pairings`; **Pairings** row **Session** → `/sessions?sessionId=…` when **sessionId** is present.
 
-**How do I filter consumed pairing codes or open Pairings from Overview/Devices (1.41.0)?**  
+**How do I filter consumed pairing codes or open Pairings from Overview/Devices ?**
 On **Pairings**, use the **Consumed** select (**Consumed** / **Unused** / **All**); it syncs to **`?consumed=yes|no`** and **GET** `/api/v1/admin/pairings` (`yes` = `consumedAt` set). Also open from **Overview** → **Pairings** card, or **Devices** → **Actions** → **Pairings** (`?deviceId=` pre-filled). See [Admin console](/user/admin-console).
 
-**How do I open Pairings from the user drawer or Orders from Membership (1.42.0)?**  
+**How do I open Pairings from the user drawer or Orders from Membership ?**
 On **Users**, the detail drawer **Open pairings** → `/pairings?userId=…`; on **Membership**, **Open orders** in the header → `/orders?userId=…` (URL `?userId=` or the commerce order **userId** on that page). See [Admin console](/user/admin-console).
 
-**How do I open Membership from Orders or filter pairing audit (1.43.0)?**  
-On **Orders**, row **Membership** in **Actions** → `/membership?userId=…` when the order has **userId** (pairs with **Membership** **Open orders**, 1.42.0). On **Audit**, action presets include **`pairing.create`** and **`pairing.join`** (server has logged these since 1.12.0). See [Admin console](/user/admin-console).
+**How do I open Membership from Orders or filter pairing audit ?**
+On **Orders**, row **Membership** in **Actions** → `/membership?userId=…` when the order has **userId** (pairs with **Membership** **Open orders**). On **Audit**, action presets include **`pairing.create`** and **`pairing.join`** . See [Admin console](/user/admin-console).
 
-**Where is billing history on the Client membership page (1.43.0)?**  
+**Where is billing history on the Client membership page ?**
 The Web **Client** `/membership` page shows a muted footnote that past orders are for platform operators in Admin — **no Admin link** on that page. End users contact IT or sales; operators use Admin **Orders** / **Membership**. See [Plans & billing](/user/plans-and-billing).
 
-**What does the Admin 403 page offer (1.44.0)?**  
+**What does the Admin 403 page offer ?**
 **Forbidden** shows **Back to dashboard** (→ `/`); signed-in users can **Sign in with another account**; otherwise **Sign in**. See [Admin console](/user/admin-console).
 
-**How do Pairings header audit links work (1.44.0)?**  
+**How do Pairings header audit links work ?**
 On **Pairings**, **Create audit** / **Join audit** open `/audit?action=pairing.create` or `pairing.join`. See [Admin console](/user/admin-console).
 
-**What does the monitor-wall info alert say (1.44.0)?**  
+**What does the monitor-wall info alert say ?**
 It explains that layout can be saved, plus tips for in-wall observe / enterprise multi-screen observe. Product capabilities and enablement: [Device Fleet & Enterprise](/user/fleet-and-enterprise).
 
-**Already signed in on `/login` (1.45.0)?**  
+**Already signed in on `/login` ?**
 You are **redirected to the dashboard** (`/`) with an “already signed in” link. See [Admin console](/user/admin-console).
 
-**How do I quickly filter pairing audit actions (1.45.0)?**  
+**How do I quickly filter pairing audit actions ?**
 On **Audit**, under the action filter, click the **`pairing.create`** / **`pairing.join`** chips (same targets as the Pairings header audit links). See [Admin console](/user/admin-console).
 
-**Why does System warn about webhook under enforce (1.47.0)?**  
-When `entitlementMode` is `enforce` and the **webhook secret is not configured**, inbound `POST /api/v1/commerce/webhooks/entitlement` **always returns 401** until the server has a non-empty `ENTITLEMENT_WEBHOOK_SECRET`. The current viewer has **no System warning UI**; check `webhookSecretConfigured` via `GET /api/v1/admin/system/entitlement`. See [Admin console](/user/admin-console); production checklist on [Production payment readiness](/user/payment-production).
+**Why does System warn about webhook under enforce ?**
+When `entitlementMode` is `enforce` and the **webhook secret is not configured**, inbound `POST /api/v1/commerce/webhooks/entitlement` **always returns 401** until the server has a non-empty `ENTITLEMENT_WEBHOOK_SECRET`. check `webhookSecretConfigured` via `GET /api/v1/admin/system/entitlement`. See [Admin console](/user/admin-console); production checklist on [Production payment readiness](/user/payment-production).
 
-**Do Orders and Users filters sync to the URL (1.47.0)?**  
+**Do Orders and Users filters sync to the URL ?**
 Yes. **Orders**: `id`, `userId`, `sku`, `provider`, `currency`, `status`; **Users**: `userId`, `email`, `status`, `plan`, `billingKind`, `orgId`, `planExpiry`. Bookmark or share links; Membership / user drawer deep links still seed `?userId=`. See [Admin console](/user/admin-console).
 
 ## Deploy & go-live
 
-**What to verify before production payments?**  
+**What to verify before production payments?**
 Walk [Production payment readiness · Checklist](/user/payment-production#checklist) (mock → sandbox → production). Merchant credentials and notify DNS are configured in your environment / Entitlement; follow the checklist for go-live.
 
-**Where is the 15-step remote control acceptance?**  
+**Where is the 15-step remote control acceptance?**
 On a logged-in host Agent plus the Web controller, follow [Remote control · Manual acceptance checklist](/user/remote-control#manual-acceptance-checklist-one-pass). **Sign out and sign in** on the controller first so the ops JWT is fresh; use power/host dry-run env vars on dev machines.
 
-**What are the local Docker host ports?**  
+**What are the local Docker host ports?**
 See [Docker deployment](/deploy/docker) for the **core** + **dev** table (Postgres **5637**, Redis **6380**, Server **3000**; optional `turn` / `ai` / `recording` / `admin` profiles on the same page). Production must not expose DB/Redis on the host.
 
-**What does `pnpm assert:prod-env` do?**  
+**What does `pnpm assert:prod-env` do?**
 Read-only check in `deploy/` **before** production `docker compose up`: validates `.env.prod.example` required keys; when `compose/.env.prod` exists, rejects weak placeholders; with `ENTITLEMENT_MODE=enforce`, requires a **non-empty** `ENTITLEMENT_WEBHOOK_SECRET`. Passing does **not** mean a production PSP is shipped. See [Docker deployment · assert:prod-env](/deploy/docker#pnpm-assertprod-env) and [Production payment readiness](/user/payment-production).
 
-**Which MinIO endpoints for local recording?**  
+**Which MinIO endpoints for local recording?**
 Dev **`recording`** profile: server in compose → `http://minio:9000`; **Desktop Agent** on the host → `http://127.0.0.1:19000`; console **19001**. The default **production** stack has **no** MinIO — use external S3. See [Docker deployment · Recording (MinIO)](/deploy/docker#recording-minio).
 
 ## Get help

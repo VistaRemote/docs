@@ -8,7 +8,7 @@
 | **Pro** | Small teams; SFU multi-viewer, cloud AI inference, etc. |
 | **Enterprise** | Audit, policies, self-hosted, **device fleet** (group control / monitor wall / virtual display, etc.), dedicated support |
 
-Canonical rules: [Commercial trial](/architecture/commercial-trial) and `spec/commercial-tier-spec.md`.
+Canonical description: [Commercial trial](/architecture/commercial-trial).
 
 ## Enterprise device fleet
 
@@ -22,22 +22,22 @@ After purchasing enterprise service (see [Device Fleet & Enterprise](/user/fleet
 | **Virtual display** | Dedicated virtual screen for remote sessions |
 | **Out-of-band (AMT, etc.)** | Enabled under enterprise private-deploy contracts |
 
-Proposals may state these as **supported product capabilities**; enablement and on-site delivery follow sales / implementation and the contract.
+Enabled after you buy enterprise service. Larger monitor-wall slots and on-site scope are in the contract. See [Device fleet and enterprise](/user/fleet-and-enterprise).
 
 ## After trial ends
 
 These typically require a **paid plan**:
 
-- **SFU** multi-viewer
-- **Cloud behavior inference** (`ai.cloud_infer`)
-- **Cloud recording & playback** (`recording` — agent-side buffer upload)
+- **Many viewers** on one shared desktop
+- **Cloud behavior analysis**
+- **Cloud recording and playback** (buffered on the host computer, then uploaded; this does not use the multi-viewer path’s recorder)
 
 ## Recording & plans
 
 | Capability | Plan | Notes |
 | :--- | :--- | :--- |
-| Agent-side recording + cloud storage | Pro+ | Local buffer, chunked upload; **not** default SFU recording |
-| SFU server recording | Enterprise | PlainTransport + FFmpeg; high resource use |
+| Agent-side recording + cloud storage | Pro and above | Buffered on the host, then uploaded in parts. Not the default recorder on the multi-viewer path |
+| Central recording | Enterprise | Recorded on the forwarding service. Higher resource use, enabled on its own |
 
 See [Recording & billing](/architecture/recording-and-billing).
 
@@ -46,16 +46,22 @@ See [Recording & billing](/architecture/recording-and-billing).
 - **Subscription**: monthly/yearly renewal
 - **Perpetual**: one-time license (per product catalog)
 
-Payment methods depend on deployment: WeChat Pay, Alipay, PayPal, Wise, etc.
+Payment methods follow the deployment: WeChat Pay, Alipay, PayPal, Wise, and bank card.
 
-## Upgrade & renewal
+## Upgrade and renewal
 
-1. Sign in to the web client or contact sales for checkout.
-2. Entitlements apply after successful payment (sandbox: Client Membership poll / complete; production webhooks land on Entitlement). Dev may simulate **local** orders in Admin. Ops go-live checklist: [Production payment readiness](/user/payment-production).
-3. Renew before expiry to avoid SFU / cloud inference being blocked.
+1. Sign in on the web client, or ask sales for a payment link.
+2. The plan applies after payment. An admin can also change a user’s plan in the console.
+3. Renew before expiry so multi-viewer sessions and cloud analysis continue.
 
-## Client membership page (1.43.0 / 1.52.0)
+## Membership page
 
-Web **Client** `/membership`: pick catalog `providerHint` (WeChat Pay / Alipay), show QR or a payment link, then **poll order status** and optionally **Complete payment**. The on-page sandbox note is **not** live merchant notify. A muted footnote says past orders are for platform operators in **Admin**. There is **no Admin link** on that page. Operators use [Admin console](/user/admin-console) **Users** (plan grant) or **Orders** (local simulate-paid only).
+On the web client membership page, choose WeChat Pay or Alipay and pay with the QR code or payment link. The page waits for the result. You can also choose complete payment to refresh the plan. Past orders are in the admin console. The membership page does not link there.
+
+## For operators
+
+- Production payment callbacks land on Entitlement. Check [Production payment readiness](/user/payment-production) before go-live.
+- In a local or sandbox environment, the membership page polls the order. Admin can mark a **local order** paid so the plan turns on. That does not replace a live merchant notification.
+- The screen shows channel names such as WeChat and Alipay. Do not show internal provider ids to end users.
 
 Integrators: [Commercial billing](/architecture/commercial-billing).

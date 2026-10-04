@@ -45,7 +45,7 @@ IT Support 在 Client 用 `orgRole=it_support` 协助本组织设备；平台管
 | SSE `/api/v1/events/stream` | Controller 或 Admin JWT；`userId` 须与 `sub` 一致 |
 | Agent | Device Token（不能用于信令主控） |
 
-实现状态：权限字与 `evaluatePolicy` 已在 `shared/src/auth/`；WSS/SSE 握手校验为 **P3**（见 messaging-transport Spec FR-MSG-10/11）。
+权限字与 `evaluatePolicy` 在 `shared/src/auth/`。WSS / SSE 握手使用上表凭证。
 
 ## 代码入口
 

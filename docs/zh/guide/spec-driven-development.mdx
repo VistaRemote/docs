@@ -32,17 +32,12 @@ shared → server / ai → web | desktop | mobile → docs
 
 违反顺序会导致类型漂移与 CI 失败。
 
-## 与实现状态的关系
+## 和平台文档的关系
 
-开发前查阅 [实现状态](/engineering/implementation-status)：
-
-- **✅ Ready**：可直接实现 Spec 中的 FR
-- **🟡 Partial**：在现有占位实现 / 内存 store 上扩展
-- **⬜ Planned**：先补基建或拆 P1 子任务
+动手前阅读对应模块 Spec，以及 [平台组成](/engineering/implementation-status)，确认要改的是信令、主控、Agent 还是 AI。
 
 ## PR 检查清单
 
 - [ ] 已更新或确认相关 `spec/*.md`
 - [ ] 跨端变更已改 `shared`
-- [ ] 已更新 `implementation-status.md`（若改变就绪度）
-- [ ] 用户可见行为已更新 `user/*` 或 `guide/*`
+- [ ] 用户能看见的行为已更新 `user/*` 或 `guide/*`

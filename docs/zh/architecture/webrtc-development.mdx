@@ -41,7 +41,7 @@ Server 通过信令 `session-mode` 下发 `MediasoupSfuParams`（`roomId`、`sig
 
 ## 播放端：抖动与 Web Worker
 
-除 `JitterBuffer` 外，P1 提供 **`decode.worker.ts`**：
+除 `JitterBuffer` 外，播放端使用 **`decode.worker.ts`**：
 
 - 解码与缓冲在 Worker 内完成
 - 主线程 `DecodeWorkerBridge` 仅 `drawImage` 上屏
@@ -95,7 +95,7 @@ cd desktop && pnpm dev         # 被控
 
 Chrome：`chrome://webrtc-internals` 查看候选类型（host / srflx / relay）与当前是否 P2P。
 
-## P2 能力（已实现）
+## 信令与多人观看
 
 | 能力 | 说明 |
 | :--- | :--- |

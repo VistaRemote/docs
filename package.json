@@ -4,9 +4,9 @@
   "private": true,
   "description": "VistaRemote documentation site (Rspress)",
   "scripts": {
-    "dev": "rspress dev",
+    "dev": "rspress dev --port 13401 --host 127.0.0.1",
     "build": "rspress build && node scripts/publish-ai-reservation.mjs",
-    "preview": "rspress preview",
+    "preview": "rspress preview --port 13401 --host 127.0.0.1",
     "test": "rstest",
     "test:watch": "rstest -w",
     "lint": "biome check .",
