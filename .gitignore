@@ -13,3 +13,6 @@ dist/
 .DS_Store
 *.tsbuildinfo
 .cache/
+
+# Local AI provider secrets — never commit
+.env.ai
